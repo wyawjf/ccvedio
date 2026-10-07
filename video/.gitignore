@@ -1,0 +1,5 @@
+node_modules/
+build/*
+!build/timeline.json
+!build/final.mp4
+!build/cover.jpg

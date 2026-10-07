@@ -1,0 +1,12 @@
+html, body { margin: 0; background: #000; overflow: hidden; }
+#stage { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+#gl { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+#overlay { position: absolute; inset: 0; pointer-events: none; font-family: 'Noto Sans SC', sans-serif;
+  -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
+.ov { position: absolute; white-space: nowrap; }
+.ln { display: block; overflow: hidden; padding: 0.08em 0.04em 0.1em; margin: -0.08em -0.04em -0.1em; }
+.ln > span { display: inline-block; }
+.p { color: #6A3BFF; }
+.pg { color: #8E6BFF; }
+.num { font-family: 'Anton', 'Noto Sans SC', sans-serif; font-weight: 400; }
+.en { font-family: 'Inter', sans-serif; }
