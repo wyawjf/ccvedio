@@ -32,7 +32,8 @@ export default function make({ env, T, shotStart, DURATION }) {
   leafL.castShadow = leafR.castShadow = true;
   hingeL.add(leafL); hingeR.add(leafR);
   scene.add(hingeL, hingeR);
-  const lightMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffffff'), toneMapped: false, fog: false });
+  const lightMat = new THREE.MeshBasicMaterial({ color: new THREE.Color('#ffffff'), toneMapped: false, fog: false,
+    map: radialTexture('rgba(255,255,255,1)', 'rgba(150,120,255,1)', 512) });
   const portal = new THREE.Mesh(new THREE.PlaneGeometry(14, 30), lightMat); portal.position.set(0, 15, DZ - 0.4); scene.add(portal);
   const carpet = new THREE.Mesh(new THREE.PlaneGeometry(16, 60), new THREE.MeshBasicMaterial({
     map: (() => { const cv = document.createElement('canvas'); cv.width = 64; cv.height = 512; const g = cv.getContext('2d');
@@ -78,7 +79,7 @@ export default function make({ env, T, shotStart, DURATION }) {
   function update(t) {
     // camera: a long, slow push toward the door
     const u = easeInOutSine(seg(t, shotStart, tWhite));
-    camera.position.set(lerp(3.0, 0.6, u) + noise1(t * 0.4, 3) * 0.06, lerp(1.6, 1.35, u) + noise1(t * 0.35, 4) * 0.04, lerp(34, 0, u));
+    camera.position.set(lerp(3.0, 0.6, u) + noise1(t * 0.4, 3) * 0.06, lerp(1.6, 1.15, u) + noise1(t * 0.35, 4) * 0.04, lerp(34, 13, u));
     look.set(lerp(-0.5, 0, u), lerp(12.5, 13.5, u), DZ);
     camera.lookAt(look);
     hero.face(camera);
@@ -87,11 +88,11 @@ export default function make({ env, T, shotStart, DURATION }) {
     hingeL.rotation.y = open * 1.45; hingeR.rotation.y = -open * 1.45;
     const glow = easeOutCubic(seg(t, tOpen - 0.1, tOpen + 1.2));
     const more = seg(t, Q.start, tWhite);
-    lightMat.color.set('#c9b6ff').multiplyScalar(4 + glow * 8 + more * 6);
-    carpet.material.opacity = 0.85 * glow;
-    doorLight.intensity = 2600 * glow;
+    lightMat.color.set('#e4dbff').multiplyScalar(2.2 + glow * 1.6 + more * 1.2);
+    carpet.material.opacity = 0.35 * glow;
+    doorLight.intensity = 420 * glow;
     halo.material.opacity = 0.35 * glow;
-    hero.shadowMat.opacity = 0.42 * glow;
+    hero.shadowMat.opacity = 0.55 * glow;
     hero.shadow.scale.y = 1 + glow * 3.5;
     hemi.intensity = 0.62 - 0.12 * glow;
 
@@ -134,7 +135,7 @@ export default function make({ env, T, shotStart, DURATION }) {
     const white = easeOutCubic(seg(t, tWhite, tWhite + 0.35));
     return {
       overlay: o, theme: 'light', noSubs: t > Q.start - 0.1,
-      bloom: [0.7 + glow * 0.5, 0.65, 1.9 - glow * 0.3],
+      bloom: [0.5 - glow * 0.2, 0.3, 2.2],
       fade: ['#F6F3EE', white * (t > tOutro ? lerp(1, 0.86, seg(t, tOutro, tOutro + 1.5)) : 1)],
       vignette: 0.42, grain: 0.03, ca: 0.6,
     };

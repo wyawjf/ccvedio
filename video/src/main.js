@@ -124,7 +124,8 @@ window.renderAt = async (t) => {
   finish.uniforms.uGrain.value = r.grain ?? 0.03;
   finish.uniforms.uCA.value = r.ca ?? 1.0;
   composer.render();
-  overlay.render([...(r.overlay || []), ...(r.noSubs ? [] : subtitle(t, r.theme))]);
+  const clean = new URLSearchParams(location.search).has('clean');
+  overlay.render(clean ? [] : [...(r.overlay || []), ...(r.noSubs ? [] : subtitle(t, r.theme))]);
   await new Promise((res) => requestAnimationFrame(() => res()));
 };
 

@@ -32,7 +32,8 @@ python3 audio/score.py build
 # 画面：可分段并行
 node render.mjs --from 0 --to 20.7 --out build/segments/a.mp4
 node render.mjs --from 20.7 --to 41.3 --out build/segments/b.mp4
-node render.mjs --from 41.3 --to 70 --out build/segments/c.mp4
+node render.mjs --from 41.3 --to 45.36 --out build/segments/c1.mp4
+node render.mjs --from 45.36 --to 70 --out build/segments/c2.mp4
 # 合成
 ./mux.sh
 ```
