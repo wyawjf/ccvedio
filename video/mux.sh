@@ -2,7 +2,7 @@
 # Concatenate rendered segments, add the mixed audio, normalize loudness to -14 LUFS.
 set -euo pipefail
 cd "$(dirname "$0")/build"
-printf "file 'segments/%s.mp4'\n" a b c1 c2 > concat.txt
+printf "file 'segments/%s.mp4'\n" ${SEGMENTS:-v2_a v2_b v2_c v2_d} > concat.txt
 ffmpeg -y -loglevel error -f concat -safe 0 -i concat.txt -c copy video.mp4
 ffmpeg -y -loglevel error -i video.mp4 -i mix.wav \
   -filter_complex "[1:a]loudnorm=I=-14:TP=-1.0:LRA=11,aresample=48000[a]" \

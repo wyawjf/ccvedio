@@ -1,0 +1,25 @@
+{
+  "title": "当智慧像电一样便宜",
+  "outro": 3.4,
+  "note": "No voice-over: each line is an on-screen beat. start/end are seconds; ev holds event offsets (seconds from start) that the shots and the score sync to.",
+  "lines": [
+    { "id": "hook1",      "shot": "protein", "start": 0.6,  "end": 4.4,  "ev": {} },
+    { "id": "hook2",      "shot": "protein", "start": 4.4,  "end": 7.9,  "ev": { "两亿": 1.2 } },
+    { "id": "nobel",      "shot": "protein", "start": 7.9,  "end": 10.2, "ev": {} },
+    { "id": "trailer",    "shot": "protein", "start": 10.2, "end": 12.6, "ev": { "这只是": 0.8 } },
+    { "id": "stairs",     "shot": "stairs",  "start": 12.9, "end": 17.4, "ev": { "食物": 0.7, "力气": 1.9, "信息": 3.1 } },
+    { "id": "wisdom",     "shot": "stairs",  "start": 17.4, "end": 20.4, "ev": { "智慧": 0.8 } },
+    { "id": "bottleneck", "shot": "title",   "start": 20.7, "end": 23.6, "ev": {} },
+    { "id": "genius",     "shot": "title",   "start": 23.6, "end": 26.0, "ev": {} },
+    { "id": "title",      "shot": "title",   "start": 26.0, "end": 28.4, "ev": { "像电": 0.45 } },
+    { "id": "disease",    "shot": "walls",   "start": 28.7, "end": 35.4, "ev": {} },
+    { "id": "life",       "shot": "walls",   "start": 35.7, "end": 42.4, "ev": {} },
+    { "id": "origin",     "shot": "walls",   "start": 42.7, "end": 49.4, "ev": {} },
+    { "id": "dream",      "shot": "walls",   "start": 49.7, "end": 56.4, "ev": { "正在倒下": 0.5, "一个人": 1.9 } },
+    { "id": "time",       "shot": "walls",   "start": 56.7, "end": 63.4, "ev": { "还给": 3.4 } },
+    { "id": "survive",    "shot": "door",    "start": 63.7, "end": 66.8, "ev": { "学会": 0.9 } },
+    { "id": "graduate",   "shot": "door",    "start": 66.8, "end": 70.0, "ev": { "毕业": 1.4 } },
+    { "id": "question",   "shot": "door",    "start": 70.3, "end": 72.6, "ev": {} },
+    { "id": "dare",       "shot": "door",    "start": 72.6, "end": 74.4, "ev": {} }
+  ]
+}

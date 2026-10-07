@@ -10,3 +10,13 @@ html, body { margin: 0; background: #000; overflow: hidden; }
 .pg { color: #8E6BFF; }
 .num { font-family: 'Anton', 'Noto Sans SC', sans-serif; font-weight: 400; }
 .en { font-family: 'Inter', sans-serif; }
+.cap { border: 5px solid #15121b; padding: 22px 32px 26px; white-space: normal; text-wrap: balance; }
+.cap .num { font-size: 1.12em; }
+.ph { position: relative; border: 6px solid #15121b; background: #15121b; }
+.ph img { display: block; }
+.ph .tape { position: absolute; top: -22px; left: 50%; width: 150px; height: 40px; margin-left: -75px; transform: rotate(-4deg);
+  background: rgba(246, 243, 238, 0.78); border: 1px solid rgba(21, 18, 27, 0.12); }
+.ph .tag { position: absolute; left: -6px; bottom: -64px; background: #15121b; color: #F6F3EE; font: 700 26px/1.25 'Noto Sans SC', sans-serif;
+  padding: 10px 16px; white-space: nowrap; letter-spacing: .04em; }
+.ph .tag b { color: #A98DFF; font-weight: 900; }
+.kick { font: 800 24px/1 'Inter', sans-serif; letter-spacing: .26em; color: #5B2EFF; }

@@ -3,10 +3,11 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { studio, mats, contactShadow, glowSprite, lightCone, dust, textPlane, radialTexture, C } from '../lib/stage.js';
 import { InkFigure, PROPS, poses } from '../lib/figure.js';
-import { revealHTML } from '../lib/overlay.js';
+import { revealHTML, capBox, photo } from '../lib/overlay.js';
+import { lifeChart, bellCurves, dotsGrid, ecgLine } from '../lib/viz.js';
 import { rng, seg, lerp, clamp, easeOutCubic, easeInCubic, easeInOutCubic, easeOutBack, noise1, wordTime } from '../lib/util.js';
 
-export const text = '疾病寿命出身梦想时间年→抱起孙子的那些年全世界最好的老师个人=家公司把时间，还给最爱的人01020304 05DISEASELIFESPANORIGINDREAMTIME';
+export const text = '疾病寿命出身梦想时间年→抱起孙子的那些年全世界最好的老师个人=家公司把时间，还给最爱的人01020304 05DISEASELIFESPANORIGINDREAMTIME医学进步压缩进今天：一款新药要亿美元，会失败AI读眼底照片筛查糖网病获FDA批准岁全球人均寿命下一次翻倍，可能靠多出来的，是还能抱起孙子超过一对一辅导的学生，成绩超过的同龄人。可全世界没有那么多好老师布鲁姆普通课堂现在，大山里的孩子，也能拥有卖了全公司只有个人下一个奇迹，可能只需要敢想的人，先到NASA宇航员SpaceX离家时，你这辈子陪父母的时间，已经用掉了接手重复的工作，把时间还给最爱的人Instagram';
 
 const BEATS = [
   { id: 'disease', word: '疾病', en: 'DISEASE' },
@@ -380,30 +381,57 @@ export default function make({ env, T, shotStart }) {
     camera.position.y += noise1(t * 11, bi + 3) * 0.22 * shake + noise1(t * 0.45, 19 + bi) * 0.04;
     camera.lookAt(look);
     set.figs.forEach((f) => f.face(camera));
+    // the observer in front of the wall steps out of frame once the camera starts moving through
+    set.figs[0].group.visible = t < b.impact + 0.5;
 
-    // overlay: kicker + key phrase
+    // overlay: kicker, key figure, then two waves of captions / data / photos
     const o = [];
-    const k = easeOutCubic(seg(t, b.cut + 0.05, b.cut + 0.55));
-    o.push({ id: 'wk-bar', html: '<div style="width:84px;height:10px;background:#5B2EFF"></div>', x: 76, y: 212, opacity: k });
-    o.push({ id: 'wk', x: 72, y: 244, size: 54, weight: 900, color: '#15121b', lh: 1.1,
+    const k = easeOutCubic(seg(t, b.cut + 0.05, b.cut + 0.5));
+    o.push({ id: 'wk-bar', html: '<div style="width:96px;height:12px;background:#5B2EFF"></div>', x: 76, y: 204, opacity: k });
+    o.push({ id: 'wk', x: 72, y: 234, size: 64, weight: 900, color: '#15121b', lh: 1.1, shadow: '0 0 22px rgba(246,243,238,.95)',
       html: revealHTML([`<span class="num" style="color:#5B2EFF">0${bi + 1}</span>&nbsp; ${b.word}`], [k]) });
-    const phrases = {
-      disease: '<span class="num">100</span> 年<br><span style="color:#5B2EFF">→</span> <span class="num p">10</span> 年',
-      life: '抱起孙子的<br>那些年',
-      origin: '全世界<br><span class="p">最好的老师</span>',
-      dream: '<span class="num p">1</span> 个人<br>= <span class="num p">1</span> 家公司',
-      time: '把时间，<br>还给<span class="p">最爱的人</span>',
-    };
-    const tp = b.id === 'dream' ? wordTime(b.L, '一个人') - 0.05 : b.id === 'time' ? wordTime(b.L, '还给') - 0.2 : b.impact + 0.1;
-    const pk = easeOutCubic(seg(t, tp, tp + 0.5));
-    const lines = phrases[b.id].split('<br>');
-    o.push({ id: 'wp', x: 72, y: 340, size: b.id === 'disease' ? 150 : 118, weight: 900, color: '#15121b', lh: 1.08, shadow: '0 0 28px rgba(246,243,238,.85)',
-      html: revealHTML(lines, lines.map((_, j) => easeOutCubic(seg(t, tp + j * 0.12, tp + 0.5 + j * 0.12)))), opacity: pk > 0 ? 1 : 0 });
+    const tA = b.impact + 0.15, tB = b.id === 'time' ? wordTime(b.L, '还给') - 0.1 : b.id === 'dream' ? b.impact + 2.7 : b.L.start + 3.9;
+    const A = easeOutCubic(seg(t, tA, tA + 0.45)), Aout = 1 - seg(t, tB - 0.3, tB);
+    const Bv = easeOutCubic(seg(t, tB, tB + 0.45));
+    const big = (id, lines, size = 150) => ({ id, x: 72, y: 336, size, weight: 900, color: '#15121b', lh: 1.04, shadow: '0 0 30px rgba(246,243,238,.95)',
+      html: revealHTML(lines, lines.map((_, j) => easeOutCubic(seg(t, tA + j * 0.12, tA + 0.45 + j * 0.12)))), opacity: A > 0 ? 1 : 0 });
+    const card = (id, html, a, extra = {}) => capBox(id, html, { y: 1180, a, size: 54, ...extra });
+    const panel = (id, inner, a, y = 700, w = 940, rot = -1) => ({ id, x: 540, y, ax: 0.5, opacity: a > 0 ? Math.min(1, a * 1.6) : 0, scale: 0.92 + 0.08 * a, ty: (1 - a) * 40,
+      html: `<div class="cap" style="background:#F6F3EE;box-shadow:14px 14px 0 #5B2EFF;transform:rotate(${rot}deg);width:${w}px;box-sizing:border-box;padding:30px 20px 24px">${inner}</div>` });
+    if (b.id === 'disease') {
+      o.push(big('wp', ['<span class="num">100</span> 年医学进步', '<span style="color:#5B2EFF">→</span> 压缩进 <span class="num p">10</span> 年'], 124));
+      o.push(card('c1', '今天：一款新药要 <span class="num">10</span> 年、<span class="num">10</span> 亿美元——<span class="p">90%</span> 会失败。', A * Aout));
+      o.push(photo('ph', '/assets/img/retina.png', { x: 72, y: 640, w: 400, h: 400, rot: -3, a: Bv, tag: 'AI 读眼底照片 · 筛查糖网病' }));
+      o.push(card('c2', '<span class="num">2018</span> 年，FDA 批准了第一个<span class="p">不需要医生读片</span>的 AI 诊断系统。', Bv, { rot: 1.2 }));
+    } else if (b.id === 'life') {
+      o.push(big('wp', ['<span class="num">32</span> 岁 <span style="color:#5B2EFF">→</span> <span class="num p">73</span> 岁'], 150));
+      o.push(panel('chart', `<div style="font-size:36px;font-weight:900;margin:0 0 10px 22px">全球人均寿命 · 1900 → 2023</div>${lifeChart(seg(t, tA + 0.2, tA + 2.2), 880, 380)}`, A * Aout, 620));
+      o.push(card('c2', '下一次翻倍，可能靠 AI。多出来的，是还能<span class="p">抱起孙子</span>的那些年。', Bv, { rot: -1.2 }));
+      o.push({ id: 'ecg', x: 0, y: 1590, opacity: Bv * 0.95, html: ecgLine(t - tB, 1080, 170) });
+    } else if (b.id === 'origin') {
+      o.push(big('wp', ['超过 <span class="num p">98%</span>'], 170));
+      o.push(panel('bell', `<div style="font-size:36px;font-weight:900;margin:0 0 6px 22px">布鲁姆「2σ 问题」· 1984</div>${bellCurves(seg(t, tA + 0.3, tA + 1.8), 880, 330)}`, A * Aout, 640));
+      o.push(card('c1', '一对一辅导的学生，成绩超过 <span class="p">98%</span> 的同龄人。可全世界，没有那么多好老师。', A * Aout));
+      o.push(card('c2', '现在，<span class="p">大山里的孩子</span>，也能拥有全世界最好的老师。', Bv, { rot: 1.2, y: 1430 }));
+    } else if (b.id === 'dream') {
+      o.push(big('wp', ['<span class="num p">1</span> 个人', '＝ <span class="num p">1</span> 家公司'], 150));
+      o.push(card('c1', '<span class="num">2012</span> 年，Instagram 卖了 <span class="num">10</span> 亿美元——全公司只有 <span class="num p">13</span> 个人。', A * Aout));
+      o.push(photo('ph1', '/assets/img/rocket.png', { x: 600, y: 700, w: 380, h: 490, rot: 3.5, a: Bv, tag: 'SpaceX · 猎鹰 9 号' }));
+      o.push(photo('ph2', '/assets/img/astronaut.png', { x: 90, y: 760, w: 340, h: 404, rot: -4, a: easeOutCubic(seg(t, tB + 0.2, tB + 0.65)), tag: 'NASA 宇航员', shadow: '#15121b' }));
+      o.push(card('c2', '下一个奇迹，可能只需要 <span class="num p">1</span> 个敢想的人。', easeOutCubic(seg(t, tB + 0.4, tB + 0.85)), { y: 1330, rot: -1.2 }));
+    } else if (b.id === 'time') {
+      o.push(big('wp', ['<span class="num p" style="font-size:1.7em">93%</span>'], 150));
+      o.push(panel('dots', `<div style="display:flex;align-items:center;gap:26px;padding:0 12px">${dotsGrid(seg(t, tA + 0.2, tA + 1.8), 360)}
+        <div style="font-size:44px;font-weight:900;line-height:1.3;white-space:normal">一格 = 1%<br><span style="color:#5B2EFF">只剩 7 格</span></div></div>`, A * Aout, 640, 760, 1.2));
+      o.push(card('c1', '<span class="num">18</span> 岁离家时，你这辈子陪父母的时间，已经用掉了 <span class="p">93%</span>。', A * Aout));
+      o.push(card('c2', 'AI 接手重复的工作，<br>把时间，<span class="p">还给最爱的人</span>。', Bv, { rot: 1.2, y: 1430 }));
+    }
 
     const flash = bi > 0 ? 1 - seg(t, b.cut, b.cut + 0.18) : 1 - seg(t, b.cut, b.cut + 0.3);
     const out = seg(t, end - 0.3, end);
     return {
-      overlay: o, theme: 'light', bloom: [0.6, 0.55, 1.9],
+      overlay: o, theme: 'light', noSubs: true, bloom: [0.6, 0.55, 1.9], ink: 0.6, tone: 0.24, streak: 0.3,
+      speed: t > b.impact ? 0.8 * Math.exp(-(t - b.impact) * 3.0) : 0, speedC: [0.5, 0.6], speedColor: '#15121b',
       fade: out > 0 ? ['#F6F3EE', easeOutCubic(out)] : ['#F6F3EE', flash * 0.85],
       vignette: 0.42, grain: 0.03, ca: 0.6,
     };

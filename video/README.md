@@ -1,4 +1,26 @@
-# 《当智慧像电一样便宜》1 分钟视频
+# 《当智慧像电一样便宜》视频
+
+当前版本是 **v2**：无配音、大字、漫画风后期、真实图片与数据（约 78 秒）。v1（带 AI 配音，62 秒）的流程见下方「v1」。
+
+## v2 流程
+
+```bash
+python3 assets/process.py assets/raw assets/img     # 公有领域/CC0 图片 → 漫画网点面板；心电/寿命数据 → JSON
+python3 story_to_timeline.py story.json build/timeline.json
+python3 audio/score2.py build                      # 纯音乐配乐 → build/mix.wav
+node render.mjs --from 0 --to 14 --out build/segments/v2_a.mp4   # 可分段并行
+node render.mjs --from 14 --to 35 --out build/segments/v2_b.mp4
+node render.mjs --from 35 --to 56 --out build/segments/v2_c.mp4
+node render.mjs --from 56 --to 90 --out build/segments/v2_d.mp4
+./mux.sh
+```
+
+- `story.json`：每个画面节拍的起止时间和事件点（取代配音时间轴）
+- `src/lib/viz.js`：寿命曲线、2σ 曲线、93% 点阵、真实心电图
+- `src/main.js` 的收尾 pass：漫画墨线（Sobel）、网点、集中线、变形宽银幕光斑、开场遮幅
+- 图片与数据来源见 `../script/video-v2.md`
+
+## v1
 
 3D + 2.5D 风格的竖屏短片（1080×1920，30fps，约 62 秒），全部由代码生成：
 

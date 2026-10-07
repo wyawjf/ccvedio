@@ -2,10 +2,10 @@
 import * as THREE from 'three';
 import { studio, mats, contactShadow, glowSprite, dust, radialTexture, C } from '../lib/stage.js';
 import { InkFigure, PROPS, poses, drawFigureCanvas } from '../lib/figure.js';
-import { revealHTML } from '../lib/overlay.js';
+import { revealHTML, capBox } from '../lib/overlay.js';
 import { rng, seg, lerp, easeOutCubic, easeInOutCubic, easeInOutSine, noise1, wordTime } from '../lib/util.js';
 
-export const text = '人类花了几十万年学会活下去毕业剩下的问题，只有一个：你，敢不敢想？当智慧像电一样便宜AI继续发展下去人类会得到什么Coo-Coo出海Ai实验室';
+export const text = '人类花了几十万年学会活下去毕业剩下的问题，只有一个：你，敢不敢想？当智慧像电一样便宜AI继续发展下去人类会得到什么Coo-Coo出海Ai实验室都在学一件事可能让我们第一次从「活下去」哈勃极深场每一个光点，都是一个星系图片公有领域美国海军眼底照片细胞显微心电数据数据来源';
 
 const WALK_BOX = { minX: -2.5, maxX: 2.5, minY: -4.05, maxY: 4.2 };
 
@@ -72,7 +72,7 @@ export default function make({ env, T, shotStart, DURATION }) {
 
   const S = T.survive, G = T.graduate, Q = T.question, D = T.dare;
   const tOpen = wordTime(G, '毕业') - 0.2;
-  const tWhite = D.start - 0.25;
+  const tWhite = G.end - 0.1;
   const tOutro = D.end + 0.9;
   const look = new THREE.Vector3();
 
@@ -87,7 +87,7 @@ export default function make({ env, T, shotStart, DURATION }) {
     const open = easeInOutCubic(seg(t, tOpen, tOpen + 1.8));
     hingeL.rotation.y = open * 1.45; hingeR.rotation.y = -open * 1.45;
     const glow = easeOutCubic(seg(t, tOpen - 0.1, tOpen + 1.2));
-    const more = seg(t, Q.start, tWhite);
+    const more = seg(t, tOpen + 0.8, tWhite);
     lightMat.color.set('#e4dbff').multiplyScalar(2.2 + glow * 1.6 + more * 1.2);
     carpet.material.opacity = 0.35 * glow;
     doorLight.intensity = 420 * glow;
@@ -108,35 +108,51 @@ export default function make({ env, T, shotStart, DURATION }) {
 
     // overlay
     const o = [];
-    const sIn = easeOutCubic(seg(t, S.start - 0.05, S.start + 0.5));
+    const sIn = easeOutCubic(seg(t, S.start - 0.05, S.start + 0.45));
     const sOut = 1 - seg(t, tOpen - 0.5, tOpen - 0.1);
-    o.push({ id: 'ds', x: 72, y: 220, size: 112, weight: 900, color: '#15121b', lh: 1.1, opacity: sOut,
-      html: revealHTML(['几十万年，', '学会<span class="p">活下去</span>。'], [sIn, easeOutCubic(seg(t, wordTime(S, '学会') - 0.1, wordTime(S, '学会') + 0.4))]) });
-    const gIn = easeOutCubic(seg(t, tOpen, tOpen + 0.55));
-    const gOut = 1 - seg(t, Q.start - 0.2, Q.start + 0.1);
-    o.push({ id: 'dg', x: 540, y: 230, ax: 0.5, size: 300, weight: 900, color: '#15121b', ls: 0.06, opacity: gOut,
+    o.push({ id: 'ds', x: 72, y: 214, size: 112, weight: 900, color: '#15121b', lh: 1.1, opacity: sOut, shadow: '0 0 30px rgba(246,243,238,.95)',
+      html: revealHTML(['几十万年，', '人类都在学一件事：', '<span class="p" style="font-size:1.35em">活下去。</span>'],
+        [sIn, easeOutCubic(seg(t, S.start + 0.25, S.start + 0.7)), easeOutCubic(seg(t, wordTime(S, '学会'), wordTime(S, '学会') + 0.45))]) });
+    const gIn = easeOutCubic(seg(t, tOpen, tOpen + 0.5));
+    const gOut = 1 - seg(t, tWhite - 0.1, tWhite + 0.1);
+    o.push({ id: 'dg', x: 540, y: 210, ax: 0.5, size: 320, weight: 900, color: '#15121b', ls: 0.06, opacity: gOut,
       html: revealHTML(['毕业'], [gIn]), shadow: '0 0 50px rgba(246,243,238,.95)' });
-    const qIn = easeOutCubic(seg(t, Q.start - 0.05, Q.start + 0.5));
-    o.push({ id: 'dq', x: 540, y: 300, ax: 0.5, size: 76, weight: 900, color: '#15121b', opacity: 1 - seg(t, tWhite - 0.1, tWhite + 0.1),
-      html: revealHTML(['剩下的问题，', '只有一个：'], [qIn, easeOutCubic(seg(t, Q.start + 0.35, Q.start + 0.85))]), align: 'center', lh: 1.2 });
-    const dIn = easeOutCubic(seg(t, D.start - 0.05, D.start + 0.45));
+    o.push(capBox('dg2', 'AI，可能让我们第一次，从「活下去」这门课<span class="p">毕业</span>。',
+      { y: 1170, a: easeOutCubic(seg(t, tOpen + 0.5, tOpen + 0.9)) * gOut, size: 56, rot: -1.2, shadow: '#5B2EFF' }));
+    // the Hubble eXtreme Deep Field (NASA, public domain) as the final backdrop
+    const hub = seg(t, tWhite + 0.05, tWhite + 0.5) * (1 - seg(t, tOutro - 0.3, tOutro + 0.2));
+    const zoom = 1.0 + 0.16 * seg(t, tWhite, tOutro + 0.5);
+    o.push({ id: 'hubble', x: 0, y: 0, opacity: hub, z: 2,
+      html: `<div style="width:1080px;height:1920px;overflow:hidden;background:#07050d"><img src="/assets/img/hubble_deep_field.png" style="width:1080px;height:1920px;display:block;transform:scale(${zoom.toFixed(4)});transform-origin:55% 45%"></div>` });
+    o.push(capBox('htag', '哈勃极深场（NASA）：每一个光点，都是一个星系。', { x: 64, y: 210, w: 800, size: 38, a: easeOutCubic(seg(t, Q.start - 0.1, Q.start + 0.3)) * (1 - seg(t, tOutro - 0.3, tOutro)),
+      bg: '#15121b', color: '#F6F3EE', shadow: '#5B2EFF', rot: -1.2 }));
+    const qIn = easeOutCubic(seg(t, Q.start + 0.2, Q.start + 0.6)), qOut = 1 - seg(t, D.start - 0.15, D.start + 0.05);
+    o.push({ id: 'dq', x: 540, y: 820, ax: 0.5, ay: 0.5, size: 104, weight: 900, color: '#F6F3EE', opacity: qOut, align: 'center', lh: 1.2, shadow: '0 4px 40px rgba(0,0,0,.6)',
+      html: revealHTML(['剩下的问题，', '只有一个：'], [qIn, easeOutCubic(seg(t, Q.start + 0.5, Q.start + 0.95))]) });
+    const dIn = easeOutCubic(seg(t, D.start, D.start + 0.4));
     const dOut = 1 - seg(t, tOutro - 0.35, tOutro);
-    o.push({ id: 'dd', x: 540, y: 760, ax: 0.5, ay: 0.5, size: 168, weight: 900, color: '#15121b', align: 'center', lh: 1.12, opacity: dOut,
-      scale: 1 + 0.04 * seg(t, D.start, tOutro), html: revealHTML(['你，', '<span class="p">敢</span>不敢想？'], [dIn, easeOutCubic(seg(t, D.start + 0.25, D.start + 0.75))]) });
+    o.push({ id: 'dd', x: 540, y: 860, ax: 0.5, ay: 0.5, size: 196, weight: 900, color: '#F6F3EE', align: 'center', lh: 1.1, opacity: dOut,
+      scale: 1 + 0.05 * seg(t, D.start, tOutro), shadow: '0 6px 50px rgba(0,0,0,.65)',
+      html: revealHTML(['你，', '<span style="color:#B69CFF;text-shadow:0 0 40px rgba(120,80,255,.9)">敢</span>不敢想？'], [dIn, easeOutCubic(seg(t, D.start + 0.25, D.start + 0.7))]) });
     // end card
-    const e1 = easeOutCubic(seg(t, tOutro, tOutro + 0.6)), e2 = easeOutCubic(seg(t, tOutro + 0.3, tOutro + 0.9)), e3 = easeOutCubic(seg(t, tOutro + 0.7, tOutro + 1.3));
-    o.push({ id: 'e-bar', html: '<div style="width:84px;height:10px;background:#5B2EFF"></div>', x: 76, y: 640, opacity: e1 });
-    o.push({ id: 'e1', x: 72, y: 680, size: 118, weight: 900, color: '#15121b', lh: 1.1, opacity: e1 > 0 ? 1 : 0,
+    const e0 = seg(t, tOutro - 0.2, tOutro + 0.3);
+    o.push({ id: 'e-bg', x: 0, y: 0, opacity: e0, z: 20, html: '<div style="width:1080px;height:1920px;background:#F2EEE7"></div>' });
+    const e1 = easeOutCubic(seg(t, tOutro, tOutro + 0.6)), e2 = easeOutCubic(seg(t, tOutro + 0.3, tOutro + 0.9)), e3 = easeOutCubic(seg(t, tOutro + 0.6, tOutro + 1.2));
+    o.push({ z: 30, id: 'e-bar', html: '<div style="width:96px;height:12px;background:#5B2EFF"></div>', x: 76, y: 560, opacity: e1 });
+    o.push({ z: 30, id: 'e1', x: 72, y: 600, size: 132, weight: 900, color: '#15121b', lh: 1.08, opacity: e1 > 0 ? 1 : 0,
       html: revealHTML(['当<span class="p">智慧</span>', '像电一样便宜'], [e1, e2]) });
-    o.push({ id: 'e2', x: 76, y: 970, size: 40, weight: 500, color: 'rgba(21,18,27,.66)', ls: 0.04, opacity: e2, html: 'AI 继续发展下去，人类会得到什么？' });
-    o.push({ id: 'e3', x: 76, y: 1700, size: 34, weight: 700, color: '#15121b', ls: 0.06, opacity: e3,
-      html: '<span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:#5B2EFF;margin-right:14px;vertical-align:middle"></span>Coo-Coo出海Ai实验室' });
+    o.push({ z: 30, id: 'e2', x: 76, y: 910, size: 46, weight: 700, color: 'rgba(21,18,27,.7)', opacity: e2, html: 'AI 继续发展下去，人类会得到什么？' });
+    o.push({ z: 30, id: 'e3', x: 76, y: 1080, size: 40, weight: 900, color: '#15121b', ls: 0.04, opacity: e3,
+      html: '<span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:#5B2EFF;margin-right:14px;vertical-align:middle"></span>Coo-Coo出海Ai实验室' });
+    o.push({ z: 30, id: 'e4', x: 76, y: 1560, width: 930, size: 24, weight: 500, color: 'rgba(21,18,27,.55)', lh: 1.55, opacity: e3,
+      html: '图片：NASA、SpaceX（公有领域）· Grace Hopper（美国海军，公有领域）· 眼底照片、细胞显微（CC0）· 心电数据 MIT-BIH（ODC-By）<br>数据：AlphaFold DB · Bloom et al. 2020 · Our World in Data · Bloom 1984 · Tim Urban · Dario Amodei' });
 
     const white = easeOutCubic(seg(t, tWhite, tWhite + 0.35));
     return {
-      overlay: o, theme: 'light', noSubs: t > Q.start - 0.1,
+      overlay: o, theme: 'light', noSubs: true, ink: 0.55, tone: 0.22, streak: glow * 0.9,
+      speed: t > tOpen ? 0.7 * Math.exp(-(t - tOpen) * 2.2) : 0, speedC: [0.5, 0.45], speedColor: '#15121b',
       bloom: [0.5 - glow * 0.2, 0.3, 2.2],
-      fade: ['#F6F3EE', white * (t > tOutro ? lerp(1, 0.86, seg(t, tOutro, tOutro + 1.5)) : 1)],
+      fade: ['#F6F3EE', white],
       vignette: 0.42, grain: 0.03, ca: 0.6,
     };
   }

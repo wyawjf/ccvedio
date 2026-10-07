@@ -3,10 +3,10 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { studio, mats, contactShadow, glowSprite, dust, C } from '../lib/stage.js';
 import { InkFigure, PROPS, poses } from '../lib/figure.js';
-import { revealHTML, leaderSVG } from '../lib/overlay.js';
+import { revealHTML, leaderSVG, photo, capBox } from '../lib/overlay.js';
 import { rng, seg, lerp, easeOutCubic, easeInOutCubic, easeInOutSine, noise1, wordTime } from '../lib/util.js';
 
-export const text = '人类的四次「批量生产」食物力气信息智慧01020304FOODFORCEINFORMATIONINTELLIGENCE';
+export const text = '人类的每一次飞跃，都是把稀缺品量产食物力气信息智慧万年前农业革命工业革命互联网现在轮到计算机先驱人类第一次，开始批量生产「智慧」';
 
 export function wheat(mat) {
   const r = rng(11), parts = [], grain = new THREE.SphereGeometry(1, 10, 8);
@@ -141,14 +141,14 @@ export default function make({ env, T, shotStart }) {
 
   const L = T.stairs, Wl = T.wisdom;
   const wt = [wordTime(L, '食物'), wordTime(L, '力气'), wordTime(L, '信息'), wordTime(Wl, '智慧')];
-  const end = T.title.start - 0.28;
+  const end = T.bottleneck.start - 0.28;
   const look = new THREE.Vector3(), v = new THREE.Vector3();
   const corner = (i) => new THREE.Vector3(-Wd / 2, H[i], -i * D + D / 2);
 
   // camera keyframes: [time, position, target]
   const keys = [
-    [shotStart, [15.5, 2.2, 27], [-5.0, 4.6, -8]],
-    [wt[2] + 0.3, [14.5, 6.5, 25], [-5.0, 7.6, -10]],
+    [shotStart, [15.5, 2.2, 27], [-8.0, 4.6, -8]],
+    [wt[2] + 0.3, [14.5, 6.5, 25], [-8.0, 7.6, -10]],
     [wt[3] - 0.7, [11.5, 11.5, 16], [-3.0, 12.6, -17]],
     [end, [5.5, 14.6, 4.0], [-1.0, 15.0, -21]],
   ];
@@ -174,34 +174,41 @@ export default function make({ env, T, shotStart }) {
     motes.userData.update(t);
 
     const o = [];
-    const k = easeOutCubic(seg(t, shotStart + 0.25, shotStart + 0.9));
-    o.push({ id: 'kick-bar', html: '<div style="width:84px;height:10px;background:#5B2EFF"></div>', x: 76, y: 212, opacity: k, tx: (1 - k) * -30 });
-    o.push({ id: 'kick', html: revealHTML(['人类的四次', '「批量生产」'], [k, easeOutCubic(seg(t, shotStart + 0.4, shotStart + 1.05))]), x: 72, y: 246, size: 76, weight: 900, lh: 1.12, color: '#15121b' });
-    const names = ['食物', '力气', '信息', '智慧'], en = ['FOOD', 'FORCE', 'INFORMATION', 'INTELLIGENCE'];
+    const k = easeOutCubic(seg(t, shotStart + 0.25, shotStart + 0.8));
+    const kOut = 1 - seg(t, wt[3] - 0.3, wt[3]);
+    o.push({ id: 'kick-bar', html: '<div style="width:96px;height:12px;background:#5B2EFF"></div>', x: 76, y: 206, opacity: k * kOut, tx: (1 - k) * -30 });
+    o.push({ id: 'kick', html: revealHTML(['人类的每一次飞跃，', '都是把稀缺品<span class="p">量产</span>'], [k, easeOutCubic(seg(t, shotStart + 0.4, shotStart + 0.95))]),
+      x: 72, y: 240, size: 96, weight: 900, lh: 1.12, color: '#15121b', opacity: kOut, shadow: '0 0 26px rgba(246,243,238,.9)' });
+    const names = ['食物', '力气', '信息', '智慧'], when = ['1 万年前 · 农业革命', '200 年前 · 工业革命', '30 年前 · 互联网', '现在 · 轮到'];
     const leaders = [];
-    const rowY = [1240, 1040, 840, 600];
+    const rowY = [1420, 1190, 960, 700];
     names.forEach((n, i) => {
       v.copy(i === 3 ? cube.position : corner(i)).project(camera);
       const x = (v.x * 0.5 + 0.5) * 1080, y = (-v.y * 0.5 + 0.5) * 1920;
       const a = easeOutCubic(seg(t, wt[i] - 0.1, wt[i] + 0.35));
-      const out = 1 - seg(t, wt[3] + 0.6, wt[3] + 1.0) * (i < 3 ? 1 : 0);
       const last = i === 3;
-      o.push({ id: 'lab' + i, x: 72, y: rowY[i], ax: 0, ay: 1, opacity: (a > 0 ? 1 : 0) * out,
-        html: `<div class="en" style="font-weight:800;font-size:21px;letter-spacing:.22em;color:${last ? '#6A3BFF' : 'rgba(21,18,27,.5)'};margin-bottom:8px">0${i + 1} · ${en[i]}</div>`
+      const fade = last ? 1 : 1 - seg(t, wt[3] - 0.1, wt[3] + 0.3);
+      o.push({ id: 'lab' + i, x: 72, y: rowY[i], ax: 0, ay: 1, opacity: (a > 0 ? 1 : 0) * fade,
+        html: `<div style="font-weight:900;font-size:34px;letter-spacing:.04em;color:${last ? '#5B2EFF' : 'rgba(21,18,27,.62)'};margin-bottom:6px">${when[i]}</div>`
           + revealHTML([last ? `<span class="p">${n}</span>` : n], [a]),
-        size: last ? 120 : 68, weight: 900, color: '#15121b', lh: 1.05 });
-      const lx = 72 + (last ? 270 : 160);
-      leaders.push({ x1: lx, y1: rowY[i] - 34, x2: x, y2: y, a: easeOutCubic(seg(t, wt[i] + 0.05, wt[i] + 0.55)) * out,
-        color: last ? '#5B2EFF' : 'rgba(21,18,27,.55)', w: last ? 3 : 2 });
+        size: last ? 190 : 104, weight: 900, color: '#15121b', lh: 1.02, shadow: '0 0 24px rgba(246,243,238,.95)' });
+      const lx = 72 + (last ? 390 : 214);
+      leaders.push({ x1: lx, y1: rowY[i] - (last ? 90 : 50), x2: x, y2: y, a: easeOutCubic(seg(t, wt[i] + 0.05, wt[i] + 0.55)) * fade,
+        color: last ? '#5B2EFF' : 'rgba(21,18,27,.6)', w: last ? 4 : 3 });
     });
     o.push({ ...leaderSVG('leaders', leaders), opacity: 1 });
+    const ph = easeOutCubic(seg(t, wt[2] + 0.15, wt[2] + 0.6)) * (1 - seg(t, wt[3] - 0.35, wt[3] - 0.05));
+    o.push(photo('hopper', '/assets/img/grace_hopper.png', { x: 690, y: 1080, w: 300, h: 364, rot: 3.5, a: ph, tag: 'Grace Hopper · 计算机先驱' }));
+    const wcap = easeOutCubic(seg(t, wt[3] + 0.35, wt[3] + 0.8));
+    o.push(capBox('wcap', '人类第一次，开始批量生产<span class="p">「智慧」</span>。', { x: 540, y: 1250, ax: 0.5, w: 900, a: wcap, size: 58, rot: -1.2, shadow: '#5B2EFF' }));
     const fadeIn = 1 - seg(t, shotStart, shotStart + 0.4);
     const flash = seg(t, end - 0.25, end);
     return {
       overlay: o, theme: 'light',
       bloom: [0.5 + ignite * 0.7, 0.6, 1.9 - ignite * 0.6],
       fade: flash > 0 ? ['#F6F3EE', easeOutCubic(flash)] : ['#F6F3EE', easeOutCubic(fadeIn)],
-      vignette: 0.42, grain: 0.03, ca: 0.6,
+      vignette: 0.42, grain: 0.03, ca: 0.6, ink: 0.62, tone: 0.24, streak: ignite * 0.8,
+      speed: 0.75 * Math.exp(-Math.max(0, t - wt[3]) * 2.4) * (t > wt[3] ? 1 : 0), speedC: [0.5, 0.36], speedColor: '#15121b',
     };
   }
   return { scene, camera, update };

@@ -27,6 +27,7 @@ export class Overlay {
       s.letterSpacing = `${it.ls ?? 0}em`;
       s.textAlign = it.align ?? 'left';
       s.opacity = it.opacity ?? 1;
+      s.zIndex = it.z ?? 10;
       s.transformOrigin = `${ax * 100}% ${ay * 100}%`;
       s.transform = `translate(${-ax * 100}%, ${-ay * 100}%) translate(${it.tx ?? 0}px, ${it.ty ?? 0}px) scale(${it.scale ?? 1})`;
       s.filter = it.blur ? `blur(${it.blur}px)` : 'none';
@@ -55,4 +56,26 @@ export function revealHTML(lines, progs) {
     const p = progs[i] ?? progs[progs.length - 1];
     return `<span class="ln"><span style="transform:translateY(${((1 - p) * 108).toFixed(2)}%)">${h}</span></span>`;
   }).join('');
+}
+
+// Comic caption box (paper card, ink border, hard offset shadow) that pops in with `a` in 0..1.
+export function capBox(id, html, { x = 72, y = 1180, w = 936, a = 1, size = 54, rot = -1.0, shadow = '#15121b', bg = '#F6F3EE',
+  color = '#15121b', ax = 0, ay = 0, weight = 900 } = {}) {
+  const k = Math.max(0, Math.min(1, a));
+  return {
+    id, x, y, ax, ay, size, weight, color, lh: 1.34, width: w, opacity: k > 0 ? Math.min(1, k * 1.6) : 0,
+    scale: 0.9 + 0.1 * k, ty: (1 - k) * 40,
+    html: `<div class="cap" style="transform:rotate(${rot}deg);background:${bg};box-shadow:14px 14px 0 ${shadow}">${html}</div>`,
+  };
+}
+
+// Real photo as a taped comic panel with an ink tag underneath.
+export function photo(id, src, { x, y, w, h, a = 1, rot = 2, tag = '', ax = 0, ay = 0, shadow = '#5B2EFF', zoom = 1 } = {}) {
+  const k = Math.max(0, Math.min(1, a));
+  return {
+    id, x, y, ax, ay, opacity: k > 0 ? Math.min(1, k * 1.8) : 0, scale: 0.86 + 0.14 * k, ty: (1 - k) * 60,
+    html: `<div class="ph" style="width:${w}px;height:${h}px;transform:rotate(${rot}deg);box-shadow:16px 16px 0 ${shadow};overflow:visible">
+      <div style="width:${w}px;height:${h}px;overflow:hidden"><img src="${src}" style="width:${w}px;height:${h}px;object-fit:cover;transform:scale(${zoom.toFixed(4)})"></div>
+      <div class="tape"></div>${tag ? `<div class="tag">${tag}</div>` : ''}</div>`,
+  };
 }

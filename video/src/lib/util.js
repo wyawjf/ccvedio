@@ -31,7 +31,8 @@ export function noise1(x, seed = 0) {
 
 // Approximate when a word is spoken inside a voice-over line, from its character position.
 export function wordTime(line, word, at = 'start') {
-  const text = line.tts;
+  if (line.ev && word in line.ev) return line.start + line.ev[word];
+  const text = line.tts || '';
   let idx = text.indexOf(word);
   if (idx < 0) return line.start;
   const weight = (c) => (/[，。、？！：,.?!]/.test(c) ? 1.6 : /[A-Za-z]/.test(c) ? 0.6 : 1);
