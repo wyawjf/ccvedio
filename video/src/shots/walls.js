@@ -406,19 +406,19 @@ export default function make({ env, T, shotStart }) {
     } else if (b.id === 'life') {
       o.push(big('wp', ['<span class="num">32</span> 岁 <span style="color:#5B2EFF">→</span> <span class="num p">73</span> 岁'], 150));
       o.push(panel('chart', `<div style="font-size:36px;font-weight:900;margin:0 0 10px 22px">全球人均寿命 · 1900 → 2023</div>${lifeChart(seg(t, tA + 0.2, tA + 2.2), 880, 380)}`, A * Aout, 620));
-      o.push(card('c2', '下一次翻倍，可能靠 AI。多出来的，是还能<span class="p">抱起孙子</span>的那些年。', Bv, { rot: -1.2 }));
-      o.push({ id: 'ecg', x: 0, y: 1590, opacity: Bv * 0.95, html: ecgLine(t - tB, 1080, 170) });
+      o.push(card('c2', '下一次翻倍，可能靠 AI。多出来的，是还能<span class="p">抱起孙子</span>的那些年。', Bv, { rot: -1.2, y: 560 }));
+      o.push({ id: 'ecg', x: 0, y: 860, opacity: Bv * 0.95, html: ecgLine(t - tB, 1080, 170) });
     } else if (b.id === 'origin') {
       o.push(big('wp', ['超过 <span class="num p">98%</span>'], 170));
       o.push(panel('bell', `<div style="font-size:36px;font-weight:900;margin:0 0 6px 22px">布鲁姆「2σ 问题」· 1984</div>${bellCurves(seg(t, tA + 0.3, tA + 1.8), 880, 330)}`, A * Aout, 640));
       o.push(card('c1', '一对一辅导的学生，成绩超过 <span class="p">98%</span> 的同龄人。可全世界，没有那么多好老师。', A * Aout));
       o.push(card('c2', '现在，<span class="p">大山里的孩子</span>，也能拥有全世界最好的老师。', Bv, { rot: 1.2, y: 1430 }));
     } else if (b.id === 'dream') {
-      o.push(big('wp', ['<span class="num p">1</span> 个人', '＝ <span class="num p">1</span> 家公司'], 150));
-      o.push(card('c1', '<span class="num">2012</span> 年，Instagram 卖了 <span class="num">10</span> 亿美元——全公司只有 <span class="num p">13</span> 个人。', A * Aout));
-      o.push(photo('ph1', '/assets/img/rocket.png', { x: 600, y: 700, w: 380, h: 490, rot: 3.5, a: Bv, tag: 'SpaceX · 猎鹰 9 号' }));
-      o.push(photo('ph2', '/assets/img/astronaut.png', { x: 90, y: 760, w: 340, h: 404, rot: -4, a: easeOutCubic(seg(t, tB + 0.2, tB + 0.65)), tag: 'NASA 宇航员', shadow: '#15121b' }));
-      o.push(card('c2', '下一个奇迹，可能只需要 <span class="num p">1</span> 个敢想的人。', easeOutCubic(seg(t, tB + 0.4, tB + 0.85)), { y: 1330, rot: -1.2 }));
+      o.push({ ...big('wp', ['<span class="num p">1</span> 个人', '＝ <span class="num p">1</span> 家公司'], 150), opacity: (A > 0 ? 1 : 0) * (1 - seg(t, tB, tB + 0.3)) });
+      o.push(card('c1', '<span class="num">2012</span> 年，Instagram 卖了 <span class="num">10</span> 亿美元——全公司只有 <span class="num p">13</span> 个人。', A * Aout, { y: 740 }));
+      o.push(photo('ph1', '/assets/img/rocket.png', { x: 610, y: 640, w: 360, h: 460, rot: 3.5, a: Bv, tag: 'SpaceX · 猎鹰 9 号' }));
+      o.push(photo('ph2', '/assets/img/astronaut.png', { x: 100, y: 690, w: 320, h: 380, rot: -4, a: easeOutCubic(seg(t, tB + 0.2, tB + 0.65)), tag: 'NASA 宇航员', shadow: '#15121b' }));
+      o.push(card('c2', '下一个奇迹，可能只需要 <span class="num p">1</span> 个敢想的人。', easeOutCubic(seg(t, tB + 0.3, tB + 0.75)), { y: 330, rot: -1.2 }));
     } else if (b.id === 'time') {
       o.push(big('wp', ['<span class="num p" style="font-size:1.7em">93%</span>'], 150));
       o.push(panel('dots', `<div style="display:flex;align-items:center;gap:26px;padding:0 12px">${dotsGrid(seg(t, tA + 0.2, tA + 1.8), 360)}
