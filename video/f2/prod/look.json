@@ -4,5 +4,5 @@
              "lift": 0.0, "gain": 1.0, "shoulder": 0.97,
              "print_bloom": 0.20, "print_bloom_sigma": 0.6},
  "keys": [{"t": 52.667, "grain": 0.034, "vignette": 0.14, "bloom": 0.0},
-          {"t": 52.700, "grain": 0.022, "vignette": 0.05, "bloom": 0.30},
-          {"t": 53.033, "grain": 0.022, "vignette": 0.05, "bloom": 0.0}]}
+          {"t": 52.700, "grain": 0.022, "vignette": 0.05, "bloom": 0.08},
+          {"t": 53.200, "grain": 0.022, "vignette": 0.05, "bloom": 0.0}]}

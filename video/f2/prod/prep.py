@@ -187,7 +187,8 @@ def plate_shade(n, az, el):
     th, e = np.radians(az), np.radians(el)
     L = np.array([np.cos(th) * np.cos(e), -np.sin(th) * np.cos(e), np.sin(e)], np.float32)
     x = (n @ L) / L[2]
-    return (1 + 0.30 * np.tanh((x - 1) / 0.30)).astype(np.float32)     # soft knee, no flat plateaus
+    # soft knees on both sides; the lit side stays under the paper cap so the pressure variation survives
+    return np.where(x < 1, 1 + 0.30 * np.tanh((x - 1) / 0.30), 1 + 0.055 * np.tanh((x - 1) / 0.10)).astype(np.float32)
 
 
 def measure_mark(img, rect):
@@ -211,7 +212,7 @@ def paper(depth):
     rest = np.minimum(alb * plate_shade(n, 135, 24)[..., None], 0.985)
     m = measure_mark(rest, rect)
     save_png(os.path.join(QA, 'paper_rest.png'), rest)
-    print('plate mark at rest (target top/left -13..-17, bottom/right +4..+7, inside -2..-4 %):', m)
+    print('plate mark at rest (target top/left -13..-17, bottom/right +3..+7, inside -2..-4 %):', m)
     return m
 
 

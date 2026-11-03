@@ -11,14 +11,18 @@ COIN16_R = 23.5
 
 
 def hook_scale(t):
+    if t <= 15:
+        return lerp(2.43, 2.42, ease('FADE', t, 0, 15))
     if t <= 44:
-        return lerp(2.43, 2.40, ease('ACCEL', t, 0, 44))
+        return lerp(2.42, 2.40, ease('ACCEL', t, 15, 44))
     return lerp(2.40, 2.46, span(t, 44, 115))
 
 
 def hook_focus_radius(t):
-    """Focus accelerates into the clack like the rattle does: still soft at f30, sharp exactly at f44."""
-    return 16.0 * (1 - ease('ACCEL', t, 0, 44))
+    """A first breath with the whirr (f0-f15), then focus accelerates into the clack and lands on f44."""
+    if t <= 15:
+        return 16.0 - 5.0 * ease('FADE', t, 0, 15)
+    return 11.0 * (1 - ease('ACCEL', t, 15, 44))
 
 
 def hook_origin(s):
@@ -102,7 +106,8 @@ def router_lights(t, coins):
             break
         if t < b:                                      # mid-flight the beam narrows and dims (review MO-05)
             u = ease('HOP', t, a, b)
-            sw = math.sin(math.pi * u)
+            g = min(1.0, max(0.0, (b - a - 2) / 2.0))
+            sw = math.sin(math.pi * u) * g
             p, q = C[seq[i - 1]], C[seq[i]]
             key = (lerp(p['cx'], q['cx'], u), lerp(p['cy'], q['cy'], u), lerp(p['r'], q['r'], u) * (1 - 0.35 * sw),
                    1.0 - 0.6 * sw)
@@ -172,7 +177,7 @@ def retina_light(t):
 SHEET_XS = (90, 390, 690)            # third column ends at 945: clear of the feed's action column
 SHEET_ROWS = (508, 744, 980, 1216)
 S0 = 438.0 / 170.0
-S1 = 996.0 / 255.0
+S1 = 1160.0 / 255.0                       # plate 12 grows wider than the screen: a band (R2-CD-01)
 CELLS = [  # id, cache name, source w, h, scale, sheet x, y, develop start
     (1, 'coins_full', 384, 303, 170 / 303, 90, 508, 1156),
     (2, 'coffee_rgb', 600, 400, 170 / 400, 390, 508, 1140),
@@ -188,7 +193,7 @@ CELLS = [  # id, cache name, source w, h, scale, sheet x, y, develop start
 ]
 CELL12 = (690.0, 1216.0, 255.0, 170.0)
 CELL12_C = (690.0 + 127.5, 1216.0 + 85.0)
-PLATE12 = (42.0, 600.0, 996.0, 664.0)
+PLATE12 = (-40.0, 545.3, 1160.0, 773.3)
 
 
 def sheet_tf(t):
@@ -207,7 +212,7 @@ def sheet_tf(t):
     s = s0 * (S1 / s0) ** u
     p0x, p0y = s0 * 690 + CELL12_C[0] * (1 - s0), s0 * 1216 + CELL12_C[1] * (1 - s0)
     w = (s - s0) / (S1 - s0)
-    px, py = lerp(p0x, 42.0, w), lerp(p0y, 600.0, w)
+    px, py = lerp(p0x, -40.0, w), lerp(p0y, 545.3, w)
     return s, px - s * 690, py - s * 1216
 
 
@@ -222,11 +227,11 @@ PAPER_REST = (90.0, 540.0, 642.0, 428.0)
 def plate_rect(t):
     """Screen rect (x, y, w, h) of the plate during the pull-out."""
     u = ease('SETTLEL', t, 1580, 1628)
-    r = 642.0 / 996.0
+    r = 642.0 / 1160.0
     s = r ** u
     k = (1 - s) / (1 - r)
-    x, y = lerp(42.0, 90.0, k), lerp(600.0, 540.0, k)
-    return x, y, 996.0 * s, 664.0 * s
+    x, y = lerp(-40.0, 90.0, k), lerp(545.3, 540.0, k)
+    return x, y, 1160.0 * s, 773.3 * s
 
 
 def paper_tf(t):
@@ -238,10 +243,11 @@ def paper_tf(t):
 
 def rake(t):
     """The light lowers until the relief peaks on f1604 (the withheld D5), then settles to rest (review MO-03)."""
-    az = lerp(215.0, 135.0, ease('RAKE', t, 1580, 1628))
     if t < 1604:
-        return az, lerp(38.0, 10.0, ease('RAKE', t, 1580, 1604))
-    return az, lerp(10.0, 24.0, ease('SETTLEL', t, 1604, 1628))
+        u = ease('RAKE', t, 1580, 1604)
+        return lerp(215.0, 155.0, u), lerp(38.0, 10.0, u)
+    u = ease('SETTLEL', t, 1604, 1628)
+    return lerp(155.0, 135.0, u), lerp(10.0, 24.0, u)
 
 
 def lamp(t):
@@ -250,11 +256,11 @@ def lamp(t):
 
 
 # ---------------------------------------------------------------- shots
-SHOTS = [(0, 116), (116, 380), (380, 644), (644, 860), (860, 1124), (1124, 1388), (1388, 1580), (1580, 1772)]
+SHOTS = [(0, 116), (116, 380), (380, 644), (644, 860), (860, 1124), (1124, 1388), (1388, 1580), (1580, 1796)]
 
 
 def shot_of(f):
     for i, (a, b) in enumerate(SHOTS):
         if a <= f < b:
             return i + 1, a, b
-    return 8, 1580, 1772
+    return 8, 1580, 1796

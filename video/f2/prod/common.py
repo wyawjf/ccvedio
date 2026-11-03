@@ -13,7 +13,7 @@ BUILD = os.path.join(ROOT, 'build', 'f2')
 CACHE = os.path.join(BUILD, 'cache')
 
 W, H, FPS = 1080, 1920, 30
-NFRAMES = 1772                                          # 59.067 s
+NFRAMES = 1796                                          # 59.867 s: one beat added for the end card (R2-CD-02)
 
 
 def hexrgb(h):

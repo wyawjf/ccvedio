@@ -1056,7 +1056,7 @@ where they disagree with §0–§10, this section wins. IDs refer to the review 
   window develops f1187–f1202 (no stroke draw-on) (CD-01). A 2 % lean toward cell 12 during the hold, and the dive starts
   from it (MO-06).
 - Inside plate 12 the outline dissolves after the dive (f1432–f1444) and re-forms f1564–f1576 (CD-06).
-- S08 one beat earlier: the light table is a switch (dark f1580, lit f1581) with a 10 f bloom (0.30) as the eye adapts;
+- S08 one beat earlier: the light table is a switch (dark f1580, lit f1581) with a 15 f bloom (0.08) as the eye adapts;
   the raking light lowers until the relief peaks on f1604, where the withheld D5 now sounds (CD-08, MO-03, MO-04).
 - Score cue changes: `f2/prod/CUES_v2.md`.
 
@@ -1073,3 +1073,21 @@ where they disagree with §0–§10, this section wins. IDs refer to the review 
 - Carousel: hand-drawn china-marker loop on the cover (two passes, #7A5CFF at 85 %), cover hook 64 px (CD-03, XHS-02);
   C3 tray × 1.80; C2 frontier block 40 px lower; C4 plate label 图 04 / 12; C6 shows C5's cell 12 in place with a wall
   label; C7 uses the shared footer and a 540 × 360 plate mark (CJK-01/06/07, CD-11, XHS-04/08).
+- Round 2 (type): S02 vertical caption prints at f314/f317 as the slit completes; plate labels enter after their
+  statement (S02 f164/168/172, S03 f530/534/538 on hop 3); the S06 title and header lean with the sheet; header
+  tracking 0 (film) / 22 px (C5); end card spacing regrouped with the question at 40/56; 未注明用途 for plates
+  without a stated test purpose; SRC4 …其余为…
+- Round 2 (picture): bloom at the switch 0.08 over 15 f (0.30 blew the frame out); lit plate walls get their own knee
+  `1 + 0.055·tanh((x − 1)/0.10)` under the paper cap, so the pressure variation survives (rest walls about −16 / −16 /
+  +3 / +3 %); the rake reaches az 155° and el 10° together on f1604; coin #16 develops as one piece at the S03 cut;
+  two-frame router hops keep full intensity.
+- Round 2 (viewer): the end card closes on one line, 换模型之前，你会先拿哪道题考一遍？ (the question is the action;
+  39 characters in 4.5 s); the running head keeps 改过的看法 for all of chapter 3; S03 and C3 fill light 0.16 so the
+  unlit coins read as the set of choices. 据报道 stays on the Copilot line (the brief marks it as reported).
+- Round 2 (fresh eyes): plate 12 grows wider than the screen (−40, 545.3, 1160 × 773.3; S1 = 4.549), so inside it his
+  line sits in a full-width band whose rules stay at rule-30 (no type on plain black); S07 labels hang under the band
+  (y 1342/1386/1420); the pull-out starts from that band. The film gains one beat at the end (1796 frames, 59.867 s):
+  the reading's payoff holds alone 28 f, your_eval() and the closing line land on B68, the account and the whole source
+  block on B69 (no wipe), and the complete card holds about 3 s. The hook breathes first (focus 16 → 11 px over
+  f0–f15, then lands on f44); cell 12's number arrives with its window, its name on f1268. The cover's marker loop is
+  tapered and textured like wax.

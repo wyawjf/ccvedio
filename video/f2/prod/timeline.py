@@ -36,7 +36,7 @@ TOK = {
     'T-CAP2': (('mono', 400, 24, 0.02, 'b5'), 34, ('sans', 500, 24, 0.04, 'b5')),
     'T-CAP3': (('mono', 400, 24, 0.02, 'b5'), 34, None),
     'T-CAP4': (('sans', 500, 24, 0.04, 'b5'), 34, ('mono', 400, 24, 0.02, 'b5')),
-    'T-HDR': (('mono', 400, 24, 0.02, 'b5'), 24, None),
+    'T-HDR': (('mono', 400, 24, 0, 'b5'), 24, None),
     'T-SHEET': (('mono', 500, 28, 0.02, 'b5'), 34, ('sans', 500, 28, 0.02, 'b7')),
     'T-RHN': (('mono', 500, 24, 0.08, 'b5'), 24, None),
     'T-RHA': (('sans', 500, 24, 0.06, 'b5'), 24, None),
@@ -44,7 +44,7 @@ TOK = {
     'T-VMONO': (('mono', 400, 24, 0.02, 'b5'), 24, None),
     'T-RL': (('sans', 500, 40, 0.04, 'p70'), 40, None),
     'T-READ': (('sans', 500, 56, 0, 'inkp'), 78, None),
-    'T-ASK': (('sans', 500, 44, 0, 'p78'), 62, None),
+    'T-ASK': (('sans', 500, 40, 0, 'p78'), 56, None),
     'T-ACC': (('sans', 700, 40, 0, 'inkp'), 46, None),
     'T-EVAL': (('mono', 500, 26, 0.02, 'p70'), 26, None),
     'T-ENTRY': (('sans', 500, 40, 0, 'inkp'), 56, None),
@@ -150,7 +150,7 @@ def build():
     digits = [('RH-D1', '1', 118, None, 382), ('RH-D2', '2', None, 382, 646),
               ('RH-D3', '3', None, 646, 1126), ('RH-D4', '4', None, 1126, None)]
     names = [('RH-A1', '价格战', 118, None, 382), ('RH-A2', '混着用', None, 382, 646),
-             ('RH-A3', '改过的看法', None, 646, 862), ('RH-A4', '零信任', None, 862, 1126),
+             ('RH-A3', '改过的看法', None, 646, 1126),
              ('RH-A5', '私有评测集', None, 1126, None)]
     for lst, tok, x in ((digits, 'T-RHN', 90 + adv), (names, 'T-RHA', 90 + 9 * adv)):
         for eid, text, first, rin, rout in lst:
@@ -164,22 +164,22 @@ def build():
     E('S02-K1', 'T-KICK', 90, 330, '他判断', 128, 228)
     E('S02-A1', 'T-ST', 90, 396, '在大多数企业场景里，', 134, 228)
     E('S02-A2', 'T-ST', 78, 487, '日常算力终将商品化。', 149, 228)   # 日 has a wide side bearing
-    E('S02-L1', 'T-CAP1', 390, 1280, '图` 02 / 12`　一杯浓缩咖啡', 150, 224)
-    E('S02-L2', 'T-CAP2', 390, 1324, 'skimage.data.coffee()`　椭圆与纹理', 154, 224)
-    E('S02-L3', 'T-CAP3', 390, 1358, LIVE['S02-L3'](158), 158, 224, live=LIVE['S02-L3'])
-    E('S02-K2', 'T-KICK', 90, 330, '而在他看来', 266, 356)
-    E('S02-B1', 'T-ST', 90, 396, '前沿模型，', 272, 356)
-    E('S02-B2', 'T-ST', 90, 487, '只服务', 280, 356)
-    E('S02-B3', 'T-ST', 90, 578, '少数顶级场景。', 286, 356)
+    E('S02-L1', 'T-CAP1', 390, 1280, '图` 02 / 12`　一杯浓缩咖啡', 164, 224)
+    E('S02-L2', 'T-CAP2', 390, 1324, 'skimage.data.coffee()`　椭圆与纹理', 168, 224)
+    E('S02-L3', 'T-CAP3', 390, 1358, LIVE['S02-L3'](172), 172, 224, live=LIVE['S02-L3'])
+    E('S02-K2', 'T-KICK', 90, 330, '而在他看来', 266, 360)
+    E('S02-B1', 'T-ST', 90, 396, '前沿模型，', 272, 360)
+    E('S02-B2', 'T-ST', 90, 487, '只服务', 280, 360)
+    E('S02-B3', 'T-ST', 90, 578, '少数顶级场景。', 286, 360)
     b = TOK['T-VCAP'][0]
     m = TOK['T-VCAP'][2]
     EL['S02-V1'] = dict(id='S02-V1', kind='vtext', layer='screen', x=652, y=693, lh=30, align='left', tok='T-VCAP', runs=[
         run(*b, '图'), run(*m, '03', tcu=True), run(*b, '／'), run(*m, '12', tcu=True),
         run(*b, '　猎鹰'), run(*b, '9', tcu=True), run(*b, '号与 DSCOVR')])
-    ANIM['S02-V1'] = ('std', 288, 352, None)
+    ANIM['S02-V1'] = ('std', 314, 356, None)
     EL['S02-V2'] = dict(id='S02-V2', kind='vtext', layer='screen', x=614, y=693, lh=24, align='left', tok='T-VMONO',
-                        runs=runs('T-VMONO', LIVE['S02-V2'](294)))
-    ANIM['S02-V2'] = ('std', 291, 352, LIVE['S02-V2'])
+                        runs=runs('T-VMONO', LIVE['S02-V2'](317)))
+    ANIM['S02-V2'] = ('std', 317, 356, LIVE['S02-V2'])
     # ---------------- S03
     E('S03-T1', 'T-FACT', 90, 330, '大模型按 token 计价。', 386, 478)
     E('S03-T2', 'T-FACT', 90, 404, '英文里，token 也指代币。', 400, 478)
@@ -187,9 +187,9 @@ def build():
     E('S03-C1', 'T-ST', 90, 396, '微软 Copilot 内部，', 494, 616)
     E('S03-C2', 'T-ST', 90, 487, '每天都在混用', 507, 616)
     E('S03-C3', 'T-ST', 90, 578, '便宜的闭源与开源模型。', 516, 616)
-    E('S03-N1', 'T-KEY', 182, 1326, '示意　每一束光，是一次调用', 512, 612)
-    E('S03-N2', 'T-CAP4', 182, 1372, '底图　`01 / 12`　`skimage.data.coins()', 516, 612)
-    E('S03-N3', 'T-CAP3', 182, 1406, LIVE['S03-N3'](520), 520, 612, live=LIVE['S03-N3'])
+    E('S03-N1', 'T-KEY', 182, 1326, '示意　每一束光，是一次调用', 530, 612)
+    E('S03-N2', 'T-CAP4', 182, 1372, '底图　`01 / 12`　`skimage.data.coins()', 534, 612)
+    E('S03-N3', 'T-CAP3', 182, 1406, LIVE['S03-N3'](538), 538, 612, live=LIVE['S03-N3'])
     # ---------------- S04
     E('S04-K', 'T-KICK', 90, 330, '他以前以为', 656, 836)
     E('S04-OLD', 'T-ST64', 90, 396, '规模够大，对齐自然会来。', 662, 836)
@@ -215,9 +215,9 @@ def build():
     E('S05-L3', 'T-CAP3', 454, 1288, '1411 × 1411 px · × 0.31', 970, 1108)
     E('S05-L4', 'T-CAP4', 454, 1322, '血管纹路因人而异，可用于身份识别', 974, 1108)
     # ---------------- S06 (screen) + sheet captions (sheet layer)
-    E('S06-F1', 'T-FACT46', 90, 290, '这 11 张，都是代码库自带的公开示例图，', 1172, 1360)
-    E('S06-F2', 'T-FACT46', 90, 355, '谁都能下载，谁都能拿它们考算法。', 1188, 1360)
-    E('S06-HDR', 'T-HDR', 90, 446, 'from skimage import data · matplotlib sample_data · 11 / 12', 1172, 1360)
+    E('S06-F1', 'T-FACT46', 90, 290, '这 11 张，都是代码库自带的公开示例图，', 1172, 1360, layer='sheet')
+    E('S06-F2', 'T-FACT46', 90, 355, '谁都能下载，谁都能拿它们考算法。', 1188, 1360, layer='sheet')
+    E('S06-HDR', 'T-HDR', 90, 446, 'from skimage import data · matplotlib sample_data · 11 / 12', 1172, 1360, layer='sheet')
     starts = {c[0]: (c[7] if c[7] is not None else 1136) for c in geom.CELLS}
     ring = {5: 0, 2: 1, 8: 1, 4: 2, 6: 2, 1: 3, 3: 3, 7: 3, 9: 3}
     for i in range(11):
@@ -226,45 +226,48 @@ def build():
         fin = max(starts[i + 1] + 6, 1166 + ring.get(i + 1, 0))
         E(f'S06-C{i + 1:02d}', 'T-SHEET', x, y, f'{i + 1:02d}', fin, 1364, 'norise12', layer='sheet')
     base = TOK['T-SHEET'][0]
-    EL['S06-C12a'] = dict(id='S06-C12a', kind='text', layer='sheet', x=690, y=1396, lh=34, align='left', tok='T-SHEET',
-                          runs=[run(*base, '12  '), run('sans', 500, 32, 0.02, 'bone', '你的评测集')])
-    ANIM['S06-C12a'] = ('norise12', 1199, 1364, None)
+    # the empty window and its number arrive with the other eleven; its name gets its own beat (R2-CD-04)
+    EL['S06-C12n'] = dict(id='S06-C12n', kind='text', layer='sheet', x=690, y=1396, lh=34, align='left', tok='T-SHEET',
+                          runs=[run(*base, '12')])
+    ANIM['S06-C12n'] = ('norise12', 1199, 1364, None)
+    EL['S06-C12a'] = dict(id='S06-C12a', kind='text', layer='sheet', x=760, y=1396, lh=34, align='left', tok='T-SHEET',
+                          runs=[run('sans', 500, 32, 0.02, 'bone', '你的评测集')])
+    ANIM['S06-C12a'] = ('norise12', 1268, 1364, None)
     EL['S06-C12b'] = dict(id='S06-C12b', kind='text', layer='sheet', x=760, y=1432, lh=34, align='left', tok='T-SHEET',
                           runs=[run('sans', 500, 28, 0.02, 'b5', '未公开')])
-    ANIM['S06-C12b'] = ('norise12', 1203, 1364, None)
+    ANIM['S06-C12b'] = ('norise12', 1272, 1364, None)
     # ---------------- S07
     E('S07-K', 'T-KICK', 90, 660, '纳德拉认为', 1430, 1556)
     E('S07-E1', 'T-ST', 90, 726, '每家公司，', 1436, 1556)
     E('S07-E2', 'T-ST', 90, 817, '都会有自己的', 1444, 1556)
     E('S07-E3', 'T-ST', 90, 908, '私有评测集。', 1453, 1556)
     E('S07-E4', 'T-SECOND', 90, 1040, '那会是它的核心 IP。', 1464, 1556)
-    E('S07-L1', 'T-CAP1', 90, 1290, '图` 12 / 12`　|bone|你的评测集', 1470, 1552)
-    E('S07-L2', 'T-CAP2', 90, 1334, 'your_eval()`　未公开', 1474, 1552)
-    E('S07-L3', 'T-CAP3', 90, 1368, 'not in any library', 1478, 1552)
+    E('S07-L1', 'T-CAP1', 90, 1342, '图` 12 / 12`　|bone|你的评测集', 1470, 1552)
+    E('S07-L2', 'T-CAP2', 90, 1386, 'your_eval()`　未公开', 1474, 1552)
+    E('S07-L3', 'T-CAP3', 90, 1420, 'not in any library', 1478, 1552)
     # ---------------- S08 paper
     EL['S08-SQ1'] = dict(id='S08-SQ1', kind='rect', layer='screen', x=62, y=287, w=14, h=14, c=COL['brand'])
     ANIM['S08-SQ1'] = ('std', 1628, None, None)
     E('S08-RL', 'T-RL', 90, 274, '我们的解读', 1628, None)
     E('S08-R1', 'T-READ', 90, 336, '公开的考题，谁都能刷分；', 1632, None)
     E('S08-R2', 'T-READ', 90, 414, '你的考题，只有你有。', 1648, None)
-    E('S08-EVAL', 'T-EVAL', 90, 996, 'your_eval()', 1652, None)          # the plate is named, never a blank box
-    E('S08-EN', 'T-ENTRY', 90, 1036, '换模型、混用模型之前，先拿它考一遍。', 1656, None)
-    E('S08-Q', 'T-ASK', 90, 1106, '你的第一道题，考什么？', 1668, None)
-    EL['S08-SQ2'] = dict(id='S08-SQ2', kind='rect', layer='screen', x=62, y=1206, w=14, h=14, c=COL['brand'])
-    ANIM['S08-SQ2'] = ('std', 1676, None, None)
-    E('S08-ACC', 'T-ACC', 90, 1190, 'Coo-Coo出海Ai实验室', 1676, None)
-    for k, (x, y) in enumerate(source_layout(1254, pitch=30, gap=6)):
-        E(f'S08-SRC{k + 1}', 'T-SRC', x, y, SOURCES[k], 1688 + 2 * k, None)
+    E('S08-EVAL', 'T-EVAL', 90, 990, 'your_eval()', 1676, None)          # the plate is named, never a blank box
+    E('S08-EN', 'T-ENTRY', 90, 1026, '换模型之前，你会先拿哪道题考一遍？', 1680, None)
+    EL['S08-SQ2'] = dict(id='S08-SQ2', kind='rect', layer='screen', x=62, y=1138, w=14, h=14, c=COL['brand'])
+    ANIM['S08-SQ2'] = ('std', 1700, None, None)
+    E('S08-ACC', 'T-ACC', 90, 1122, 'Coo-Coo出海Ai实验室', 1700, None)
+    for k, (x, y) in enumerate(source_layout(1180, pitch=30, gap=6)):
+        E(f'S08-SRC{k + 1}', 'T-SRC', x, y, SOURCES[k], 1700, None)
 
 
-PURPOSES = ['分割测试', '椭圆与纹理', '无指定用途', '多尺度检测', '圆形图像', '分割与去噪', '无指定用途', '无指定用途',
+PURPOSES = ['分割测试', '椭圆与纹理', '未注明用途', '多尺度检测', '圆形图像', '分割与去噪', '未注明用途', '未注明用途',
             '直方图均衡', '角点检测', '反卷积']
 
 SOURCES = [
     '来源　`20VC` 播客，Harry Stebbings 对话 Satya Nadella，`2026.10.26` 发布。',
     '嘉宾观点据该期节目的公开报道转述整理，非原话；我们的解读为本号观点。',
     '图像　均为 scikit-image 与 matplotlib 自带示例图；',
-    '除 `09`（未注明授权）外，均为公有领域、CC0 或无已知版权限制。',
+    '除 `09`（未注明授权）外，其余为公有领域、CC0 或无已知版权限制。',
     '`01` Brooklyn Museum　`02` Rachel Michetti　`03` SpaceX　`04` NASA',
     '`05` Mikael Häggström　`06` Lav Varshney　`07` NASA　`08` U.S. Navy',
     '`10` Wikipedia　`11` Stefan van der Walt',

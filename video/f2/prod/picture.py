@@ -216,10 +216,11 @@ class Picture:
         img = np.empty((H, W, 3), np.float32)
         img[:] = INK
         s, ox, oy = geom.tray_tf(geom.tray_drift(t))
-        box, rgb, cov = self.coins_dissolve(s, ox, oy, geom.router_lights(t, self.coins), 0.10, soft=0.6)
+        box, rgb, cov = self.coins_dissolve(s, ox, oy, geom.router_lights(t, self.coins), 0.16, soft=0.6)
         E = ease('DEVELOP', t, 380, 419)
         if E < 1:
-            rgb = develop(rgb, E, self.noise(f, box), 'in')
+            m16, _ = warp(self.matte16, s, ox, oy, box, sharpen=False)
+            rgb = develop(rgb, E, self.noise(f, box), 'in', L=np.maximum(luma(rgb), 0.80 * m16))
         self.paste(img, box, rgb, cov)
         return img
 
@@ -316,8 +317,7 @@ class Picture:
             self.sheet_cells(img, t, f, s, tx, ty, fade_out=ease('LAMP', t, 1390, 1416))
         u = geom.plunge_u(t)
         x, y, w, h = geom.CELL12
-        a = 0.30                                         # rule-30: an 0.18 line vanishes on a phone (XHS-05)
-        a *= (1 - ease('LEAVE', t, 1432, 1444)) if t < 1564 else ease('FADE', t, 1564, 1576)
+        a = 0.30                                         # rule-30; the band's rules frame his line (R2-CD-01)
         hairline(img, (tx + s * x, ty + s * y, s * w, s * h), a, radius=6.0 * u)
         return img
 
