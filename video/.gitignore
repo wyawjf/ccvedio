@@ -9,3 +9,6 @@ build/f/*
 !build/f/F_preview.mp4
 __pycache__/
 *.pyc
+!build/f2/
+build/f2/*
+!build/f2/carousel/

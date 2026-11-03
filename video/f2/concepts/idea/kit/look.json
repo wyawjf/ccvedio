@@ -1,0 +1,4 @@
+{"default": {"grain": 0.030, "grain_size": 1.25, "grain_chroma": 0.15, "halation": 0.16, "hal_thresh": 0.74, "hal_radius": 16,
+             "bloom": 0.05, "bloom_radius": 48, "ca": 0.0005, "vignette": 0.24, "vig_round": 1.0, "weave": 0.0, "flicker": 0.0,
+             "lift": 0.0, "gain": 1.0},
+ "keys": []}

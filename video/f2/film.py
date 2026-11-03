@@ -24,10 +24,13 @@ DEFAULT = dict(
     bloom_radius=60,
     ca=0.0012,          # radial chromatic aberration (relative scale offset of R/B)
     vignette=0.28,      # darkening at the corners (0..1)
-    vig_round=1.0,      # 1 = circular, <1 = follows the frame aspect
+    vig_round=1.0,      # 1 = elliptical, following the frame aspect; 0 = circular in pixels
     weave=0.35,         # gate weave amplitude in px
     flicker=0.006,      # exposure flicker amplitude
     lift=0.0, gain=1.0, # final black lift / gain
+    shoulder=0.85,      # highlights above this roll off softly to 1.0 (>= 1 disables the roll-off)
+    print_bloom=0.0,    # share of a sub-pixel blur mixed in before grain (kills razor-digital edges)
+    print_bloom_sigma=0.6,
 )
 
 
@@ -70,9 +73,16 @@ class Film:
         self.luma_w = np.array([0.2126, 0.7152, 0.0722], np.float32)
         self._vig = {}
         self._bank = {}
-        # tone shoulder as a lookup over 0..2 (1/1024 steps): highlights roll off instead of clipping
-        x = np.linspace(0, 2, 2049, dtype=np.float32)
-        self.shoulder = np.where(x > 0.85, 0.85 + (1 - np.exp(-(x - 0.85) * 4)) * 0.15, x).astype(np.float32)
+        self._shoulder = {}
+
+    def shoulder(self, s):
+        # tone shoulder as a lookup over 0..2 (1/1024 steps): highlights above s roll off towards 1.0
+        key = round(s, 3)
+        if key not in self._shoulder:
+            x = np.linspace(0, 2, 2049, dtype=np.float32)
+            k = 1.0 / max(1e-3, 1 - s)
+            self._shoulder = {key: np.where(x > s, s + (1 - np.exp(-(x - s) * k)) * (1 - s), x).astype(np.float32)}
+        return self._shoulder[key]
 
     def vignette(self, p):
         key = (round(p["vignette"], 3), round(p["vig_round"], 2))
@@ -99,12 +109,16 @@ class Film:
             s = max(1.0, size)
             gw, gh = int(self.w / s), int(self.h / s)
             bank = []
+            brng = np.random.default_rng(4242)      # fixed: every worker/segment builds the same bank
             for _ in range(24):
-                n = self.rng.standard_normal((gh, gw, 3)).astype(np.float32)
+                n = brng.standard_normal((gh, gw, 3 if chroma > 0 else 1)).astype(np.float32)
                 n = cv2.GaussianBlur(n, (0, 0), 0.55)
                 if (gw, gh) != (self.w, self.h):
                     n = cv2.resize(n, (self.w, self.h), interpolation=cv2.INTER_CUBIC)
-                n = n[..., :1] * (1 - chroma) + n * chroma
+                if n.ndim == 2:
+                    n = n[..., None]
+                if chroma > 0:
+                    n = n[..., :1] * (1 - chroma) + n * chroma
                 bank.append(n.astype(np.float32))
             self._bank = {key: bank}
         return self._bank[key]
@@ -120,9 +134,9 @@ class Film:
         resp = (4 * luma * (1 - luma)) ** 0.7 * 0.85 + 0.15
         return n * (p["grain"] * resp[..., None])
 
-    def __call__(self, frame_u8, t):
+    def __call__(self, frame, t):
         p = params_at(self.look, t) if hasattr(self, "look") else dict(DEFAULT)
-        img = frame_u8.astype(np.float32) / 255.0
+        img = frame.astype(np.float32) if frame.dtype != np.uint8 else frame.astype(np.float32) / 255.0
         # gate weave: tiny smooth sub-pixel drift
         if p["weave"] > 0:
             dx = p["weave"] * (np.sin(t * 2.1) * 0.6 + np.sin(t * 5.3 + 1.7) * 0.4)
@@ -149,8 +163,12 @@ class Film:
             img = img * (1 + p["flicker"] * (np.sin(t * 23.0) * 0.5 + np.sin(t * 61.0 + 1.3) * 0.5))
         img = img * p["gain"] + p["lift"]
         # soft shoulder so halation never clips harshly
-        idx = np.clip(img * 1024, 0, 2048).astype(np.uint16)
-        img = self.shoulder[idx]
+        if p["shoulder"] < 1:
+            idx = np.clip(img * 1024, 0, 2048).astype(np.uint16)
+            img = self.shoulder(p["shoulder"])[idx]
+        if p["print_bloom"] > 0:
+            soft = cv2.GaussianBlur(img, (0, 0), p["print_bloom_sigma"])
+            img = img * (1 - p["print_bloom"]) + soft * p["print_bloom"]
         luma2 = np.clip(img @ self.luma_w, 0, 1)
         img = img + self.grain(p, luma2)
         return (np.clip(img, 0, 1) * 255 + 0.5).astype(np.uint8)

@@ -1,0 +1,8 @@
+{"default": {"grain": 0.034, "grain_size": 1.35, "grain_chroma": 0.0,
+             "halation": 0.0, "bloom": 0.0, "bloom_radius": 120, "ca": 0.0,
+             "vignette": 0.14, "vig_round": 1.0, "weave": 0.45, "flicker": 0.006,
+             "lift": 0.0, "gain": 1.0, "shoulder": 0.97,
+             "print_bloom": 0.20, "print_bloom_sigma": 0.6},
+ "keys": [{"t": 53.467, "grain": 0.034, "vignette": 0.14, "bloom": 0.0},
+          {"t": 53.867, "bloom": 0.18},
+          {"t": 54.267, "grain": 0.022, "vignette": 0.05, "bloom": 0.0}]}

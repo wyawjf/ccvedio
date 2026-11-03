@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<title>RAKING LIGHT proofs</title>
+<link rel="stylesheet" href="/nm/@fontsource/noto-sans-sc/300.css">
+<link rel="stylesheet" href="/nm/@fontsource/noto-sans-sc/400.css">
+<link rel="stylesheet" href="/nm/@fontsource/noto-sans-sc/500.css">
+<link rel="stylesheet" href="/nm/@fontsource/noto-sans-sc/700.css">
+<link rel="stylesheet" href="/nm/@fontsource/inter-tight/300.css">
+<link rel="stylesheet" href="/nm/@fontsource/inter-tight/400.css">
+<link rel="stylesheet" href="/nm/@fontsource/inter-tight/500.css">
+<link rel="stylesheet" href="/nm/@fontsource/geist-mono/400.css">
+<link rel="stylesheet" href="/nm/@fontsource/geist-mono/500.css">
+<style>
+/* ---------- tokens (see product.md §4) ---------- */
+:root{
+  --void:#0A0908; --ink1:#F1ECE3; --ink2:#A49D92; --ink3:#6B655D; --hair:rgba(241,236,227,.20);
+  --tung:#FFC98F; --day:#CFE0FF; --violet:#5B2EFF; --violet-t:#A98DFF;
+  --sans:"Inter Tight","Noto Sans SC",sans-serif; --mono:"Geist Mono",monospace;
+  --mx:96px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--void)}
+body{width:var(--W);height:var(--H);overflow:hidden;position:relative;color:var(--ink1);font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;font-kerning:normal}
+.abs{position:absolute}
+/* type scale (film) */
+.k{font:500 32px/44px var(--sans);letter-spacing:.08em;color:var(--ink2)}
+.d1{font:500 132px/148px var(--sans);letter-spacing:.005em}
+.d2{font:400 64px/88px var(--sans);letter-spacing:.02em}
+.d3{font:400 52px/76px var(--sans);letter-spacing:.02em}
+.lab{font:400 44px/60px var(--sans);letter-spacing:.02em}
+.lab b{font-weight:500;color:var(--ink1);margin-right:.75em}
+.lab span{color:var(--ink2)}
+.c1{font:400 24px/34px var(--sans);letter-spacing:.02em;color:var(--ink2)}
+.c2{font:400 20px/30px var(--sans);letter-spacing:.02em;color:var(--ink3)}
+.m{font:400 18px/24px var(--mono);letter-spacing:.06em;color:var(--ink3)}
+.dim{opacity:.38}
+.idx{left:var(--mx);top:222px;display:flex;gap:14px;align-items:baseline}
+.idx .n{font:500 18px/24px var(--mono);letter-spacing:.06em;color:var(--ink3)}
+.idx .t{font:400 22px/24px var(--sans);letter-spacing:.06em;color:var(--ink2)}
+/* our reading */
+.ours{padding-left:28px;border-left:2px solid var(--violet)}
+.ours .tag{display:flex;align-items:center;gap:12px;font:500 30px/40px var(--sans);letter-spacing:.06em;color:var(--violet-t);margin-bottom:14px}
+.ours .tag i{width:12px;height:12px;border-radius:50%;background:var(--violet);box-shadow:0 0 10px rgba(91,46,255,.55),inset 0 0 0 1px rgba(169,141,255,.6)}
+/* gauge */
+.gauge{right:var(--mx);top:220px;display:flex;align-items:center;gap:18px}
+.gauge .txt{text-align:right}
+.gauge .txt .a{font:400 22px/28px var(--sans);letter-spacing:.06em;color:var(--ink2)}
+.gauge .txt .b{font:400 16px/22px var(--mono);letter-spacing:.06em;color:var(--ink3)}
+.plate{display:block;mix-blend-mode:lighten}
+.brand{display:flex;align-items:center;gap:16px;font:700 40px/48px var(--sans);letter-spacing:.01em}
+.brand i{width:14px;height:14px;border-radius:50%;background:var(--violet);box-shadow:0 0 14px rgba(91,46,255,.7),0 0 2px rgba(169,141,255,.9)}
+.days{font:400 32px/40px var(--sans);letter-spacing:.62em;color:var(--ink3)}
+.days em{font-style:normal;color:var(--ink1)}
+.tagc{font:500 44px/52px var(--sans);letter-spacing:.04em;color:var(--ink1)}
+/* carousel scale */
+.cv .d1{font:500 148px/164px var(--sans)}
+.cv .d2{font:400 56px/80px var(--sans)}
+.cv .d3{font:400 44px/66px var(--sans)}
+.cv .k{font:500 30px/40px var(--sans)}
+.cv .idx{top:112px}
+.cv .gauge{top:104px}
+.foot{left:var(--mx);right:var(--mx);display:flex;justify-content:space-between;align-items:center}
+.foot .brand{font:700 30px/36px var(--sans);gap:12px}
+.foot .brand i{width:11px;height:11px}
+.hl{position:absolute;height:1px;background:var(--hair)}
+canvas{position:absolute;left:0;top:0}
+</style>
+</head>
+<body>
+<script type="module">
+import * as THREE from '/nm/three/build/three.module.js';
+const q = new URLSearchParams(location.search);
+const F = q.get('f') || 'f01';
+const isCar = F.startsWith('c');
+const W = 1080, H = isCar ? 1440 : 1920;
+document.documentElement.style.setProperty('--W', W + 'px');
+document.documentElement.style.setProperty('--H', H + 'px');
+if (isCar) document.body.classList.add('cv');
+const B = document.body;
+// CJK <-> Latin spacing: U+2005 (1/4 em) at every script boundary
+const BRAND = 'Coo-Coo出海Ai实验室';
+const sp0 = s => s.replace(/([一-鿿　-〿＀-￯])([A-Za-z0-9])/g, '$1 $2')
+                 .replace(/([A-Za-z0-9%])([一-鿿])/g, '$1 $2');
+const sp = s => s.split(BRAND).map(sp0).join(BRAND);
+function el(cls, html, x, y, extra = {}) {
+  const d = document.createElement('div');
+  d.className = 'abs ' + cls; d.innerHTML = sp(html);
+  if (x !== null) d.style.left = x + 'px';
+  if (y !== null) d.style.top = y + 'px';
+  Object.assign(d.style, extra); B.appendChild(d); return d;
+}
+function img(src, x, y, w, h, extra = {}) {
+  const i = new Image(); i.src = 'img/' + src; i.className = 'abs plate';
+  Object.assign(i.style, { left: x + 'px', top: y + 'px', width: w ? w + 'px' : 'auto', height: h ? h + 'px' : 'auto' }, extra);
+  B.appendChild(i); return i;
+}
+function gauge(name, elv, az, kelvin) {
+  const g = document.createElement('div'); g.className = 'abs gauge';
+  const warm = kelvin < 4500;
+  const r = 27, rr = Math.cos(elv * Math.PI / 180) * r;                // dot radius from centre = cos(el)
+  const a = az * Math.PI / 180, dx = Math.cos(a) * rr, dy = -Math.sin(a) * rr;
+  const col = warm ? '255,201,143' : '207,224,255';
+  g.innerHTML = `<div class="txt"><div class="a">${name}</div><div class="b">EL ${String(Math.round(elv)).padStart(2,'0')}°&nbsp;&nbsp;${kelvin}K</div></div>
+  <svg width="58" height="58" viewBox="-29 -29 58 58">
+    <circle r="27" fill="none" stroke="rgba(241,236,227,.32)" stroke-width="1"/>
+    <circle r="13.5" fill="none" stroke="rgba(241,236,227,.10)" stroke-width="1"/>
+    <line x1="0" y1="-27" x2="0" y2="-23" stroke="rgba(241,236,227,.45)" stroke-width="1"/>
+    <line x1="0" y1="0" x2="${dx.toFixed(2)}" y2="${dy.toFixed(2)}" stroke="rgba(${col},.55)" stroke-width="1"/>
+    <circle cx="${dx.toFixed(2)}" cy="${dy.toFixed(2)}" r="9" fill="rgba(${col},.22)"/>
+    <circle cx="${dx.toFixed(2)}" cy="${dy.toFixed(2)}" r="3.6" fill="rgb(${col})"/>
+  </svg>`;
+  B.appendChild(g);
+}
+const idx = (n, t) => el('idx', `<span class="n">${n}</span><span class="t">${t}</span>`, null, null);
+const M = 96;
+
+/* ===================== FILM FRAMES (1080 x 1920) ===================== */
+const frames = {
+  // S1 hook, t = 1.20 s
+  f01() {
+    el('k', '微软 CEO 纳德拉判断', M, 300);
+    el('d1', '大模型<br>要打价格战了', M, 352);
+    img('hero6_hook.png', 0, 1040 - 500);
+    gauge('侧光', 6, 160, 3200);
+    el('c1', '古希腊钱币，庞贝出土', M, 1388);
+    el('c2', '照片：布鲁克林博物馆　本片重新打光', M, 1424);
+  },
+  // S2 token, t = 5.40 s
+  f02() {
+    el('d2', '大模型按 token 计价。', M, 300);
+    el('d3 dim', 'token 在英文里，也指代币：<br>一种代替钱流通的小圆片。', M, 408, {opacity: 1, color: 'var(--ink2)'});
+    img('hero6_token.png', 0, 1040 - 500);
+    gauge('侧光', 10, 150, 3200);
+    el('c1', '古希腊钱币，庞贝出土', M, 1388);
+    el('c2', '照片：布鲁克林博物馆　本片重新打光', M, 1424);
+  },
+  // S3 flattening mid-move, t = 9.10 s (single coin, light at 62 deg)
+  f03a() {
+    idx('01', '价格战');
+    el('k', '他判断', M, 300);
+    el('d2', '大多数企业场景的日常算力，<br>终将商品化。', M, 352);
+    img('hero6_flat.png', 0, 1040 - 500);
+    gauge('顺光', 84, 90, 5600);
+  },
+  // S3 tray, t = 12.80 s
+  f03() {
+    idx('01', '价格战');
+    el('k', '他判断', M, 300);
+    el('d2 dim', '大多数企业场景的日常算力，<br>终将商品化。', M, 352);
+    el('d2', '模型层，会有一场<br>残酷的价格战。', M, 552);
+    img('tray_flat.png', 60, 760, 960, 757);
+    gauge('顺光', 84, 90, 5600);
+  },
+  // S4 frontier, t = 17.60 s
+  f04() {
+    idx('01', '价格战');
+    el('k', '他判断', M, 300);
+    el('d2', '最前沿的模型，<br>只会服务少数顶尖场景。', M, 352);
+    img('rocket_plate.png', 540 - 248, 580, 496, 806);
+    el('c1', '猎鹰 9 号与 DSCOVR 卫星，发射前，2015', 540 - 248, 1400);
+    el('c2', '照片：SpaceX　公有领域', 540 - 248, 1434);
+  },
+  // S5 mixing, t = 22.55 s (day 三)
+  f05() {
+    idx('02', '混用');
+    el('k', '据报道', M, 300);
+    el('d2', '微软 Copilot 内部，<br>每天都在混用<br>便宜的闭源与开源模型。', M, 352);
+    img('tray_spot.png', 60, 720, 960, 757);
+    // landing 3 = coin at src (101,195) -> screen (60 + 2.5*101, 720 + 2.5*195) = (312.5, 1207.5); src radius 21.7 px -> 54 px
+    const cx = 312.5, cy = 1207.5, r = 54;
+    const ln = document.createElement('div'); ln.className = 'abs';
+    Object.assign(ln.style, {left: cx + 'px', top: (cy - r - 14 - 32) + 'px', width: '1px', height: '32px', background: 'rgba(241,236,227,.55)'}); B.appendChild(ln);
+    el('tagc', '开源', cx - 44, cy - r - 14 - 32 - 8 - 52);
+    el('days', '一　二　<em>三</em>　四　五　六　日', M, 648);
+    gauge('追光', 36, 128, 3200);
+  },
+  // S6 eval, t = 30.40 s
+  f06() {
+    idx('03', '私有评测');
+    el('k', '纳德拉认为', M, 300);
+    el('d2', '每家公司，都会有<br>自己的私有评测。', M, 352);
+    el('d2', '那会是它的核心 IP。', M, 552);
+    img('hero6_eval.png', 0, 1060 - 500);
+    gauge('侧光', 5, 170, 3000);
+    el('c2', '同一枚钱币，光从 5° 掠过', M, 1424);
+  },
+  // S6b our reading, t = 35.20 s (light back at raking)
+  f06b() {
+    idx('03', '私有评测');
+    const o = el('ours', '<div class="tag"><i></i>我们的理解</div><div class="d3" style="color:var(--ink2)">公开榜单像顺光，<br>模型看起来都差不多。</div><div class="d3" style="margin-top:18px">私有评测是你自己的侧光，<br>照出你在乎的差别。</div>', M, 300);
+    img('hero6_eval.png', 0, 1100 - 500);
+    gauge('侧光', 5, 170, 3000);
+  },
+  // S7 changed mind, t = 39.40 s
+  f07() {
+    idx('04', '改变的看法');
+    el('k', '被问到改变过什么看法', M, 300);
+    el('d2', '他以前以为，规模够大，<br>对齐自然会来。', M, 352);
+    img('hubble_plate.png', M, 580, 888, 818);
+    el('c1', '哈勃极深场，2012', M, 1410);
+    el('c2', '照片：NASA　公有领域', M, 1444);
+  },
+  f07b() {
+    idx('04', '改变的看法');
+    el('k', '被问到改变过什么看法', M, 300);
+    el('d2 dim', '他以前以为，规模够大，<br>对齐自然会来。', M, 352);
+    el('d2', '现在，他不这么想了。', M, 552);
+    img('hubble_plate.png', M, 680, 888, 818, {filter: 'brightness(.62)'});
+  },
+  // S8 glass, t = 47.80 s (rendered by three.js + 2D overlay)
+  f08() { return glassScene({ coinY: 1010, labels: true }); },
+  // S9 closing, t = 53.60 s
+  f09() {
+    el('ours', '<div class="tag"><i></i>我们的理解</div><div class="d2">模型，人人都买得到。<br>看它的角度，只有你有。</div><div class="d3" style="color:var(--ink2);margin-top:22px">你的评测，你的规则。</div>', M, 300);
+    return glassScene({ coinY: 1110, labels: false, keepDom: true });
+  },
+  // S10 end card, t = 57.00 s
+  f10() {
+    el('brand', '<i></i>Coo-Coo出海Ai实验室', M, 820);
+    el('c1', '大模型要打价格战了　20VC 对话纳德拉　笔记', M, 896, {color: 'var(--ink2)'});
+    const L = el('c2', '来源：20VC 播客，Harry Stebbings 对话 Satya Nadella（微软 CEO），2026.10.26 发布。<br>片中观点据公开报道转述，非原话；标注为我们的理解的部分，是本号观点。<br>图片：布鲁克林博物馆（本片重新打光）、SpaceX、NASA；公有领域或无已知版权限制。', M, 1288, {width: '888px'});
+  },
+
+  /* ===================== CAROUSEL (1080 x 1440) ===================== */
+  c01() {
+    el('k', '微软 CEO 纳德拉判断', M, 132);
+    el('d1', '大模型<br>要打价格战了', M, 180);
+    img('hero6_hook.png', 60, 870 - 500);
+    gauge('侧光', 6, 160, 3200);
+    el('c1', '古希腊钱币，庞贝出土', M, 1196);
+    el('c2', '照片：布鲁克林博物馆　本片重新打光', M, 1232);
+    footer('20VC · 2026.10.26', '01 / 07');
+  },
+  c02() {
+    idx('01', '价格战');
+    el('k', '他判断', M, 184);
+    el('d2', '大多数企业场景的日常算力，<br>终将商品化；<br>模型层，会有一场残酷的价格战。', M, 230, {fontSize: '48px', lineHeight: '72px'});
+    img('tray_flat.png', 60, 470, 960, 757);
+    gauge('顺光', 84, 90, 5600);
+    el('c1', '顺光下，24 枚各不相同的古币，看起来都差不多。', M, 1252);
+    footer('20VC · 2026.10.26', '02 / 07');
+  },
+
+
+  c03() {
+    idx('01', '价格战');
+    el('k', '他判断', M, 184);
+    el('d2', '最前沿的模型，<br>只会服务少数顶尖场景。', M, 230);
+    img('rocket_plate.png', 540 - 211, 430, 422, 686);
+    el('c1', '猎鹰 9 号与 DSCOVR 卫星，发射前，2015', 540 - 211, 1136);
+    el('c2', '照片：SpaceX　公有领域', 540 - 211, 1172);
+    footer('', '03 / 07');
+  },
+  c04() {
+    idx('02', '混用');
+    el('k', '据报道', M, 184);
+    el('d2', '微软 Copilot 内部，每天都在混用<br>便宜的闭源模型和开源模型。', M, 230, {fontSize: '48px', lineHeight: '72px'});
+    el('days', '一　二　三　<em>四</em>　五　六　日', M, 404, {fontSize: '30px'});
+    img('tray_spot2.png', 0, 470, 1080, 852);
+    // coins at src (155,50) and (270,118) -> tray px *3 -> screen *0.9375 + 470
+    const tags = [['闭源', 155 * 3 * 0.9375, 470 + 50 * 3 * 0.9375], ['开源', 270 * 3 * 0.9375, 470 + 118 * 3 * 0.9375]];
+    tags.forEach(([t, x, y]) => {
+      el('tagc', t, x - 44, y - 164);
+      const ln = document.createElement('div'); ln.className = 'abs';
+      Object.assign(ln.style, {left: x + 'px', top: (y - 104) + 'px', width: '1px', height: '32px', background: 'rgba(241,236,227,.55)'}); B.appendChild(ln);
+    });
+    gauge('追光', 36, 128, 3200);
+    footer('', '04 / 07');
+  },
+  c06() {
+    idx('04', '改变的看法　零信任');
+    el('k', '被问到改变过什么看法', M, 176);
+    el('d3', '他以前以为，规模够大，对齐自然会来。<br>现在，他不这么想了。', M, 220, {fontSize: '44px', lineHeight: '64px'});
+    img('hubble_plate.png', M, 372, 888, 120, {objectFit: 'cover', objectPosition: '50% 46%'});
+    el('c2', '哈勃极深场，2012　照片：NASA', M, 500, {fontSize: '18px', lineHeight: '28px'});
+    el('k', '他说', M, 880);
+    el('d3', '微软不等对齐问题解决，<br>先给模型套上零信任架构。', M, 924, {fontSize: '44px', lineHeight: '64px'});
+    const rows = [['身份', '每个 agent 都有自己的身份'], ['记录', '每一次工具与模型调用都留下记录'], ['权限', '规则放在模型之外']];
+    rows.forEach(([hd, tx], i) => el('lab', `<b>${hd}</b><span>${tx}</span>`, M, 1072 + i * 60));
+    footer('', '06 / 07');
+    return glassScene({ coinY: 708, labels: false, keepDom: true, dist: 6000 });
+  },
+  c05() {
+    idx('03', '私有评测');
+    el('k', '纳德拉认为', M, 184);
+    el('d2', '每家公司，都会有自己的私有评测。<br>那会是它的核心 IP。', M, 230, {fontSize: '48px', lineHeight: '72px'});
+    // diptych: same coin, flat vs raking
+    img('hero5_flat.png', 64, 420, 470, 445, {objectFit: 'none', webkitMaskImage: 'radial-gradient(closest-side, #000 62%, transparent 100%)'});
+    img('hero5_eval.png', 546, 420, 470, 445, {objectFit: 'none', webkitMaskImage: 'radial-gradient(closest-side, #000 62%, transparent 100%)'});
+    el('lab', '<b>顺光</b>', 120, 876);
+    el('c1', '公开榜单　EL 84°　5600K', 120, 940);
+    el('lab', '<b>侧光</b>', 602, 876);
+    el('c1', '你的私有评测　EL 05°　3000K', 602, 940);
+    const v = document.createElement('div'); v.className = 'abs';
+    Object.assign(v.style, {left: '540px', top: '470px', width: '1px', height: '520px', background: 'var(--hair)'}); B.appendChild(v);
+    el('ours', '<div class="tag" style="font-size:26px;margin-bottom:8px"><i></i>我们的理解</div><div class="d3" style="font-size:44px;line-height:64px">公开榜单像顺光，模型看起来都差不多；<br>私有评测是你自己的侧光，<br>照出你在乎的差别。</div>', M, 1040);
+    footer('20VC · 2026.10.26', '05 / 07');
+  },
+  c07() {
+    el('ours', '<div class="tag"><i></i>我们的理解</div><div class="d2" style="font-size:56px;line-height:80px">给出海团队的三件事</div>', M, 132);
+    const items = [
+      ['1', '接入多家模型，按任务路由，<br>别绑死一家。'],
+      ['2', '用你自己的数据和标准，<br>建一套私有评测。'],
+      ['3', '给每个 agent 身份，调用全记录，<br>权限放在模型之外。'],
+    ];
+    items.forEach(([n, t], i) => {
+      const y = 380 + i * 196;
+      el('m', n, M, y + 14, {fontSize: '22px', color: 'var(--ink2)'});
+      el('d3', t, M + 64, y, {fontSize: '44px', lineHeight: '64px'});
+      const ln = document.createElement('div'); ln.className = 'hl';
+      Object.assign(ln.style, {left: M + 'px', top: (y - 26) + 'px', width: '888px'}); B.appendChild(ln);
+    });
+    img('hero5_glass.png', 1080 - 500, 790, 470, 445, {objectFit: 'none', opacity: .9, webkitMaskImage: 'radial-gradient(closest-side, #000 62%, transparent 100%)'});
+    el('d3', '模型，人人都买得到；<br>看它的角度，只有你有。', M, 948, {fontSize: '44px', lineHeight: '64px', color: 'var(--ink2)'});
+    el('c2', '来源：20VC 播客，Harry Stebbings 对话 Satya Nadella，2026.10.26 发布。观点据公开报道转述，非原话。<br>图片：布鲁克林博物馆（本片重新打光）、SpaceX、NASA。', M, 1240, {width: '888px', fontSize: '18px', lineHeight: '28px'});
+    footer('20VC · 2026.10.26', '07 / 07');
+  },
+};
+
+function footer(mid, page) {
+  const f = el('foot', `<div class="brand"><i></i>Coo-Coo出海Ai实验室</div><div class="m">${page}</div>`, null, 1336);
+}
+
+/* ---------- S8: glass case over the hero coin (three.js plate + 2D glass) ---------- */
+async function glassScene({ coinY, labels, keepDom, dist = 4150 }) {
+  if (!keepDom) {
+    idx('04', '零信任');
+    el('k', '他说', M, 300);
+    el('d2', '微软不等对齐问题解决，<br>先给模型套上零信任架构。', M, 352);
+  }
+  const tex = await new THREE.TextureLoader().loadAsync('img/hero6_glass.png');
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, alpha: true });
+  renderer.setSize(W, H); renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.domElement.style.mixBlendMode = 'lighten';
+  B.prepend(renderer.domElement);
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(24, W / H, 10, 10000);
+  const tilt = 34 * Math.PI / 180, D = dist;
+  // world: table plane z=0 (x right, y away from camera), coin at origin. Units = plate px.
+  cam.up.set(0, 0, 1);
+  cam.position.set(0, -Math.sin(tilt) * D, Math.cos(tilt) * D);
+  cam.lookAt(0, 0, 0);
+  cam.setViewOffset(W, H, 0, -(coinY - H / 2), W, H);      // coin lands at screen y = coinY
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(1080, 1000), new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }));
+  scene.add(plane);
+  renderer.render(scene, cam);
+  // --- glass case, projected with the same camera
+  const a = 230, h = 190, t = 6;   // half footprint, height, wall thickness (plate px)
+  const P = (x, y, z) => { const v = new THREE.Vector3(x, y, z).project(cam); return [(v.x + 1) / 2 * W, (1 - v.y) / 2 * H]; };
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; B.appendChild(cv);
+  const g = cv.getContext('2d');
+  const b = { fl: P(-a, -a, 0), fr: P(a, -a, 0), bl: P(-a, a, 0), br: P(a, a, 0) };
+  const T = { fl: P(-a, -a, h), fr: P(a, -a, h), bl: P(-a, a, h), br: P(a, a, h) };
+  const Ti = { fl: P(-a + t, -a + t, h), fr: P(a - t, -a + t, h), bl: P(-a + t, a - t, h), br: P(a - t, a - t, h) };
+  const poly = (pts) => { g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(...p) : g.moveTo(...p)); g.closePath(); };
+  const line = (p, q, w, c, blur = 0) => { g.save(); g.lineWidth = w; g.strokeStyle = c; g.lineCap = 'round'; if (blur) { g.shadowBlur = blur; g.shadowColor = c; } g.beginPath(); g.moveTo(...p); g.lineTo(...q); g.stroke(); g.restore(); };
+  const lerp = (p, q, u) => [p[0] + (q[0] - p[0]) * u, p[1] + (q[1] - p[1]) * u];
+  // 1. cast shadow of the case on the felt (key light from upper-left, 12 deg)
+  g.save(); g.filter = 'blur(34px)';
+  const shg = g.createLinearGradient(...b.fr, ...P(a + 170, -a + 70, 0));
+  shg.addColorStop(0, 'rgba(0,0,0,.26)'); shg.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = shg; poly([b.fr, P(a + 150, -a + 60, 0), P(a + 150, a + 60, 0), b.br]); g.fill(); g.restore();
+  // 2. far edges, seen through two walls: faint, slightly green
+  [[b.bl, b.br], [b.bl, T.bl], [b.br, T.br], [b.fl, b.bl], [b.fr, b.br]].forEach(([p, q]) => line(p, q, 1, 'rgba(200,228,214,.15)'));
+  // 3. front wall: Fresnel (more reflective toward the top where the view grazes), one soft horizontal reflection band
+  let gr = g.createLinearGradient(...lerp(b.fl, b.fr, .5), ...lerp(T.fl, T.fr, .5));
+  gr.addColorStop(0, 'rgba(214,232,224,.025)'); gr.addColorStop(.78, 'rgba(214,232,224,.05)'); gr.addColorStop(.9, 'rgba(255,244,230,.10)'); gr.addColorStop(1, 'rgba(214,232,224,.04)');
+  g.fillStyle = gr; poly([b.fl, b.fr, T.fr, T.fl]); g.fill();
+  // 4. top glass: broad reflection of the soft box (back-left) + narrow sweep streak + two dust specks
+  g.save(); poly([T.fl, T.fr, T.br, T.bl]); g.clip();
+  const rc = P(-a * 0.55, a * 0.45, h);
+  let rg = g.createRadialGradient(rc[0], rc[1], 0, rc[0], rc[1], 330);
+  rg.addColorStop(0, 'rgba(255,240,222,.13)'); rg.addColorStop(.55, 'rgba(255,240,222,.05)'); rg.addColorStop(1, 'rgba(255,240,222,0)');
+  g.fillStyle = rg; g.fillRect(0, 0, W, H);
+  const c0 = P(-a * 0.05, -a * 0.1, h);
+  const sg = g.createLinearGradient(c0[0] - 120, c0[1] + 70, c0[0] + 120, c0[1] - 70);
+  sg.addColorStop(0, 'rgba(255,236,214,0)'); sg.addColorStop(.40, 'rgba(255,236,214,.05)'); sg.addColorStop(.5, 'rgba(255,244,230,.17)');
+  sg.addColorStop(.60, 'rgba(255,236,214,.05)'); sg.addColorStop(1, 'rgba(255,236,214,0)');
+  g.fillStyle = sg; g.fillRect(0, 0, W, H);
+  [[c0[0] - 18, c0[1] + 4, .85], [c0[0] + 36, c0[1] - 15, .55]].forEach(([x, y, o]) => { g.fillStyle = `rgba(255,246,232,${o})`; g.fillRect(x, y, 1.3, 1.3); });
+  g.restore();
+  // 5. caustic: light refracted through the left wall lands just inside the right wall
+  line(P(a - 12, -a + 40, 0.5), P(a - 12, a - 40, 0.5), 2, 'rgba(255,214,170,.18)', 7);
+  // 6. contact with the felt: a dark seam + a tiny bright meniscus line above it
+  line(b.fl, b.fr, 2.4, 'rgba(0,0,0,.7)');
+  line(lerp(b.fl, T.fl, .012), lerp(b.fr, T.fr, .012), 1, 'rgba(232,244,238,.30)');
+  // 7. edges: every visible edge is two lines (outer surface + inner surface = wall thickness), inner one float-glass green
+  const dbl = (p, q, o, pi, qi) => { line(p, q, 1.3, `rgba(250,248,240,${o})`); line(pi, qi, 1, `rgba(170,214,192,${o * 0.55})`); };
+  dbl(b.fl, T.fl, .50, P(-a + t, -a + t, 0), Ti.fl);
+  dbl(b.fr, T.fr, .38, P(a - t, -a + t, 0), Ti.fr);
+  [[T.fr, T.br, .40, Ti.fr, Ti.br], [T.br, T.bl, .26, Ti.br, Ti.bl], [T.bl, T.fl, .52, Ti.bl, Ti.fl]].forEach(([p, q, o, pi, qi]) => dbl(p, q, o, pi, qi));
+  dbl(T.fl, T.fr, .70, Ti.fl, Ti.fr);
+  // the key light catches the front-top edge: a short hot segment with bloom (this is what travels during the sweep)
+  line(lerp(T.fl, T.fr, .02), lerp(T.fl, T.fr, .34), 2, 'rgba(255,244,228,.95)', 12);
+  // 8. case label: like the label plate in front of a museum case, below a hairline
+  if (labels) {
+    const rows = [['身份', '每个 agent 都有自己的身份'], ['记录', '每一次工具与模型调用都留下记录'], ['权限', '规则放在模型之外']];
+    const y0 = 1270;
+    const rule = document.createElement('div'); rule.className = 'hl';
+    Object.assign(rule.style, { left: M + 'px', top: (y0 - 22) + 'px', width: '888px' }); B.appendChild(rule);
+    rows.forEach(([hd, tx], i) => el('lab', `<b>${hd}</b><span>${tx}</span>`, M, y0 + i * 72));
+  }
+  gauge('侧光', 12, 150, 3200);
+}
+
+const run = frames[F];
+const p = run && run();
+await (p || Promise.resolve());
+await document.fonts.ready;
+await Promise.all([...document.images].map(i => i.decode().catch(() => {})));
+window.__ready = true;
+</script>
+</body>
+</html>

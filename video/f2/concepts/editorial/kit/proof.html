@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>PUBLIC DOMAIN proof frames</title>
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/500.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/600.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/400.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/500.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/700.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/instrument-serif/400.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/instrument-serif/400-italic.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/geist-mono/400.css">
+<style>
+:root{
+  --night:#0D0C0B; --paper:#EFEBE3; --ink:#171513;
+  --n1:#E9E4DA; --n2:#A39D92; --n3:#6F6A62;
+  --p2:#5F5B55; --p3:#8C877F;
+  --violet:#5B2EFF; --violet-n:#9A84FF;
+  --hair-n:rgba(233,228,218,.30); --hair-p:rgba(23,21,19,.32);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;overflow:hidden;background:var(--night)}
+body{font-synthesis:none;-webkit-font-smoothing:antialiased}
+.stage{position:relative;width:1080px;overflow:hidden}
+.night{background:var(--night);color:var(--n1)}
+.paper{background:var(--paper);color:var(--ink)}
+.abs{position:absolute;white-space:nowrap}
+.zh-d{font-family:'Noto Serif SC',serif;font-weight:600;letter-spacing:-.01em;text-autospace:normal;font-feature-settings:"halt" 0}
+.zh-b{font-family:'Noto Serif SC',serif;font-weight:500;text-autospace:normal}
+.zh-k{font-family:'Noto Sans SC',sans-serif;font-weight:500;font-size:44px;line-height:48px;letter-spacing:.02em;text-autospace:normal}
+.zh-c{font-family:'Noto Sans SC',sans-serif;font-weight:400;font-size:22px;line-height:30px;letter-spacing:.02em;text-autospace:normal}
+.mono{font-family:'Geist Mono',monospace;font-weight:400;font-size:20px;line-height:30px;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.it{font-family:'Instrument Serif',serif;font-style:italic;font-weight:400}
+.rom{font-family:'Instrument Serif',serif;font-style:normal;font-weight:400}
+.night .c2{color:var(--n2)} .paper .c2{color:var(--p2)}
+.night .c3{color:var(--n3)} .paper .c3{color:var(--p3)}
+.ours-n{color:var(--violet-n)} .ours-p{color:var(--violet)}
+.dot{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--violet);vertical-align:middle;margin:-6px 16px 0 0}
+.hn{background:var(--hair-n)} .hp{background:var(--hair-p)}
+img{display:block}
+.pc{font-feature-settings:"halt" 1;margin-right:.12em}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const IMG = 'img/';
+const f = new URLSearchParams(location.search).get('f') || 'f1';
+const CAR = f.startsWith('c');
+const H = CAR ? 1440 : 1920;
+const stage = document.createElement('div'); stage.className = 'stage'; stage.style.height = H + 'px';
+document.getElementById('root').appendChild(stage);
+const el = (html, css = '', cls = '') => { const d = document.createElement('div'); d.className = 'abs ' + cls; d.style.cssText = css; d.innerHTML = html; stage.appendChild(d); return d; };
+const img = (src, x, y, w, h, extra = '') => el(`<img src="${IMG + src}" style="width:${w}px;height:${h}px">`, `left:${x}px;top:${y}px;width:${w}px;height:${h}px;${extra}`);
+const hl = (x, y, w, c, t = 1.5) => el('', `left:${x}px;top:${y}px;width:${w}px;height:${t}px`, c);
+const vl = (x, y, h, c) => el('', `left:${x}px;top:${y}px;width:1.5px;height:${h}px`, c);
+const night = () => stage.classList.add('night');
+const paper = (src) => { stage.classList.add('paper'); if (src) img(src, 0, 0, 1080, H); };
+// running head: film y=196, carousel y=96
+function rh(num, sec) {
+  const y = CAR ? 96 : 196;
+  el(`<span class="zh-c">纳德拉 × 20VC</span><span class="mono" style="margin-left:16px">2026.10.26</span>`, `left:72px;top:${y}px`, 'c2');
+  el(`<span class="mono">${num}</span>${sec ? `<span class="zh-c" style="margin-left:12px">${sec}</span>` : ''}`, `right:72px;top:${y}px`, 'c2');
+}
+function foot() { // carousel footer
+  el('<span class="dot" style="width:10px;height:10px;margin:-4px 12px 0 0"></span>Coo-Coo出海Ai实验室', 'left:72px;top:1356px;font-family:Noto Sans SC;font-weight:500;font-size:24px;line-height:30px', 'c2');
+}
+const kick = (t, y, cls = 'c2') => el(t, `left:72px;top:${y}px`, 'zh-k ' + cls);
+const disp = (t, y, size, lh, cls = '', x = 68) => el(t.replace(/([，：；、])/g, '<span class="pc">$1</span>'), `left:${x}px;top:${y}px;font-size:${size}px;line-height:${lh}px`, 'zh-d ' + cls);
+const body = (t, y, size, lh, cls = 'c2', x = 72) => el(t, `left:${x}px;top:${y}px;font-size:${size}px;line-height:${lh}px`, 'zh-b ' + cls);
+// strike-through every rendered line of a block (ink hairline through the glyph centre)
+function strike(node, cls, pigtail) {
+  const r = document.createRange(); r.selectNodeContents(node);
+  const rects = [...r.getClientRects()].filter(q => q.width > 4);
+  const lines = {}; rects.forEach(q => { const k = Math.round(q.top); lines[k] = lines[k] ? { l: Math.min(lines[k].l, q.left), r: Math.max(lines[k].r, q.right), t: q.top, h: q.height } : { l: q.left, r: q.right, t: q.top, h: q.height }; });
+  const fs = parseFloat(getComputedStyle(node).fontSize);
+  Object.values(lines).forEach((L, i, arr) => {
+    const y = L.t + L.h / 2 + fs * 0.02;
+    hl(L.l - 4, y, L.r - L.l + 8, cls, 2.5);
+    if (pigtail && i === arr.length - 1) {     // proofreader's delete mark: stroke ends in a small loop
+      const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      s.setAttribute('width', 90); s.setAttribute('height', 70); s.style.cssText = `position:absolute;left:${L.r + 4}px;top:${y - 35}px;overflow:visible`;
+      s.innerHTML = `<path d="M0 35 C 22 35, 40 30, 52 18 C 62 8, 76 12, 72 26 C 68 40, 50 40, 52 26 C 54 14, 70 6, 86 4" fill="none" stroke="${cls === 'hp' ? '#171513' : '#E9E4DA'}" stroke-width="2.5" stroke-linecap="round"/>`;
+      stage.appendChild(s);
+    }
+  });
+}
+function waitFonts(cb) { document.fonts.ready.then(() => requestAnimationFrame(() => requestAnimationFrame(cb))); }
+
+// ---------- contact sheet (shared by film f6 and carousel c4) ----------
+const SHEET = [['coins','coins()','分割'],['rocket','rocket()','示例图'],['coffee','coffee()','椭圆 · 纹理'],['camera','camera()','分割 · 去噪'],
+  ['astronaut','astronaut()','彩色图'],['moon','moon()','直方图均衡'],['text','text()','角点检测'],['clock_motion','clock()','去模糊'],
+  ['hubble_deep_field','hubble_deep…()','多尺度检测'],['retina','retina()','圆形图像'],['grace_hopper','grace_hopper.jpg','matplotlib'],[null]];
+const TH = {coins:[205,162],rocket:[216,144],coffee:[216,144],camera:[162,162],astronaut:[162,162],moon:[162,162],text:[216,83],clock_motion:[216,162],hubble_deep_field:[186,162],retina:[162,162],grace_hopper:[138,162]};
+function sheet(top, mode) {
+  SHEET.forEach((c, i) => {
+    const col = i % 4, row = Math.floor(i / 4), x = 72 + col * 240, y = top + row * 270;
+    if (!c[0]) { el('', `left:${x}px;top:${y}px;width:216px;height:162px;border:1.5px solid var(${mode === 'n' ? '--hair-n' : '--hair-p'})`);
+      el('<span style="opacity:.6">12</span>', `left:${x}px;top:${y + 174}px;font-size:18px`, 'mono c2'); return; }
+    const [w, h] = TH[c[0]];
+    img('th_' + c[0] + '.png', x, y + 162 - h, w, h);
+    el(`<span style="opacity:.6">${String(i + 1).padStart(2, '0')}</span>&nbsp;&nbsp;${c[1]}`, `left:${x}px;top:${y + 174}px;font-size:18px`, 'mono c2');
+    el(c[2], `left:${x}px;top:${y + 202}px;font-size:20px`, 'zh-c c3');
+  });
+}
+
+const F = {
+  // ===================== FILM 1080x1920 =====================
+  f1() { night();
+    img('coins_hook_x2.4.png', 234, 653, 922, 727, 'mask-image:radial-gradient(ellipse 62% 58% at 55% 63%,#000 55%,transparent 100%)');
+    kick('微软CEO纳德拉判断', 288);
+    disp('大模型<br>要打价格战了', 360, 144, 168);
+  },
+  f2() { night(); rh('01', '价格战');
+    img('coins_hook_x2.4.png', 234, 653, 922, 727, 'mask-image:radial-gradient(ellipse 62% 58% at 55% 63%,#000 55%,transparent 100%)');
+    el('token', 'left:62px;top:268px;font-size:200px;line-height:200px', 'it');
+    el('/ˈtəʊkən/&nbsp;&nbsp;n.', 'left:72px;top:476px;font-size:24px', 'mono c2');
+    el('1', 'left:72px;top:540px;font-size:24px;line-height:72px', 'mono c3');
+    body('大模型API的计价单位', 540, 48, 72, '', 112);
+    el('2', 'left:72px;top:612px;font-size:24px;line-height:72px', 'mono c3');
+    body('代币：代替钱流通的小圆片', 612, 48, 72, '', 112);
+  },
+  f3() { night(); rh('01', '价格战');
+    kick('他判断', 288);
+    disp('模型层，会有一场<br>残酷的价格战', 360, 72, 96);
+    img('coins_field_16.png', 72, 696, 766, 606);
+    el('× 256<br>= 6,144 枚', 'left:862px;top:1242px', 'mono c2');
+  },
+  f4() { night(); rh('01', '价格战');
+    kick('他认为', 288);
+    disp('最前沿的模型<br>只会服务少数顶尖场景', 360, 72, 96);
+    img('field_slit.png', 72, 696, 766, 606);
+  },
+  f5() { night(); rh('02', '混用');
+    kick('据报道', 288);
+    disp('微软Copilot内部<br>每天都在混用多家模型', 360, 64, 88);
+    body('便宜的闭源模型，和开源模型', 560, 44, 60);
+    img('coins_hop_moment_x2.png', 72, 696, 766, 606);
+  },
+  f6() { night(); rh('03', '测试图');
+    disp('片中的照片，全是<br>开源软件自带的测试图', 360, 64, 88);
+    body('谁都能下载，谁都能拿它考算法', 552, 44, 60);
+    sheet(640, 'n');
+    el('前 10 张来自 scikit-image（skimage.data），1 张来自 matplotlib', 'left:72px;top:1428px', 'zh-c c3');
+  },
+  f7() { paper('emboss_film_plate12.png'); rh('03', '评测集');
+    kick('纳德拉认为', 288);
+    disp('每家公司，都会有<br>自己的私有评测集<br>这会是它的核心IP', 360, 64, 88);
+    el('图版 12', 'left:792px;top:672px', 'zh-c c2');
+    el('your_eval()<br>未公开<br>尺寸：只有你知道', 'left:792px;top:708px;font-size:20px', 'mono c3');
+    kick('<span class="dot"></span>我们的理解', 1242, 'ours-p');
+    disp('公开的考题，谁都能刷分<br>你的考题，只有你有', 1306, 52, 76, 'ours-p', 70);
+  },
+  f8() { paper('paper_1080x1920.png'); rh('04', '改口');
+    kick('被问到改变过什么看法，他说', 288);
+    img('text_696.png', 72, 360, 696, 267);
+    el('图版 07 · text() · 448 × 172 px · × 1.55', 'left:72px;top:651px', 'mono c3');
+    const s = body('以前以为：模型规模够大<br>对齐就会自然出现', 732, 64, 88, 'c2', 72);
+    disp('现在，他不这么想了', 944, 96, 120);
+    waitFonts(() => strike(s, 'hp', true));
+  },
+  f9() { paper('paper_1080x1920.png'); rh('04', '零信任');
+    kick('他说', 288);
+    disp('微软不等对齐问题解决<br>先给模型套上零信任架构', 360, 64, 88);
+    el('', 'left:72px;top:624px;width:536px;height:536px;border:1.5px solid var(--hair-p)');
+    img('retina_488.png', 96, 648, 488, 488);
+    [['身份', '每个Agent<br>都有身份', 624], ['记录', '每次调用<br>都留痕', 812], ['权限', '规则放在<br>模型之外', 1000]].forEach(([k, v, y]) => {
+      hl(608, y + 24, 80, 'hp'); el(k, `left:712px;top:${y}px`, 'zh-k'); body(v, y + 56, 44, 56, 'c2', 712); });
+    el('图版 10 · retina() · 1411 × 1411 px · × 0.35', 'left:72px;top:1184px', 'mono c2');
+    el('视网膜的血管分布因人而异，常被用作身份识别', 'left:72px;top:1216px', 'zh-c c3');
+  },
+  f10() { paper('paper_1080x1920.png'); rh('05', '我们的解读');
+    kick('<span class="dot"></span>我们的解读', 288, 'ours-p');
+    disp('给出海创业者的三件事', 360, 64, 88);
+    const items = [['架构上支持多模型路由<br>别绑死一家', 'idx_field.png'], ['建一套自己的<br>私有评测集', 'idx_emboss.png'], ['Agent的身份、日志、权限<br>放在模型之外', 'idx_retina.png']];
+    items.forEach(([t, th], i) => { const y = 520 + i * 232;
+      hl(72, y, 936, 'hp', 1.5);
+      el(String(i + 1), `left:70px;top:${y + 20}px;font-size:120px;line-height:120px`, 'rom ours-p');
+      body(t, y + 32, 48, 68, '', 192);
+      img(th, 912, y + 36, 96, 72); });
+    hl(72, 520 + 3 * 232, 936, 'hp', 1.5);
+    el('以上是我们的理解，不是纳德拉原话', 'left:72px;top:1240px;font-size:28px;line-height:36px', 'zh-c c2');
+  },
+  f11() { paper('paper_1080x1920.png');
+    disp('你的产品，现在<br>接了几家模型？', 360, 72, 96);
+    body('评论区聊聊', 576, 44, 60);
+    el('<span class="dot" style="width:16px;height:16px;margin:-6px 18px 0 0"></span>Coo-Coo出海Ai实验室', 'left:72px;top:1140px;font-family:Noto Sans SC;font-weight:700;font-size:48px;line-height:56px;letter-spacing:.01em');
+    el('来源：20VC 播客（主持 Harry Stebbings），嘉宾 Satya Nadella（微软CEO）<br>2026.10.26 发布。文中观点据公开报道整理，均为转述，非逐字引用<br>图片：scikit-image 与 matplotlib 自带的测试图<br>Brooklyn Museum · SpaceX · NASA · Rachel Michetti · Lav Varshney<br>Stefan van der Walt · Wikimedia Commons · U.S. Navy', 'left:72px;top:1236px;font-size:22px;line-height:32px', 'zh-c c2');
+  },
+  f11a() { // t = 56.4 s: coin 16 (matte, x2 = 94 px) sits on the dot's anchor (left edge x=72, centre y=1168); name not yet set
+    F.f11(); const m = stage.querySelectorAll('.abs'); m[m.length - 2].style.opacity = 0; m[m.length - 1].style.opacity = 0;
+    img('coin16_matte_x2.png', 72, 1168 - 47, 94, 94);
+  },
+  // ===================== CAROUSEL 1080x1440 =====================
+  c1() { night(); rh('01 / 07');
+    img('coins_hook_x2.4.png', 234, 537, 922, 727, 'mask-image:radial-gradient(ellipse 62% 58% at 55% 60%,#000 55%,transparent 100%)');
+    kick('微软CEO纳德拉判断', 168).style.cssText += ';font-size:48px;line-height:56px';
+    disp('大模型<br>要打价格战了', 244, 148, 172);
+    el('4 个判断 · 3 点解读　→', 'right:72px;top:1356px;font-size:24px;line-height:30px', 'zh-c c2');
+    foot();
+  },
+  c2() { night(); rh('02 / 07', '价格战');
+    kick('纳德拉判断', 168);
+    disp('大多数企业的日常算力<br>终将变成大宗商品', 236, 64, 88);
+    body('模型层会有一场残酷的价格战<br>最前沿的模型，只会服务少数顶尖场景', 436, 44, 64);
+    img('field_slit.png', 72, 600, 766, 606);
+    el('同一张照片 × 256　= 6,144 枚', 'left:72px;top:1230px', 'mono c3');
+    foot();
+  },
+  c3() { night(); rh('03 / 07', '混用');
+    kick('据报道', 168);
+    disp('微软Copilot内部<br>每天都在混用多家模型', 236, 64, 88);
+    body('便宜的闭源模型，和开源模型', 436, 44, 64);
+    img('coins_hops_multi_x2.png', 72, 552, 766, 606);
+    el('示意：每一束光，是一次调用', 'left:72px;top:1182px;font-size:28px;line-height:36px', 'zh-c c2');
+    foot();
+  },
+  c4() { night(); rh('04 / 07', '测试图');
+    kick('关于这组照片', 168);
+    disp('前面的照片，全是<br>开源软件自带的测试图', 236, 64, 88);
+    body('谁都能下载，谁都能拿它考算法', 424, 44, 60);
+    sheet(512, 'n');
+    foot();
+  },
+  c5() { paper('emboss_car_plate12.png'); rh('05 / 07', '评测集');
+    kick('纳德拉认为', 168);
+    disp('每家公司，都会有<br>自己的私有评测集<br>这会是它的核心IP', 236, 64, 88);
+    el('图版 12', 'left:712px;top:548px', 'zh-c c2');
+    el('your_eval()<br>未公开<br>尺寸：只有你知道', 'left:712px;top:584px;font-size:20px', 'mono c3');
+    kick('<span class="dot"></span>我们的理解', 1058, 'ours-p');
+    disp('公开的考题，谁都能刷分<br>你的考题，只有你有', 1122, 52, 76, 'ours-p', 70);
+    foot();
+  },
+  c6() { paper('paper_1080x1440.png'); rh('06 / 07', '零信任');
+    kick('被问到改变过什么看法，他说', 168);
+    const s = body('以前以为：模型规模够大<br>对齐就会自然出现', 236, 52, 72, 'c2', 72);
+    disp('现在，他不这么想了', 404, 72, 96);
+    body('微软不等对齐问题解决，<br>先给模型套上零信任架构：', 520, 44, 64, '', 72);
+    el('', 'left:72px;top:680px;width:536px;height:536px;border:1.5px solid var(--hair-p)');
+    img('retina_488.png', 96, 704, 488, 488);
+    [['身份', '每个Agent<br>都有身份', 704], ['记录', '每次调用<br>都留痕', 888], ['权限', '规则放在<br>模型之外', 1072]].forEach(([k, v, y]) => {
+      hl(608, y + 24, 80, 'hp'); el(k, `left:712px;top:${y}px`, 'zh-k');
+      body(v, y + 56, 44, 56, 'c2', 712); });
+    el('图版 10 · retina() · 1411 × 1411 px · × 0.35', 'left:72px;top:1240px', 'mono c3');
+    waitFonts(() => strike(s, 'hp', true));
+    foot();
+  },
+  c7() { paper('paper_1080x1440.png'); rh('07 / 07', '我们的解读');
+    kick('<span class="dot"></span>我们的解读', 168, 'ours-p');
+    disp('给出海创业者的三件事', 236, 64, 88);
+    const items = [['架构上支持多模型路由，别绑死一家', 'idx_field.png'], ['建一套自己的私有评测集', 'idx_emboss.png'], ['Agent的身份、日志、权限，<br>放在模型之外', 'idx_retina.png']];
+    items.forEach(([t, th], i) => { const y = 364 + i * 176;
+      hl(72, y, 936, 'hp');
+      el(String(i + 1), `left:70px;top:${y + 22}px;font-size:96px;line-height:96px`, 'rom ours-p');
+      body(t, y + 30, 44, 60, '', 160);
+      img(th, 912, y + 32, 96, 72); });
+    hl(72, 364 + 3 * 176, 936, 'hp');
+    el('以上是我们的理解，不是纳德拉原话', 'left:72px;top:912px;font-size:28px;line-height:36px', 'zh-c c2');
+    disp('你的产品，现在接了几家模型？', 1000, 52, 72);
+    body('评论区聊聊', 1076, 44, 60);
+    el('来源：20VC 播客（主持 Harry Stebbings），嘉宾 Satya Nadella（微软 CEO），2026.10.26 发布<br>观点据公开报道整理，均为转述，非逐字引用<br>图片：scikit-image、matplotlib 自带测试图 · Brooklyn Museum · SpaceX · NASA<br>Rachel Michetti · Lav Varshney · Stefan van der Walt · Wikimedia Commons · U.S. Navy', 'left:72px;top:1164px;font-size:20px;line-height:30px', 'zh-c c3');
+    el('<span class="dot" style="width:12px;height:12px;margin:-5px 14px 0 0"></span>Coo-Coo出海Ai实验室', 'left:72px;top:1340px;font-family:Noto Sans SC;font-weight:700;font-size:36px;line-height:44px');
+  },
+};
+F[f]();
+</script>
+</body>
+</html>

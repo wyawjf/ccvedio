@@ -1,0 +1,178 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>F2 type layer</title>
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/500.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/600.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/700.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/500.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/700.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/ibm-plex-mono/400.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/ibm-plex-mono/500.css">
+<style>
+  html, body { margin: 0; padding: 0; background: transparent; }
+  #stage { position: relative; overflow: hidden; }
+  #sheet { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 0 0; }
+  /* §5.2 CJK rules: full-width punctuation everywhere, literal spaces only, no wrapping */
+  .e, .clip, .e span {
+    font-feature-settings: normal; font-kerning: normal; text-spacing-trim: space-all;
+    text-autospace: no-autospace; white-space: pre; text-rendering: geometricPrecision;
+    -webkit-font-smoothing: antialiased;
+  }
+  .e { position: absolute; display: none; will-change: transform, opacity; }
+  .clip { position: absolute; overflow: hidden; display: none; }
+  .clip > .e { display: block; left: 0; }
+  .v { writing-mode: vertical-rl; text-orientation: mixed; }
+  .tcu { text-combine-upright: all; }
+</style></head>
+<body><div id="stage"><div id="sheet"></div></div>
+<script>
+const FAM = { serif: "'Noto Serif SC'", sans: "'Noto Sans SC'", mono: "'IBM Plex Mono'" };
+const FAMNAME = { serif: 'Noto Serif SC', sans: 'Noto Sans SC', mono: 'IBM Plex Mono' };
+const NODES = {};
+let DATA = null;
+
+function makeRuns(el, runs) {
+  for (const r of runs) {
+    const s = document.createElement('span');
+    s.textContent = r.t;
+    s.style.fontFamily = FAM[r.f];
+    s.style.fontWeight = r.w;
+    s.style.fontSize = r.s + 'px';
+    s.style.letterSpacing = r.tr + 'em';
+    s.style.color = r.c;
+    if (r.tcu) s.className = 'tcu';
+    el.appendChild(s);
+  }
+}
+
+function build(data) {
+  const stage = document.getElementById('stage');
+  stage.style.width = data.w + 'px';
+  stage.style.height = data.h + 'px';
+  const sheet = document.getElementById('sheet');
+  for (const spec of data.elements) {
+    const host = spec.layer === 'sheet' ? sheet : stage;
+    let node, outer;
+    if (spec.kind === 'rect') {
+      node = document.createElement('div');
+      node.className = 'e';
+      Object.assign(node.style, { left: spec.x + 'px', top: spec.y + 'px', width: spec.w + 'px', height: spec.h + 'px', background: spec.c });
+      host.appendChild(node);
+      outer = node;
+    } else if (spec.kind === 'ring') {          // stroke centred on radius r
+      node = document.createElement('div');
+      node.className = 'e';
+      const d = 2 * spec.r + spec.sw;
+      Object.assign(node.style, { left: (spec.cx - d / 2) + 'px', top: (spec.cy - d / 2) + 'px', width: d + 'px', height: d + 'px',
+        border: spec.sw + 'px solid ' + spec.c, borderRadius: '50%', boxSizing: 'border-box' });
+      host.appendChild(node);
+      outer = node;
+    } else {
+      node = document.createElement('div');
+      node.className = 'e' + (spec.kind === 'vtext' ? ' v' : '');
+      node.style.lineHeight = spec.lh + 'px';
+      makeRuns(node, spec.runs);
+      if (spec.clip) {                     // running head: a fixed window the text rolls through
+        outer = document.createElement('div');
+        outer.className = 'clip';
+        Object.assign(outer.style, { left: spec.x + 'px', top: (spec.y - 6) + 'px', height: (spec.lh + 12) + 'px', width: '600px' });
+        node.style.top = '6px';
+        outer.appendChild(node);
+        host.appendChild(outer);
+      } else {
+        if (spec.align === 'right') {
+          const last = spec.runs[spec.runs.length - 1];
+          node.style.right = (data.w - spec.x - last.tr * last.s) + 'px';   // drop the trailing tracking
+        } else node.style.left = spec.x + 'px';
+        node.style.top = spec.y + 'px';
+        host.appendChild(node);
+        outer = node;
+      }
+    }
+    NODES[spec.id] = { spec, node, outer };
+  }
+}
+
+function placeAfter() {
+  // running-head names sit right after the chapter number (all numbers share one mono width);
+  // measured only after the webfonts are in, never with a fallback face
+  for (const id in NODES) {
+    const n = NODES[id];
+    if (!n.spec.xAfter) continue;
+    const ref = NODES[n.spec.xAfter];
+    ref.outer.style.display = 'block';
+    ref.node.style.display = 'block';
+    const w = ref.node.getBoundingClientRect().width;
+    ref.outer.style.display = 'none';
+    n.outer.style.left = (n.spec.x + w) + 'px';
+  }
+}
+
+function fontKeys(data) {
+  const keys = {};
+  const add = (r, text) => {
+    const k = `${r.w} ${r.s}px "${FAMNAME[r.f]}"`;
+    keys[k] = (keys[k] || '') + text;
+  };
+  for (const spec of data.elements) for (const r of (spec.runs || [])) add(r, r.t);
+  for (const st of data.states) for (const id in st.e) {
+    const v = st.e[id];
+    const extra = v[2] || {};
+    if (extra.text) add(NODES[id].spec.runs[0], extra.text);
+  }
+  for (const k in keys) keys[k] = Array.from(new Set(keys[k])).join('');
+  return keys;
+}
+
+async function loadFonts(data) {
+  const keys = fontKeys(data);
+  await Promise.all(Object.entries(keys).map(([k, t]) => document.fonts.load(k, t)));
+  await document.fonts.ready;
+  await Promise.all(Object.entries(keys).map(([k, t]) => document.fonts.load(k, t)));   // second pass
+  await document.fonts.ready;
+  const failed = Object.entries(keys).filter(([k, t]) => !document.fonts.check(k, t)).map(([k]) => k);
+  window.__fontReport = { keys: Object.keys(keys).length, failed };
+  if (failed.length) throw new Error('fonts not loaded: ' + failed.join(', '));
+}
+
+function applyState(st) {
+  for (const id in NODES) {
+    const n = NODES[id];
+    const v = st.e[id];
+    if (!v) { n.outer.style.display = 'none'; continue; }
+    n.outer.style.display = 'block';
+    n.node.style.display = 'block';
+    n.node.style.opacity = v[0];
+    n.node.style.transform = `translate3d(0, ${v[1]}px, 0)`;
+    const extra = v[2] || {};
+    if (extra.text !== undefined && n.node.firstChild) n.node.firstChild.textContent = extra.text;
+    if (extra.color) for (const s of n.node.children) s.style.color = extra.color;
+    else if (n.spec.runs) n.spec.runs.forEach((r, i) => { if (n.node.children[i]) n.node.children[i].style.color = r.c; });
+  }
+  const sheet = document.getElementById('sheet');
+  if (st.sheet) sheet.style.transform = `translate(${st.sheet[1]}px, ${st.sheet[2]}px) scale(${st.sheet[0]})`;
+  else sheet.style.transform = 'none';
+}
+
+window.renderState = async (i) => {
+  applyState(DATA.states[i]);
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  return DATA.states[i].key;
+};
+
+(async () => {
+  try {
+    const src = new URLSearchParams(location.search).get('data');
+    DATA = await (await fetch(src)).json();
+    build(DATA);
+    await loadFonts(DATA);
+    placeAfter();
+    window.__nstates = DATA.states.length;
+    window.__ready = true;
+  } catch (e) {
+    window.__error = String(e);
+    window.__ready = true;
+  }
+})();
+</script>
+</body></html>

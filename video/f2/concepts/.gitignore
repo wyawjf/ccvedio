@@ -1,0 +1,3 @@
+# full-size proof renders stay local; the .jpg strips and sheets summarise them
+*.png
+__pycache__/

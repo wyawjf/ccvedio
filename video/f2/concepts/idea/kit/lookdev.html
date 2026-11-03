@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>The Last Element · look-dev</title>
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/500.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/700.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/400.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/500.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/700.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/lxgw-wenkai/500.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/geist-mono/400.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/geist-mono/500.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/instrument-serif/400-italic.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/inter-tight/500.css">
+<style>
+  :root {
+    --ink: #0B0A09; --plate: #121110; --paper: #EEE8DE; --paper2: #CFC7BA;
+    --dim: #A39C92; --mute: #6E685F; --hair: rgba(238,232,222,.18);
+    --violet: #5B2EFF; --violet-t: #8C72FF;
+  }
+  html, body { margin: 0; background: var(--ink); }
+  #stage { position: relative; width: 1080px; overflow: hidden; background: var(--ink); }
+  canvas { position: absolute; left: 0; top: 0; }
+  .t { position: absolute; white-space: nowrap; color: var(--paper); font-kerning: normal; }
+  .serif { font-family: 'Noto Serif SC', serif; }
+  .sans { font-family: 'Noto Sans SC', sans-serif; }
+  .kai { font-family: 'LXGW WenKai', serif; }
+  .mono { font-family: 'Geist Mono', monospace; font-variant-numeric: tabular-nums; }
+  .lat { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 1.12em; letter-spacing: 0; }
+  .latsans { font-family: 'Inter Tight', sans-serif; font-weight: 500; letter-spacing: 0.02em; }
+  .halt { font-feature-settings: "halt" 1; }
+  .rule { position: absolute; height: 2px; background: var(--dim); }
+  .dot { position: absolute; border-radius: 50%; background: var(--violet); }
+</style>
+</head>
+<body>
+<div id="stage"><canvas id="cv"></canvas></div>
+<script>
+const TAU = Math.PI * 2;
+const W = 1080;
+const q = new URLSearchParams(location.search);
+const FRAME = q.get('f') || 'f01';
+const H = FRAME.startsWith('c') ? 1440 : 1920;
+const stage = document.getElementById('stage');
+stage.style.height = H + 'px';
+const cv = document.getElementById('cv');
+cv.width = W; cv.height = H;
+const ctx = cv.getContext('2d');
+ctx.imageSmoothingQuality = 'high';
+
+const IMG = {};
+function load(name) {
+  return new Promise((res) => { const i = new Image(); i.onload = () => { IMG[name] = i; res(i); }; i.src = 'img/' + name; });
+}
+
+// ------------------------------------------------------------------ text, placed by BASELINE
+const probeCache = {};
+function baselineOffset(cls, size, lh, weight) {
+  const key = [cls, size, lh, weight].join('|');
+  if (probeCache[key] != null) return probeCache[key];
+  const d = document.createElement('div');
+  d.className = 't ' + cls; d.style.fontSize = size + 'px'; d.style.lineHeight = lh + 'px'; d.style.fontWeight = weight;
+  d.style.left = '0px'; d.style.top = '0px'; d.style.visibility = 'hidden';
+  d.innerHTML = '国<span style="display:inline-block;width:0;height:0;vertical-align:baseline"></span>';
+  stage.appendChild(d);
+  const off = d.lastChild.offsetTop;
+  stage.removeChild(d);
+  return (probeCache[key] = off);
+}
+// T(html, x, baseline, {cls,size,lh,weight,color,track,align})
+function T(html, x, base, o = {}) {
+  const cls = o.cls || 'serif', size = o.size || 60, lh = o.lh || Math.round(size * 1.4), weight = o.weight || 500;
+  const d = document.createElement('div');
+  d.className = 't ' + cls;
+  Object.assign(d.style, { fontSize: size + 'px', lineHeight: lh + 'px', fontWeight: weight, color: o.color || 'var(--paper)',
+    letterSpacing: (o.track ?? 0.02) + 'em' });
+  d.innerHTML = html;
+  stage.appendChild(d);
+  const top = base - baselineOffset(cls, size, lh, weight);
+  d.style.top = top + 'px';
+  if (o.align === 'right') { d.style.left = (x - d.offsetWidth + size * (o.track ?? 0.02)) + 'px'; }
+  else if (o.align === 'center') { d.style.left = (x - d.offsetWidth / 2) + 'px'; }
+  else d.style.left = (x + (o.optical || 0)) + 'px';
+  return d;
+}
+const lat = (s) => `<span class="lat">${s}</span>`;
+// kicker with a 28 x 2 rule before it
+function K(text, base, o = {}) {
+  const size = o.size || 32;
+  if (o.violet) {            // our voice: the brand's violet dot, then violet text
+    dotAt(96 + 5, base - size * 0.36, 10);
+    return T(text, 96 + 24, base, { cls: 'sans', size, weight: 500, track: 0.1, color: 'var(--violet-t)', lh: 40 });
+  }
+  return T(text, 96, base, { cls: 'sans', size, weight: 500, track: 0.1, color: 'var(--dim)', lh: 40 });   // his voice: no marker
+}
+// film micro line (chapter label left, live readout right)
+function micro(idx, cjk, latin, readout, base = 236) {
+  T(idx, 96, base, { cls: 'mono', size: 22, weight: 500, track: 0.02, color: '#8A847B', lh: 28 });
+  const c = T(cjk, 134, base, { cls: 'sans', size: 26, weight: 500, track: 0.06, color: 'var(--paper2)', lh: 32 });
+  T(latin, 134 + c.offsetWidth + 14, base, { cls: 'mono', size: 16, weight: 400, track: 0.22, color: 'var(--mute)', lh: 20 });
+  if (readout) T(readout, 984, base, { cls: 'mono', size: 24, weight: 400, track: 0.02, color: 'var(--dim)', lh: 30, align: 'right' });
+}
+function footer(page) {
+  dotAt(103, 1369, 14);
+  T('Coo-Coo出海Ai实验室', 124, 1378, { cls: 'sans', size: 26, weight: 700, track: 0.02, color: 'var(--paper2)', lh: 32 });
+  if (page) T(page, 984, 1378, { cls: 'mono', size: 20, weight: 400, track: 0.04, color: 'var(--mute)', lh: 26, align: 'right' });
+}
+function dotAt(cx, cy, d, glow) {
+  const e = document.createElement('div'); e.className = 'dot';
+  Object.assign(e.style, { left: (cx - d / 2) + 'px', top: (cy - d / 2) + 'px', width: d + 'px', height: d + 'px' });
+  if (glow) e.style.boxShadow = '0 0 18px 4px rgba(91,46,255,.55), 0 0 60px 18px rgba(91,46,255,.22)';
+  stage.appendChild(e);
+}
+
+// ------------------------------------------------------------------ photos inside an aperture
+// img drawn so that image pixel (sx, sy) lands on (cx, cy); s = display px per image px
+function photo(img, cx, cy, r, sx, sy, s, o = {}) {
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.clip();
+  ctx.fillStyle = '#121110'; ctx.fillRect(cx - r, cy - r, 2 * r, 2 * r);
+  ctx.globalAlpha = o.alpha ?? 1;
+  ctx.filter = o.filter || 'none';
+  ctx.drawImage(img, cx - sx * s, cy - sy * s, img.width * s, img.height * s);
+  ctx.filter = 'none'; ctx.globalAlpha = 1;
+  // natural lens fall-off inside the field stop (18% at the rim)
+  const g = ctx.createRadialGradient(cx, cy, r * 0.35, cx, cy, r);
+  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, `rgba(0,0,0,${o.vig ?? 0.18})`);
+  ctx.fillStyle = g; ctx.fillRect(cx - r, cy - r, 2 * r, 2 * r);
+  if (o.terminator) { // planet lighting, used only while the retina is still "a planet"
+    const tg = ctx.createLinearGradient(cx - r * 0.6, cy - r * 0.6, cx + r * 0.9, cy + r * 0.9);
+    tg.addColorStop(0, 'rgba(0,0,0,0)'); tg.addColorStop(0.55, 'rgba(0,0,0,0)'); tg.addColorStop(1, `rgba(0,0,0,${o.terminator})`);
+    ctx.fillStyle = tg; ctx.fillRect(cx - r, cy - r, 2 * r, 2 * r);
+  }
+  ctx.restore();
+  // field-stop edge: hairline + 0.8 px chromatic fringe
+  if (!o.noEdge) {
+    ctx.save(); ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(255,96,64,0.10)'; ctx.beginPath(); ctx.arc(cx, cy, r + 0.8, 0, TAU); ctx.stroke();
+    ctx.strokeStyle = 'rgba(80,140,255,0.08)'; ctx.beginPath(); ctx.arc(cx, cy, r - 0.8, 0, TAU); ctx.stroke();
+    ctx.strokeStyle = 'rgba(238,232,222,0.10)'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.stroke();
+    ctx.restore();
+  }
+}
+
+// ------------------------------------------------------------------ the iris (section 5.4)
+function iris(cx, cy, r, Ro, rMax, phi0 = -Math.PI / 2) {
+  const N = 9, close = 1 - r / rMax;
+  const phi = phi0 + 1.6 * close * Math.PI / N;
+  const k = 0.55 + 0.4 * (r / rMax);
+  const c = Math.cos(Math.PI / N);
+  const rc = r * c + (r / c - r * c) * k;
+  const DELTA = 0.95, EXP = 0.8, STEPS = 48;
+  const V = [...Array(N)].map((_, i) => phi + i * TAU / N);
+  const P = (a, rad) => [cx + rad * Math.cos(a), cy + rad * Math.sin(a)];
+  const curve = (i, u) => P(V[i] + DELTA * u, r + (Ro - r) * Math.pow(u, EXP));
+  const KEY = -3 * Math.PI / 4;  // key light from upper left
+  ctx.save();
+  for (let i = 0; i < N; i++) {
+    const j = (i + 1) % N;
+    ctx.beginPath();
+    for (let s = 0; s <= STEPS; s++) { const [x, y] = curve(i, s / STEPS); s ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    const a0 = V[i] + DELTA;
+    ctx.arc(cx, cy, Ro, a0, a0 + TAU / N, false);
+    for (let s = STEPS; s >= 0; s--) { const [x, y] = curve(j, s / STEPS); ctx.lineTo(x, y); }
+    const am = V[i] + TAU / (2 * N);
+    const [qx, qy] = P(am, rc), [vx, vy] = P(V[i], r);
+    ctx.quadraticCurveTo(qx, qy, vx, vy);
+    ctx.closePath();
+    const mid = am + DELTA * 0.55;
+    const key = 0.5 + 0.5 * Math.cos(mid - KEY);
+    const [x0, y0] = curve(i, 0.45), [x1, y1] = curve(j, 0.45);
+    const g = ctx.createLinearGradient(x0, y0, x1, y1);
+    const b0 = 22 + 9 * key, b1 = 15 + 4 * key;
+    g.addColorStop(0, `rgb(${b0 + 1},${b0},${b0 - 2})`); g.addColorStop(1, `rgb(${b1 + 1},${b1},${b1 - 2})`);
+    ctx.fillStyle = g; ctx.fill();
+  }
+  // blade edges: soft shadow cast on the next blade, then a hairline highlight
+  for (let i = 0; i < N; i++) {
+    const path = new Path2D();
+    for (let s = 0; s <= STEPS; s++) { const [x, y] = curve(i, s / STEPS); s ? path.lineTo(x, y) : path.moveTo(x, y); }
+    ctx.save(); ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 3; ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 7;
+    ctx.translate(1.2, 1.2); ctx.stroke(path); ctx.restore();
+    const mid = V[i] + DELTA * 0.5, key = 0.5 + 0.5 * Math.cos(mid - KEY);
+    ctx.strokeStyle = `rgba(238,232,222,${0.08 + 0.16 * key})`; ctx.lineWidth = 1.1; ctx.stroke(path);
+  }
+  // blade tips catch a little light at the aperture edge
+  ctx.beginPath();
+  for (let i = 0; i <= N; i++) {
+    const a = V[i % N], [vx, vy] = P(a, r);
+    if (!i) ctx.moveTo(vx, vy); else { const [qx, qy] = P(a - TAU / (2 * N), rc); ctx.quadraticCurveTo(qx, qy, vx, vy); }
+  }
+  ctx.strokeStyle = 'rgba(238,232,222,0.14)'; ctx.lineWidth = 1; ctx.stroke();
+  // outer ring (16 px), anodised black with a conic highlight
+  ctx.beginPath(); ctx.arc(cx, cy, Ro + 16, 0, TAU); ctx.arc(cx, cy, Ro, 0, TAU, true);
+  const cg = ctx.createConicGradient(KEY - Math.PI / 2, cx, cy);
+  cg.addColorStop(0, '#141312'); cg.addColorStop(0.25, '#211F1C'); cg.addColorStop(0.5, '#141312'); cg.addColorStop(0.75, '#0F0E0D'); cg.addColorStop(1, '#141312');
+  ctx.fillStyle = cg; ctx.fill();
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(238,232,222,0.12)'; ctx.beginPath(); ctx.arc(cx, cy, Ro + 0.5, 0, TAU); ctx.stroke();
+  ctx.strokeStyle = 'rgba(238,232,222,0.06)'; ctx.beginPath(); ctx.arc(cx, cy, Ro + 15.5, 0, TAU); ctx.stroke();
+  ctx.restore();
+}
+
+// ------------------------------------------------------------------ engraved barrel rings (section 5.5)
+function arcText(text, cx, cy, rad, centre, font, color, extra = 0) {
+  ctx.save(); ctx.font = font; ctx.fillStyle = color; ctx.textBaseline = 'middle';
+  const ws = [...text].map((ch) => ctx.measureText(ch).width + extra);
+  const total = ws.reduce((a, b) => a + b, 0) - extra;
+  let a = centre - total / 2 / rad;
+  [...text].forEach((ch, i) => {
+    const w = ws[i] - extra, am = a + w / 2 / rad;
+    ctx.save(); ctx.translate(cx + rad * Math.cos(am), cy + rad * Math.sin(am)); ctx.rotate(am + Math.PI / 2);
+    // engraving: 1 px dark offset below, then the fill
+    ctx.fillStyle = 'rgba(0,0,0,0.75)'; ctx.fillText(ch, -w / 2, 1);
+    ctx.fillStyle = color; ctx.fillText(ch, -w / 2, 0);
+    ctx.restore();
+    a += ws[i] / rad;
+  });
+  ctx.restore();
+  return total / rad;
+}
+function ring(cx, cy, r0, r1, spec) {
+  const KEY = -3 * Math.PI / 4, top = -Math.PI / 2;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, r1, 0, TAU); ctx.arc(cx, cy, r0, 0, TAU, true);
+  const g = ctx.createConicGradient(KEY - Math.PI / 2, cx, cy);
+  g.addColorStop(0, '#151413'); g.addColorStop(0.25, '#23201D'); g.addColorStop(0.5, '#151413'); g.addColorStop(0.75, '#100F0E'); g.addColorStop(1, '#151413');
+  ctx.fillStyle = g; ctx.fill();
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(238,232,222,0.14)'; ctx.beginPath(); ctx.arc(cx, cy, r0 + 0.5, Math.PI * 0.85, Math.PI * 1.85); ctx.stroke();
+  ctx.strokeStyle = 'rgba(0,0,0,0.9)'; ctx.beginPath(); ctx.arc(cx, cy, r1 - 0.5, 0, TAU); ctx.stroke();
+  const rot = spec.rot || 0;
+  // knurling (outer ring only)
+  if (spec.knurl) {
+    ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 1.2;
+    for (let i = 0; i < 300; i++) {
+      const a = rot + i * TAU / 300; if (Math.abs(((a - top + Math.PI) % TAU + TAU) % TAU - Math.PI) < 0.30) continue;
+      ctx.beginPath(); ctx.moveTo(cx + (r1 - 13) * Math.cos(a), cy + (r1 - 13) * Math.sin(a));
+      ctx.lineTo(cx + (r1 - 2) * Math.cos(a), cy + (r1 - 2) * Math.sin(a)); ctx.stroke();
+    }
+  }
+  // scale ticks along the inner edge
+  if (spec.ticks) {
+    const [step, major] = spec.ticks;
+    for (let d = 0; d < 360; d += step) {
+      const a = rot + d * Math.PI / 180;
+      if (Math.abs(((a - top + Math.PI) % TAU + TAU) % TAU - Math.PI) < 0.26) continue;   // leave room for the label
+      const L = d % major === 0 ? 9 : 5;
+      ctx.strokeStyle = d % major === 0 ? 'rgba(207,199,186,0.55)' : 'rgba(207,199,186,0.28)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(cx + (r0 + 2) * Math.cos(a), cy + (r0 + 2) * Math.sin(a));
+      ctx.lineTo(cx + (r0 + 2 + L) * Math.cos(a), cy + (r0 + 2 + L) * Math.sin(a)); ctx.stroke();
+    }
+  }
+  // small engraved legends around the ring
+  if (spec.legends) {
+    spec.legends.filter(([deg]) => deg < -140 || deg > -25).forEach(([deg, txt]) => arcText(txt, cx, cy, (r0 + r1) / 2 + 3, rot + deg * Math.PI / 180, '400 12px "Geist Mono"', 'rgba(207,199,186,0.62)', 1.2));
+  }
+  // the label sits on the 12 o'clock index when the ring is locked
+  const rm = (r0 + r1) / 2;
+  const span = arcText(spec.cjk, cx, cy, rm, top + rot - 0.0, '700 22px "Noto Sans SC"', '#EEE8DE', 2);
+  arcText(spec.latin, cx, cy, rm, top + rot + span / 2 + 14 / rm + (spec.latin.length * 9.5) / 2 / rm, '400 11px "Geist Mono"', 'rgba(207,199,186,0.75)', 2.2);
+  ctx.restore();
+}
+
+// ------------------------------------------------------------------ frames
+const E = { x: 540, y: 700 };   // the eyepiece centre on the 1080 x 1920 film grid
+const HERO6 = { sx: 182.4, sy: 180.6 };   // coin centre inside coin_hero_w*.png (6x of the 61 px crop)
+
+const FR = {};
+
+FR.f01 = async () => {      // hook, t = 0.60 s, after the snap
+  await load('coin_hero_w0.png');
+  micro('01', '光圈', 'APERTURE', 'ƒ/4');
+  photo(IMG['coin_hero_w0.png'], E.x, E.y, 122, HERO6.sx, HERO6.sy, 4.4 / 6);
+  iris(E.x, E.y, 118, 368, 300);
+  K('微软 CEO 纳德拉判断', 1148, { size: 34 });
+  T('大模型', 96, 1296, { size: 124, lh: 140, weight: 700, track: -0.01, optical: -5 });
+  T('要打价格战了', 96, 1436, { size: 124, lh: 140, weight: 700, track: -0.01, optical: -5 });
+};
+
+FR.f03 = async () => {      // commodity, t = 9.6 s, the wear cascade half way
+  await load('tray_mid.png');
+  micro('01', '光圈', 'APERTURE', 'ƒ/1.4');
+  photo(IMG['tray_mid.png'], E.x, E.y, 300, 192 * 2, 152 * 2, 2.0 / 2);
+  iris(E.x, E.y, 300, 368, 300);
+  K('纳德拉判断', 1176);
+  T('大多数企业场景的日常算力，', 96, 1260, { size: 60, lh: 84 });
+  T('终将被商品化。', 96, 1344, { size: 60, lh: 84 });
+};
+
+FR.f05a = async () => {     // frontier, t = 18.4 s, the wide end (24 mm)
+  await load('espresso.png');
+  micro('02', '焦距', 'FOCAL LENGTH', '24 mm · 大多数场景');
+  photo(IMG['espresso.png'], E.x, E.y, 300, 292 * 1.5, 200 * 1.5, 1.0);
+  focalScale(E.x, E.y, 300, 24);
+  T('Espresso · Rachel Michetti · CC0', 984, 1048, { cls: 'mono', size: 16, weight: 400, track: 0.04, color: 'var(--mute)', lh: 20, align: 'right' });
+};
+
+FR.f07 = async () => {      // changed mind, t = 35.6 s, focus never locks
+  await load('text_dof.png');
+  micro('04', '对焦', 'FOCUS', 'AF —');
+  photo(IMG['text_dof.png'], E.x, E.y, 210, 224 * 2.45, 86 * 2.45, 1.0);
+  K('他说', 1176);
+  T('现在，他不这么想了。', 96, 1260, { size: 60, lh: 84 });
+};
+
+FR.f08a = async () => {     // zero trust, t = 37.6 s, the clock insert
+  await load('clock.png');
+  micro('05', '镜筒', 'BARREL', '1/8 s');
+  photo(IMG['clock.png'], E.x, E.y, 210, 212 * 1.5, 152 * 1.5, 1.0);
+  K('他说', 1108);
+  T('微软不等对齐问题先被解决，', 96, 1192, { size: 60, lh: 84 });
+};
+
+FR.f04 = async () => {      // price war, t = 14.60 s, third detent (ƒ/4)
+  await load('tray_worn.png');
+  micro('01', '光圈', 'APERTURE', 'ƒ/4');
+  photo(IMG['tray_worn.png'], E.x, E.y, 110, 205 * 2, 179 * 2, 2.0 / 2);
+  iris(E.x, E.y, 106, 368, 300);
+  K('纳德拉判断', 1176);
+  T('模型这一层，', 96, 1260, { size: 60, lh: 84 });
+  T('会有一场残酷的价格战。', 96, 1344, { size: 60, lh: 84 });
+};
+
+function focalScale(cx, cy, r, current) {
+  const F = [24, 35, 50, 85, 135, 200, 300, 400, 600];
+  const a0 = Math.PI * 0.80, a1 = Math.PI * 1.20;     // left side of the aperture
+  const R = r + 30;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(238,232,222,0.16)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(cx, cy, R, a0, a1); ctx.stroke();
+  F.forEach((f, i) => {
+    const a = a1 - (a1 - a0) * i / (F.length - 1);
+    const on = f === current;
+    ctx.strokeStyle = on ? 'rgba(238,232,222,0.9)' : 'rgba(238,232,222,0.30)';
+    ctx.lineWidth = on ? 2 : 1;
+    ctx.beginPath(); ctx.moveTo(cx + R * Math.cos(a), cy + R * Math.sin(a)); ctx.lineTo(cx + (R + (on ? 14 : 8)) * Math.cos(a), cy + (R + (on ? 14 : 8)) * Math.sin(a)); ctx.stroke();
+    ctx.font = '400 15px "Geist Mono"'; ctx.fillStyle = on ? '#EEE8DE' : 'rgba(207,199,186,0.45)';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillText(String(f), cx + (R + 22) * Math.cos(a), cy + (R + 22) * Math.sin(a));
+  });
+  ctx.restore();
+}
+
+FR.f05 = async () => {      // frontier, t = 23.0 s, tele end
+  await load('rocket.png');
+  micro('02', '焦距', 'FOCAL LENGTH', '600 mm · 少数顶尖');
+  photo(IMG['rocket.png'], E.x, E.y, 220, 322 * 2.2, 228 * 2.2, 2.0 / 2.2);
+  focalScale(E.x, E.y, 220, 600);
+  T('Falcon 9 / DSCOVR · SpaceX · 2015', 984, 968, { cls: 'mono', size: 16, weight: 400, track: 0.04, color: 'var(--mute)', lh: 20, align: 'right' });
+  K('他判断', 1176);
+  T('前沿模型，', 96, 1260, { size: 60, lh: 84 });
+  T('只会服务少数顶尖的细分市场。', 96, 1344, { size: 60, lh: 84 });
+};
+
+FR.f06 = async () => {      // mix, t = 27.4 s, plates on the way in
+  await load('venn_film_mid.png');
+  micro('03', '滤镜', 'FILTER', 'R · G · B');
+  ctx.globalCompositeOperation = 'lighten'; ctx.drawImage(IMG['venn_film_mid.png'], 0, 0); ctx.globalCompositeOperation = 'source-over';
+  T('Hubble eXtreme Deep Field · NASA', 984, 272, { cls: 'mono', size: 16, weight: 400, track: 0.04, color: 'var(--mute)', lh: 20, align: 'right' });
+  K('据报道', 1176);
+  T(`微软 ${lat('Copilot')} 内部，`, 96, 1260, { size: 60, lh: 84 });
+  T('每天都在混着用', 96, 1344, { size: 60, lh: 84 });
+  T('便宜的闭源模型和开源模型。', 96, 1428, { size: 60, lh: 84 });
+};
+
+FR.f08 = async () => {      // zero trust, t = 42.0 s, all three rings locked
+  await load('coin_hero_w4.png');
+  micro('05', '镜筒', 'BARREL', 'ID · LOG · POLICY');
+  photo(IMG['coin_hero_w4.png'], E.x, E.y, 134, HERO6.sx, HERO6.sy, 4.6 / 6, { vig: 0.30 });
+  ring(E.x, E.y, 160, 198, { cjk: '身份', latin: 'IDENTITY', ticks: [6, 30],
+    legends: [[-150, 'ID·03'], [-120, 'ID·04'], [-60, 'ID·06'], [0, 'ID·08'], [30, 'ID·09'], [60, 'ID·10'], [90, 'ID·11'], [120, 'ID·12'], [150, 'ID·01'], [180, 'ID·02']] });
+  ring(E.x, E.y, 210, 250, { cjk: '记录', latin: 'LOG', ticks: [2, 10],
+    legends: [[-140, '09:41:02'], [-100, '09:41:03'], [-40, '09:41:05'], [0, '09:41:06'], [40, '09:41:07'], [80, '09:41:08'], [120, '09:41:09'], [160, '09:41:10']] });
+  ring(E.x, E.y, 262, 306, { cjk: '权限', latin: 'POLICY', knurl: true, ticks: [10, 30],
+    legends: [[160, 'ALLOW'], [180, 'ASK'], [200, 'DENY']] });
+  // index marks at 12 o'clock: everything lines up outside the glass
+  ctx.fillStyle = '#EEE8DE';
+  ctx.fillRect(E.x - 1, E.y - 306 - 22, 2, 14);
+  ctx.fillRect(E.x - 1, E.y - 158 + 2, 2, 8);
+  K('他说', 1108);
+  T('而是给模型套上零信任架构：', 96, 1192, { size: 60, lh: 84 });
+  const L = (term, def, b) => { T(term, 96, b, { cls: 'sans', size: 40, weight: 700, track: 0.06, color: 'var(--dim)', lh: 76 });
+    T(def, 228, b, { size: 52, lh: 76 }); };
+  L('身份', '每个智能体都有一个', 1276);
+  L('记录', '每一次调用都留痕', 1352);
+  L('权限', '放在模型之外', 1428);
+};
+
+FR.f09 = async () => {      // eye, t = 47.6 s
+  await load('retina.png');
+  micro('06', '眼睛', 'EYE', '∞');
+  photo(IMG['retina.png'], E.x, E.y, 420, 690, 690, 0.62, { vig: 0.12, terminator: 0.10 });
+  T('人眼眼底照片 · fundus · Wikimedia Commons · CC0', 984, 1158, { cls: 'mono', size: 16, weight: 400, track: 0.04, color: 'var(--mute)', lh: 20, align: 'right' });
+  T('最后一片镜片，是眼睛。', 96, 1268, { cls: 'kai', size: 76, lh: 96, weight: 500, track: 0.04 });
+};
+
+FR.f10 = async () => {      // thesis, t = 54.8 s, pushed toward the fovea
+  await load('retina.png');
+  micro('06', '眼睛', 'EYE', '∞');
+  photo(IMG['retina.png'], E.x, E.y, 420, 689, 692, 0.62 * 2.2, { vig: 0.16 });
+  K('我们的理解', 1176, { violet: true });
+  T('模型会降价。', 96, 1308, { cls: 'kai', size: 112, lh: 136, weight: 500, track: 0.04 });
+  T('眼光不会。', 96, 1444, { cls: 'kai', size: 112, lh: 136, weight: 500, track: 0.04 });
+};
+
+FR.f11 = async () => {      // end, t = 58.0 s
+  dotAt(E.x, E.y, 24, true);
+  T('Coo-Coo出海Ai实验室', E.x, 800, { cls: 'sans', size: 44, weight: 700, track: 0.02, lh: 56, align: 'center' });
+  T(`来源：20VC 播客 · Harry Stebbings 对谈 Satya Nadella · 2026-10-26`, E.x, 940, { cls: 'sans', size: 26, weight: 400, track: 0.02, color: '#8A847B', lh: 40, align: 'center' });
+  T('纳德拉的观点均为转述，非原话；「我们的理解」为本号解读', E.x, 980, { cls: 'sans', size: 26, weight: 400, track: 0.02, color: '#8A847B', lh: 40, align: 'center' });
+  T('Photos · Brooklyn Museum · Rachel Michetti (CC0) · SpaceX · NASA', E.x, 1044, { cls: 'mono', size: 17, weight: 400, track: 0.03, color: 'var(--mute)', lh: 26, align: 'center' });
+  T('S. van der Walt · Wikimedia Commons (CC0) · handwriting: public domain', E.x, 1072, { cls: 'mono', size: 17, weight: 400, track: 0.03, color: 'var(--mute)', lh: 26, align: 'center' });
+};
+
+// ------------------------------------------------------------------ carousel 1080 x 1440
+function cmicro(idx, cjk, latin, right) { micro(idx, cjk, latin, right, 120); }
+
+FR.c1 = async () => {
+  await load('coin_hero_w0.png');
+  K('微软 CEO 纳德拉判断', 198, { size: 34 });
+  T('大模型', 96, 360, { size: 144, lh: 164, weight: 700, track: -0.01, optical: -6 });
+  T('要打价格战了', 96, 524, { size: 144, lh: 164, weight: 700, track: -0.01, optical: -6 });
+  photo(IMG['coin_hero_w0.png'], 540, 920, 116, HERO6.sx, HERO6.sy, 4.2 / 6);
+  iris(540, 920, 112, 290, 300);
+  T('一支镜头的六个部件，讲完他的四个判断', 96, 1300, { size: 40, lh: 56, color: 'var(--dim)', track: 0.02 });
+  footer();
+  T('20VC · 2026.10.26', 984, 1378, { cls: 'mono', size: 20, weight: 400, track: 0.04, color: 'var(--mute)', lh: 26, align: 'right' });
+};
+
+FR.c2 = async () => {
+  for (let k = 0; k < 5; k++) await load(`coin_hero_w${k}.png`);
+  cmicro('01', '光圈', 'APERTURE', 'ƒ/2.8 → ƒ/11');
+  K('纳德拉判断', 214);
+  ['大多数企业场景的日常算力，', '终将被商品化；', '模型这一层，', '会有一场残酷的价格战。'].forEach((s, i) => T(s, 96, 296 + i * 76, { size: 52, lh: 76 }));
+  const D = [232, 164, 116, 82, 58], X = [212, 469, 668, 826, 955], F = ['ƒ/2.8', 'ƒ/4', 'ƒ/5.6', 'ƒ/8', 'ƒ/11'];
+  D.forEach((d, k) => {
+    const r = d / 2, img = IMG[`coin_hero_w${k}.png`];
+    const s = (d * 0.94) / (2 * 23.5 * 6);     // coin diameter = 94% of the aperture
+    photo(img, X[k], 820, r, HERO6.sx, HERO6.sy, s, { vig: 0.2 });
+    T(F[k], X[k], 990, { cls: 'mono', size: 20, weight: 400, track: 0.02, color: 'var(--dim)', lh: 26, align: 'center' });
+  });
+  T('Greek coins from Pompeii · Brooklyn Museum', 984, 1300, { cls: 'mono', size: 16, weight: 400, track: 0.04, color: 'var(--mute)', lh: 20, align: 'right' });
+  footer('02 / 07');
+};
+
+FR.c3 = async () => {
+  await load('espresso.png'); await load('rocket.png');
+  cmicro('02', '焦距', 'FOCAL LENGTH', '24 mm → 600 mm');
+  const A = { x: 356, y: 500, r: 260 }, B = { x: 852, y: 690, r: 110 };
+  // field-of-view cone: the two external tangents between the circles
+  const dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy), base = Math.atan2(dy, dx), off = Math.acos((A.r - B.r) / d);
+  ctx.save(); ctx.strokeStyle = 'rgba(238,232,222,0.18)'; ctx.lineWidth = 1;
+  [base + off, base - off].forEach((a) => { ctx.beginPath(); ctx.moveTo(A.x + A.r * Math.cos(a), A.y + A.r * Math.sin(a)); ctx.lineTo(B.x + B.r * Math.cos(a), B.y + B.r * Math.sin(a)); ctx.stroke(); });
+  ctx.restore();
+  photo(IMG['espresso.png'], A.x, A.y, A.r, 292 * 1.5, 200 * 1.5, 1.3 / 1.5);
+  photo(IMG['rocket.png'], B.x, B.y, B.r, 322 * 2.2, 212 * 2.2, 1.15 / 2.2);
+  T('24 mm', 96, 812, { cls: 'mono', size: 20, weight: 400, track: 0.02, color: 'var(--dim)', lh: 26 });
+  T('广角 · 大多数场景', 96, 850, { cls: 'sans', size: 26, weight: 500, track: 0.06, color: '#8A847B', lh: 32 });
+  T('600 mm', 962, 852, { cls: 'mono', size: 20, weight: 400, track: 0.02, color: 'var(--dim)', lh: 26, align: 'right' });
+  T('长焦 · 少数顶尖', 962, 890, { cls: 'sans', size: 26, weight: 500, track: 0.06, color: '#8A847B', lh: 32, align: 'right' });
+  K('他判断', 1000);
+  T('前沿模型，只会服务', 96, 1080, { size: 52, lh: 76 });
+  T('少数顶尖的细分市场。', 96, 1156, { size: 52, lh: 76 });
+  K('我们的理解', 1240, { violet: true });
+  T('看得越远，视野越窄。', 96, 1308, { cls: 'kai', size: 52, lh: 72, weight: 500, track: 0.04 });
+  footer('03 / 07');
+};
+
+FR.c4 = async () => {
+  await load('venn_carousel.png');
+  cmicro('03', '滤镜', 'FILTER', 'R · G · B');
+  ctx.globalCompositeOperation = 'lighten'; ctx.drawImage(IMG['venn_carousel.png'], 0, 0); ctx.globalCompositeOperation = 'source-over';
+  [['R', 196, 330], ['G', 884, 330], ['B', 540, 1012]].forEach(([s, x, y]) => T(s, x, y, { cls: 'mono', size: 18, weight: 400, track: 0.1, color: 'var(--mute)', lh: 24, align: 'center' }));
+  K('据报道', 1080);
+  T(`微软 ${lat('Copilot')} 内部，每天都在混用`, 96, 1160, { size: 52, lh: 76 });
+  T('便宜的闭源模型和开源模型。', 96, 1236, { size: 52, lh: 76 });
+  T('Hubble eXtreme Deep Field · NASA', 984, 1300, { cls: 'mono', size: 16, weight: 400, track: 0.04, color: 'var(--mute)', lh: 20, align: 'right' });
+  footer('04 / 07');
+};
+
+FR.c5 = async () => {
+  await load('coin_hero_w4.png');
+  cmicro('04', '对焦 · 05 镜筒', 'FOCUS · BARREL', '零信任');
+  K('他说', 214);
+  T('他以前以为：规模足够大，', 96, 290, { size: 48, lh: 70 });
+  T('对齐会自然出现。现在不这么想了。', 96, 360, { size: 48, lh: 70 });
+  T('微软不等这个问题被解决，', 96, 450, { size: 48, lh: 70 });
+  T('先给模型套上零信任架构：', 96, 520, { size: 48, lh: 70 });
+  const C = { x: 340, y: 850 };
+  photo(IMG['coin_hero_w4.png'], C.x, C.y, 106, HERO6.sx, HERO6.sy, (2 * 104) / (2 * 23.5 * 6), { vig: 0.25 });
+  ring(C.x, C.y, 112, 140, { cjk: '身份', latin: 'ID', ticks: [6, 30] });
+  ring(C.x, C.y, 150, 178, { cjk: '记录', latin: 'LOG', ticks: [3, 15] });
+  ring(C.x, C.y, 188, 222, { cjk: '权限', latin: 'POLICY', knurl: true, ticks: [10, 30] });
+  ctx.fillStyle = '#EEE8DE'; ctx.fillRect(C.x - 1, C.y - 222 - 20, 2, 12);
+  // callouts with hairline leaders
+  const call = (ang, rr, y, term, def) => {
+    const a = ang * Math.PI / 180, px = C.x + rr * Math.cos(a), py = C.y + rr * Math.sin(a);
+    ctx.save(); ctx.strokeStyle = 'rgba(238,232,222,0.28)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(600, y - 12); ctx.lineTo(626, y - 12); ctx.stroke();
+    ctx.fillStyle = '#EEE8DE'; ctx.beginPath(); ctx.arc(px, py, 2.5, 0, TAU); ctx.fill(); ctx.restore();
+    T(term, 640, y, { cls: 'sans', size: 30, weight: 700, track: 0.06, color: 'var(--dim)', lh: 40 });
+    T(def, 640, y + 56, { size: 44, lh: 60 });
+  };
+  call(-40, 126, 712, '身份', '每个智能体一个');
+  call(0, 164, 850, '记录', '每次调用都留痕');
+  call(40, 205, 988, '权限', '放在模型之外');
+  footer('05 / 07');
+};
+
+FR.c6 = async () => {
+  await load('retina.png');
+  cmicro('06', '眼睛', 'EYE', '∞');
+  photo(IMG['retina.png'], 540, 560, 360, 690, 690, 0.53, { vig: 0.12 });
+  T('人眼眼底照片 · fundus · Wikimedia Commons · CC0', 984, 962, { cls: 'mono', size: 16, weight: 400, track: 0.04, color: 'var(--mute)', lh: 20, align: 'right' });
+  T('最后一片镜片，是眼睛。', 96, 1062, { cls: 'kai', size: 60, lh: 80, weight: 500, track: 0.04 });
+  K('他认为', 1150);
+  T(`每家公司都会有私有评测集（${lat('eval')}），`, 96, 1222, { size: 48, lh: 70 });
+  T('这会是它的核心知识产权。', 96, 1292, { size: 48, lh: 70 });
+  footer('06 / 07');
+};
+
+FR.c7 = async () => {
+  K('我们的理解', 200, { violet: true });
+  T('模型会降价。', 96, 360, { cls: 'kai', size: 120, lh: 140, weight: 500, track: 0.04 });
+  T('眼光不会。', 96, 500, { cls: 'kai', size: 120, lh: 140, weight: 500, track: 0.04 });
+  const rows = ['别押单一模型，做多模型路由。', '把私有评测集，当成资产来建。', '权限和记录，放在模型外面。'];
+  ctx.fillStyle = 'rgba(238,232,222,0.16)';
+  [600, 700, 800, 900].forEach((y) => ctx.fillRect(96, y, 888, 1));
+  rows.forEach((s, i) => {
+    T(String(i + 1).padStart(2, '0'), 96, 666 + i * 100, { cls: 'mono', size: 22, weight: 500, track: 0.04, color: 'var(--violet-t)', lh: 28 });
+    T(s, 160, 666 + i * 100, { size: 44, lh: 60 });
+  });
+  dotAt(105, 1047, 18);
+  T('Coo-Coo出海Ai实验室', 132, 1058, { cls: 'sans', size: 36, weight: 700, track: 0.02, lh: 44 });
+  T('来源：20VC 播客 · Harry Stebbings 对谈 Satya Nadella · 2026-10-26', 96, 1140, { cls: 'sans', size: 24, weight: 400, track: 0.02, color: '#8A847B', lh: 38 });
+  T('纳德拉的观点均为转述，非原话；「我们的理解」为本号解读。', 96, 1178, { cls: 'sans', size: 24, weight: 400, track: 0.02, color: '#8A847B', lh: 38 });
+  T('Photos · Brooklyn Museum · Rachel Michetti (CC0) · SpaceX · NASA', 96, 1240, { cls: 'mono', size: 16, weight: 400, track: 0.03, color: 'var(--mute)', lh: 26 });
+  T('S. van der Walt · Wikimedia Commons (CC0) · handwriting: public domain', 96, 1266, { cls: 'mono', size: 16, weight: 400, track: 0.03, color: 'var(--mute)', lh: 26 });
+  T('07 / 07', 984, 1378, { cls: 'mono', size: 20, weight: 400, track: 0.04, color: 'var(--mute)', lh: 26, align: 'right' });
+};
+
+(async () => {
+  await document.fonts.ready;
+  await Promise.all([
+    document.fonts.load('700 22px "Noto Sans SC"', '身份记录权限'),
+    document.fonts.load('400 12px "Geist Mono"', 'ID·0123456789:ALLOWSKDENY'),
+    document.fonts.load('400 15px "Geist Mono"', '0123456789'),
+  ]);
+  ctx.fillStyle = '#0B0A09'; ctx.fillRect(0, 0, W, H);   // paint the ink first so blend modes have something to work against
+  await FR[FRAME]();                                       // pass 1 pulls in every unicode-range subset it needs
+  await document.fonts.ready; await new Promise((r) => setTimeout(r, 250)); await document.fonts.ready;
+  stage.querySelectorAll('.t,.rule,.dot').forEach((e) => e.remove());
+  for (const k in probeCache) delete probeCache[k];
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none';
+  ctx.fillStyle = '#0B0A09'; ctx.fillRect(0, 0, W, H);
+  await FR[FRAME]();                                       // pass 2 lays out with the real metrics
+  await document.fonts.ready;
+  window.__ready = true;
+})();
+</script>
+</body>
+</html>
