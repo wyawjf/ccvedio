@@ -15,18 +15,21 @@ sys.path.insert(0, HERE)
 from common import BUILD  # noqa: E402
 
 OUT = os.path.join(BUILD, 'review')
-KEY = {  # frame: what it shows
-    0: 'S01 frame 0 (hook, must be complete)', 30: 'S01 rattle / rack focus', 60: 'S01 settled + sub line',
-    80: 'S01 labels', 140: 'S02 espresso develops', 200: 'S02 statement A', 275: 'S02 slit opening',
-    320: 'S02 frontier statement + vertical caption', 400: 'S03 token fact', 470: 'S03 token fact end',
-    540: 'S03 router mid', 600: 'S03 router + labels', 700: 'S04 Hubble push', 760: 'S04 just before stop',
-    770: 'S04 after hard stop', 820: 'S04 hold', 870: 'S05 crescent', 925: 'S05 full disc', 990: 'S05 contained + notes',
-    1060: 'S05 complete', 1140: 'S06 pull-back', 1200: 'S06 sheet + facts', 1300: 'S06 complete sheet',
-    1395: 'S07 plunge', 1460: 'S07 inside plate', 1540: 'S07 complete', 1600: 'S07 outline only',
-    1612: 'S08 lamp-up', 1630: 'S08 raking light', 1680: 'S08 reading', 1771: 'S08 last frame'}
-SEQS = {'hook_settle': range(36, 56, 2), 'slit': range(258, 292, 3), 'router_hop': range(482, 502, 2),
-        'hard_stop': range(758, 778, 2), 'contain': range(930, 966, 4), 'pullback': range(1122, 1176, 5),
-        'cells_develop': range(1150, 1206, 6), 'plunge': range(1386, 1432, 5), 'lampup': range(1602, 1656, 6)}
+KEY = {  # frame: what it shows (timings after the post-review revisions, DESIGN_BIBLE §11)
+    0: 'S01 frame 0 (hook, must be complete)', 30: 'S01 rattle / rack focus', 46: 'S01 clack + glint',
+    70: 'S01 sub line + labels', 120: 'S02 crema develops first (match cut)', 200: 'S02 statement A',
+    280: 'S02 slit inside the print', 310: 'S02 slit outgrows the print', 330: 'S02 frontier + vertical caption',
+    420: 'S03 token fact', 540: 'S03 router mid-phrase', 600: 'S03 router + labels', 700: 'S04 push + tilt',
+    762: 'S04 just before the stop', 770: 'S04 after the hard stop', 820: 'S04 hold', 862: 'S05 crescent',
+    905: 'S05 full disc', 960: 'S05 contained', 1060: 'S05 notes complete', 1110: 'S05 text leaving',
+    1140: 'S06 pull-back with ripple', 1160: 'S06 ripple', 1200: 'S06 sheet + facts', 1300: 'S06 complete sheet',
+    1400: 'S07 plunge', 1460: 'S07 inside plate', 1540: 'S07 complete', 1570: 'S07 outline returns',
+    1581: 'S08 light-table switch', 1595: 'S08 raking light', 1604: 'S08 relief peak (withheld D5)',
+    1650: 'S08 reading', 1700: 'S08 end card building', 1771: 'S08 last frame'}
+SEQS = {'hook_settle': range(36, 60, 2), 'slit_beat1': range(258, 290, 3), 'slit_beat2': range(298, 322, 2),
+        'router_accelerando': range(548, 584, 3), 'hard_stop': range(752, 772, 2), 'contain': range(916, 956, 4),
+        'pullback_ripple': range(1122, 1182, 5), 'plunge': range(1386, 1432, 5), 'lampup': range(1576, 1636, 6),
+        'end_card': range(1626, 1772, 16)}
 
 
 def decode(video, frames):
@@ -86,7 +89,7 @@ def main():
             strip([fr[f] for f in part], [f'f{f}' for f in part], 360, 640).save(os.path.join(OUT, f'overview_{i // 8 + 1}.jpg'), quality=90)
         fh.write('\n## overview_N.jpg: key frames side by side\n')
         os.makedirs(os.path.join(OUT, 'xhs'), exist_ok=True)
-        for f in (0, 200, 320, 600, 820, 1060, 1300, 1540, 1771):
+        for f in (0, 200, 330, 600, 820, 1060, 1300, 1540, 1771):
             xhs_overlay(fr[f]).save(os.path.join(OUT, 'xhs', f'f{f:04d}.jpg'), quality=90)
         fh.write('\n## xhs/: key frames under a rough Xiaohongshu feed overlay (top bar, bottom caption, right actions)\n')
     print('review kit ->', OUT)
