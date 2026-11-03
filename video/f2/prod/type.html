@@ -59,6 +59,26 @@ function build(data) {
       Object.assign(node.style, { left: spec.x + 'px', top: spec.y + 'px', width: spec.w + 'px', height: spec.h + 'px', background: spec.c });
       host.appendChild(node);
       outer = node;
+    } else if (spec.kind === 'path') {          // hand-drawn mark: an SVG path over the whole canvas
+      node = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      node.setAttribute('class', 'e');
+      node.setAttribute('width', data.w);
+      node.setAttribute('height', data.h);
+      node.setAttribute('viewBox', `0 0 ${data.w} ${data.h}`);
+      Object.assign(node.style, { left: '0px', top: '0px', overflow: 'visible' });
+      for (const st of spec.strokes) {
+        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        p.setAttribute('d', st.d);
+        p.setAttribute('fill', 'none');
+        p.setAttribute('stroke', spec.c);
+        p.setAttribute('stroke-width', st.w);
+        p.setAttribute('stroke-linecap', 'round');
+        p.setAttribute('stroke-linejoin', 'round');
+        p.setAttribute('stroke-opacity', spec.op ?? 1);
+        node.appendChild(p);
+      }
+      host.appendChild(node);
+      outer = node;
     } else if (spec.kind === 'ring') {          // stroke centred on radius r
       node = document.createElement('div');
       node.className = 'e';
@@ -75,8 +95,9 @@ function build(data) {
       if (spec.clip) {                     // running head: a fixed window the text rolls through
         outer = document.createElement('div');
         outer.className = 'clip';
-        Object.assign(outer.style, { left: spec.x + 'px', top: (spec.y - 6) + 'px', height: (spec.lh + 12) + 'px', width: '600px' });
-        node.style.top = '6px';
+        const pad = spec.clipPad ?? 6;
+        Object.assign(outer.style, { left: spec.x + 'px', top: (spec.y - pad) + 'px', height: (spec.lh + 2 * pad) + 'px', width: '600px' });
+        node.style.top = pad + 'px';
         outer.appendChild(node);
         host.appendChild(outer);
       } else {

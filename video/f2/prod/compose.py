@@ -83,8 +83,11 @@ def run_all(jobs, a=0, b=NFRAMES, chunk=48):
         for s, e, dt in pool.imap_unordered(encode_chunk, sorted(chunks, key=heavy)):
             print(f'  chunk {s}-{e} done in {dt:.0f} s (elapsed {time.time() - t0:.0f} s)', flush=True)
     lst = os.path.join(SEG, 'list.txt')
-    with open(lst, 'w') as fh:
-        for s, e, p in chunks:
+    with open(lst, 'w') as fh:                               # always the whole film: patch runs reuse chunks
+        for s in range(0, NFRAMES, chunk):
+            p = os.path.join(SEG, f'seg_{s:04d}.mp4')
+            if not os.path.exists(p):
+                raise FileNotFoundError(p)
             fh.write(f"file '{p}'\n")
     out = os.path.join(BUILD, 'F2_picture.mp4')
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', lst, '-c', 'copy', out], check=True)

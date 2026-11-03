@@ -60,8 +60,12 @@ def coins():
         c = table[k - 1]
         assert abs(c['cx'] - cx) < 0.11 and abs(c['cy'] - cy) < 0.11 and abs(c['r'] - r) < 0.11, (k, c)
         assert c['note'] == note, (k, c['note'], note)
-    matte = cv2.GaussianBlur(seg.astype(np.float32), (0, 0), 0.8)
-    labels = lab.astype(np.int32)
+    # display matte from per-coin convex hulls: fills the watershed's bites (coin #17) without moving
+    # the table above, which keeps Appendix A's centres, radii and pitches
+    labels = np.zeros_like(lab, dtype=np.int32)
+    for p in props:
+        labels[p.slice][p.image_convex] = p.label
+    matte = cv2.GaussianBlur((labels > 0).astype(np.float32), (0, 0), 0.8)
     json.dump(table, open(os.path.join(CACHE, 'coins.json'), 'w'), indent=1)
     save_npy('coins_gray.npy', g)
     save_npy('coins_matte.npy', matte)
@@ -97,17 +101,23 @@ def rocket():
 
 
 def hubble():
-    a = cgrade(load_rgb('hubble_deep_field.jpg'), 0.86)      # 872 x 1000
+    src = np.clip((load_rgb('hubble_deep_field.jpg') - 0.05) / 0.95, 0, 1)   # sky floor -> ink (§7.2)
+    a = cgrade(src, 0.86)                                    # 872 x 1000
     s = 1.08
     hal = halation(a, 0.62, 10.0 / s, 0.22)
     L = luma(a)
-    fg = (cv2.GaussianBlur(L, (0, 0), 2.0 / s) > 0.30).astype(np.uint8)
+    fg = (cv2.GaussianBlur(L, (0, 0), 2.0 / s) > 0.14).astype(np.uint8)   # galaxy + its halo travel together
     k = int(round(3 / s)) * 2 + 1
     fg = cv2.dilate(fg, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (k, k)))
     fga = cv2.GaussianBlur(fg.astype(np.float32), (0, 0), 2.0 / s)
     u8 = (np.clip(a, 0, 1) * 255 + 0.5).astype(np.uint8)
-    med = cv2.medianBlur(u8, 15).astype(np.float32) / 255.0
-    bg = a * (1 - fga[..., None]) + med * fga[..., None]     # BG: bright galaxies median-filled
+    hole = cv2.dilate(fg, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (13, 13)))
+    sky = cv2.inpaint(u8, hole * 255, 9, cv2.INPAINT_TELEA).astype(np.float32) / 255.0
+    Ls = luma(a)
+    sig = float(np.std(Ls[(hole == 0) & (Ls < 0.15)]))
+    sky = sky + np.random.default_rng(5).normal(0, sig, sky.shape[:2]).astype(np.float32)[..., None] * hole[..., None]
+    hd = cv2.GaussianBlur(hole.astype(np.float32), (0, 0), 2.0 / s)[..., None]
+    bg = a * (1 - hd) + np.clip(sky, 0, 1) * hd              # BG: galaxies removed, sky inpainted (no twins)
     fg_pre = a * fga[..., None]                              # FG premultiplied by its alpha
     save_npy('hubble_bg.npy', bg)
     save_npy('hubble_fg.npy', fg_pre)
@@ -133,7 +143,7 @@ def sheet_only():
     save_npy('astronaut.npy', cgrade(load_rgb('astronaut.png'), 0.82))
     save_npy('grace_hopper.npy', cgrade(load_rgb('grace_hopper.jpg'), 0.82))
     save_npy('moon.npy', mono(load_gray('moon.png')))
-    save_npy('text.npy', mono(load_gray('text.png')[0:172, 87:360]))   # the only cropped thumbnail
+    save_npy('text.npy', mono(load_gray('text.png')[0:172, 95:353]))   # the only cropped thumbnail: 255 px wide at x0.9884
     save_npy('clock.npy', mono(load_gray('clock_motion.png')))
 
 
@@ -148,31 +158,36 @@ def rrect_sd(xx, yy, x0, y0, x1, y1, rad):
 def paper_and_mark(w, h, rect, seed, depth=0.8):
     """Returns (albedo HxWx3, normals HxWx3). Shade later with plate_shade(normals, az, el)."""
     r = np.random.default_rng(seed)
-    low = ndi.gaussian_filter(r.standard_normal((h, w)).astype(np.float32), 48)
+    low = ndi.gaussian_filter(r.standard_normal((h, w)).astype(np.float32), 140)
     low /= low.std()
     f = r.standard_normal((h, w)).astype(np.float32)
     fib = 0.7 * ndi.gaussian_filter(f, (0.7, 2.2)) + 0.3 * ndi.gaussian_filter(f, (2.2, 0.7))
     fib /= fib.std()
-    albedo = PAPER[None, None, :] * (1 + 0.008 * low + 0.0025 * fib)[..., None]
     yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
+    falloff = 1 - 0.015 * (0.6 * xx / w + 0.4 * yy / h)     # gentle fall-off away from the light (az 135)
+    albedo = PAPER[None, None, :] * ((1 + 0.004 * low + 0.0025 * fib) * falloff)[..., None]
     sd = rrect_sd(xx + 0.5, yy + 0.5, *rect, 9.0)
-    t = smoothstep(0.0, 1.0, 0.5 - sd / 14.0)
-    hgt = -depth * t + 0.22 * depth * np.exp(-((sd - 8.4) / 12.6) ** 2) * (sd > 0)
-    hgt = ndi.gaussian_filter(hgt.astype(np.float32), 4.0)
+    t = smoothstep(0.0, 1.0, 0.5 - sd / 7.0)                # a crisp 4-6 px bevel, not an inset card
+    press = ndi.gaussian_filter(r.standard_normal((h, w)).astype(np.float32), 60)
+    press /= press.std()
+    dmap = depth * (1 + 0.12 * press)                        # the press never bites evenly along an edge
+    hgt = -dmap * t + 0.22 * dmap * np.exp(-((sd - 4.5) / 6.0) ** 2) * (sd > 0)
+    hgt = ndi.gaussian_filter(hgt.astype(np.float32), 1.8)
     hgt += 0.006 * fib * (1 - 0.65 * t)
     gy, gx = np.gradient(hgt)
     n = np.dstack([-gx, -gy, np.ones_like(hgt)]).astype(np.float32)
     n /= np.linalg.norm(n, axis=2, keepdims=True)
     wipe = ndi.gaussian_filter(r.standard_normal((h, w)).astype(np.float32), (30, 90))
     wipe /= wipe.std()
-    albedo *= (1 - 0.018 * (1 + 0.35 * wipe) * t)[..., None] * (np.array([1.0, 0.995, 0.985], np.float32)[None, None, :] ** t[..., None])
+    albedo *= (1 - 0.028 * (1 + 0.35 * wipe) * t)[..., None] * (np.array([1.0, 0.995, 0.985], np.float32)[None, None, :] ** t[..., None])
     return albedo.astype(np.float32), n
 
 
 def plate_shade(n, az, el):
     th, e = np.radians(az), np.radians(el)
     L = np.array([np.cos(th) * np.cos(e), -np.sin(th) * np.cos(e), np.sin(e)], np.float32)
-    return np.clip((n @ L) / L[2], 0.70, 1.25).astype(np.float32)
+    x = (n @ L) / L[2]
+    return (1 + 0.30 * np.tanh((x - 1) / 0.30)).astype(np.float32)     # soft knee, no flat plateaus
 
 
 def measure_mark(img, rect):
@@ -204,7 +219,7 @@ if __name__ == '__main__':
     os.makedirs(QA, exist_ok=True)
     only = sys.argv[1:]
     steps = dict(coins=coins, coffee=coffee, rocket=rocket, hubble=hubble, retina=retina, sheet=sheet_only,
-                 paper=lambda: paper(float(os.environ.get('EMBOSS_DEPTH', '0.9'))))
+                 paper=lambda: paper(float(os.environ.get('EMBOSS_DEPTH', '0.46'))))
     for k, fn in steps.items():
         if not only or k in only:
             fn()

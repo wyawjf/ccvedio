@@ -1012,3 +1012,64 @@ Hero = **#16** (the facing head). Hook: screen (678, 1000) at ×2.40, r 56.4. Ro
 - `grace_hopper.jpg` sha256 `a8ca6d734765703b09728ab47fe59f473d93ae3967fc24c7c0288c3c7adb7130` = matplotlib 3.9.2 `mpl-data/sample_data/grace_hopper.jpg`.
 - Docstring purposes: coins "segmentation tests" → 分割测试; coffee "elliptical shapes … varying texture" → 椭圆与纹理; camera "segmentation and denoising" → 分割与去噪; hubble "multi-scale detection" → 多尺度检测; retina "circular images" → 圆形图像; moon "histogram equalization" → 直方图均衡; text "corner detection" → 角点检测; clock "inverse filters and deconvolution" → 反卷积; rocket, astronaut, Grace Hopper state no test purpose → 示例图.
 - Licences (docstrings / SOURCES.md): coins no known copyright restrictions · coffee CC0 · rocket public domain · hubble public domain · retina CC0 (Wikimedia Commons) · camera CC0 · astronaut public domain · Grace Hopper public domain (U.S. Navy) · text public domain (Wikipedia) · clock public domain · **moon: no statement** (hence SRC4).
+
+---
+
+## 11. Post-review revisions (supersede the sections they name)
+
+After the first full render, six independent critics (typography, cinematography, AI-look, motion, phone/platform,
+facts) reviewed frames decoded from the encoded film (`build/f2/review/`). The production follows these revisions;
+where they disagree with §0–§10, this section wins. IDs refer to the review findings.
+
+**Image and grade**
+- Develop is a continuous ramp, not a threshold stipple: `a = smoothstep(e − 0.40, e + 0.04, L + g·0.03)`, `e = 1 − 1.30E`
+  (in) / `−0.04 + 1.38E` (out), flare mask `smoothstep(0.70, 0.90, L)`, E-DEVELOP `(.30,.10,.30,1)` (DOP-01).
+  The espresso develops crema-first through a priority map, so the coin → crema match cut lands (DOP-02).
+- Unsharp mask 20 %, radius 0.5×scale, threshold 4/255; coin display matte from per-coin convex hulls (DOP-10).
+- Coins: the key light lifts the cloth weave inside its pool, `cloth = ((g − 0.04)/0.96)^1.1 · 0.90`, faded out at the scan
+  edge; S03 light falloff 0.6 (CD-04, DOP-07, MO-05).
+- Hubble: sky floor `(src − 0.05)/0.95` before the grade; FG = galaxies and halos (L > 0.14), BG inpainted (Telea) with
+  sky noise; push FG 1.00 → 1.11, BG 1.00 → 1.075 on `(.75,0,.95,.55)` plus an accelerating tilt (FG −140 px, BG −93 px);
+  motion blur from 3 px/f; f764 razor sharp; readout reports the FG scale and freezes at × 1.20 (DOP-04/05/06, MO-01, COPY-10).
+- Retina: light travels linearly f860 → f920 with a Lambert-like terminator; crescent with the optic disc at f860 (DOP-09).
+- Plate mark: wall /7, Gaussian 1.8, ridge at sd 4.5 (σ 6), ±12 % pressure variation, plate tone 2.8 %, soft-knee shading
+  `1 + 0.30·tanh((x − 1)/0.30)`, depth 0.46 → rest walls −15.9 / −15.5 / +5.7 / +5.7 %, interior −3.8 % (DOP-03).
+  Paper mottle σ 140 at 0.4 % plus a 1.5 % fall-off from the light (DOP-11).
+
+**Layout (clear of the feed's action column, x ≥ 950 in y 1040–1480)**
+- Sheet slots 90 / 390 / 690; cell 12 = (690, 1216, 255 × 170) (CJK-05, DOP-12). Coin tray origin (182, 700), centre
+  (566, 1003); retina frame (454, 700)–(940, 1186), contain centre x 697, pull-back P0 (478, 724) (XHS-06).
+- Espresso drift scales about the right-hung edge (990, 1000) (CD-12).
+- Cell 10 crop (95, 0)–(353, 172), so the thumbnail is 255 px wide and every sheet gutter is 45 px (CJK-05, verified).
+- Plate-12 outline stays rule-30 (an 0.18 line vanishes on a phone) (XHS-05).
+
+**Motion and timing**
+- Type prints on as light: opacity only, PRINT `(.25,.6,.3,1)` over 10 f, no rise; line stagger = clamp(round(1.5 ×
+  characters of the previous line), 6, 16) f (CD-02).
+- Hook: focus on E-ACCEL into the clack; glint f44–f58 on `(.25,.1,.25,1)` with a 180° shutter (DOP-08).
+- Slit in two beats: inside the espresso print f260–f287, then grows to 693–1427 f300–f318 (CD-10).
+- Router: twelve calls as an accelerando landing f488, 512, 530, 542, 554, 560, 566, 572, 578, 590, 602, 620; travel =
+  min(4, interval/3) f; the beam narrows and dims mid-flight (CD-07, MO-05).
+- S05 12 f earlier: contain f920–f950, frame draws f950–f966, text leaves into the pull-back (out f1108–f1112);
+  E-REVEAL `(.5,0,.15,1)` (MO-02).
+- Sheet develops as a ripple from the eye: 02/08 f1140, 04/06 f1146, 01/03/07/09 f1156, 11 f1171, 10 f1179; the 12th
+  window develops f1187–f1202 (no stroke draw-on) (CD-01). A 2 % lean toward cell 12 during the hold, and the dive starts
+  from it (MO-06).
+- Inside plate 12 the outline dissolves after the dive (f1432–f1444) and re-forms f1564–f1576 (CD-06).
+- S08 one beat earlier: the light table is a switch (dark f1580, lit f1581) with a 10 f bloom (0.30) as the eye adapts;
+  the raking light lowers until the relief peaks on f1604, where the withheld D5 now sounds (CD-08, MO-03, MO-04).
+- Score cue changes: `f2/prod/CUES_v2.md`.
+
+**Type and copy**
+- bone-5 `#9C9589`; ink-p-70 for sources, labels and page numbers on paper; caption tier 30 / 28 / 24 (CJK-04).
+- Running head: only the chapter digit and name roll, one after the other, through a 28 px slot (CJK-11).
+- S05 rules as 28 px kickers over couplets (second line in bone) (CD-09). The film's sheet shows frame numbers only;
+  the docstring purposes stay on C5 (CD-05).
+- End card: account 40 px heading the colophon; `your_eval()` and 换模型、混用模型之前，先拿它考一遍。 under the
+  plate (our reading, under ■ 我们的解读); sources 22 px, hung labels (CJK-02, XHS-03).
+- Copy: 前沿模型，/ 只服务 / 少数顶级场景。; 示意　每一束光，是一次调用 (captions carry no final 。); 底图　01 / 12;
+  谁都能拿它们考算法; SRC2 嘉宾观点…; SRC4 除 09（未注明授权）外…; SRC6 05 Mikael Häggström; counters set as 图 + mono
+  ` 01 / 12`; vertical caption ends …号与 DSCOVR (CJK-08/09/10, COPY-05/06/08/09).
+- Carousel: hand-drawn china-marker loop on the cover (two passes, #7A5CFF at 85 %), cover hook 64 px (CD-03, XHS-02);
+  C3 tray × 1.80; C2 frontier block 40 px lower; C4 plate label 图 04 / 12; C6 shows C5's cell 12 in place with a wall
+  label; C7 uses the shared footer and a 540 × 360 plate mark (CJK-01/06/07, CD-11, XHS-04/08).

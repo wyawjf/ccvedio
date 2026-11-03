@@ -66,10 +66,10 @@ class Bezier:
 
 EASE = {k: Bezier(*v) for k, v in dict(
     FADE=(.33, 0, .2, 1), SETTLE=(.16, 1, .3, 1), LEAVE=(.7, 0, .84, 0), ROLL=(.2, 0, 0, 1),
-    DEVELOP=(.22, .61, .36, 1), FOCUS=(.33, 0, .15, 1), GLINT=(.2, .6, .3, 1), SNAP=(.7, 0, .2, 1),
-    HOP=(.5, 0, .2, 1), ACCEL=(.5, 0, 1, 1), RISE=(.25, .1, .25, 1), TRAVEL=(.65, 0, .35, 1),
-    DRAW=(.45, 0, .2, 1), REVEAL=(.83, 0, .17, 1), DIVE=(.6, 0, .1, 1), LAMP=(.4, 0, .2, 1),
-    SETTLEL=(.22, 1, .36, 1), RAKE=(.45, 0, .55, 1)).items()}
+    DEVELOP=(.30, .10, .30, 1), FOCUS=(.33, 0, .15, 1), GLINT=(.2, .6, .3, 1), SNAP=(.7, 0, .2, 1),
+    HOP=(.5, 0, .2, 1), ACCEL=(.5, 0, 1, 1), ACCEL2=(.75, 0, .95, .55), SOFT=(.25, .1, .25, 1), RISE=(.25, .1, .25, 1), TRAVEL=(.65, 0, .35, 1),
+    DRAW=(.45, 0, .2, 1), REVEAL=(.5, 0, .15, 1), DIVE=(.6, 0, .1, 1), LAMP=(.4, 0, .2, 1),
+    SETTLEL=(.22, 1, .36, 1), RAKE=(.45, 0, .55, 1), PRINT=(.25, .6, .3, 1)).items()}
 EASE['LINEAR'] = lambda x: min(1.0, max(0.0, float(x)))
 
 
@@ -160,12 +160,13 @@ def halation(rgb, thr, sigma, strength):
 
 # ---------------------------------------------------------------- resampling
 def unsharp(img, scale):
-    """§7.1: upscales > x1.05 get unsharp mask radius 0.8*scale px, 45 %, threshold 2."""
+    """Upscales > x1.05 get a gentle unsharp mask (radius 0.5*scale px, 20 %, threshold 4/255): enough to
+    restore Lanczos softness, never enough to outline the coins (review DOP-10 lowered §7.1's 45 %)."""
     if scale <= 1.05:
         return img
-    b = cv2.GaussianBlur(img, (0, 0), 0.8 * scale)
+    b = cv2.GaussianBlur(img, (0, 0), 0.5 * scale)
     d = img - b
-    return (img + 0.45 * d * (np.abs(d) > 2 / 255.0)).astype(np.float32)
+    return (img + 0.20 * d * (np.abs(d) > 4 / 255.0)).astype(np.float32)
 
 
 def warp(src, s, ox, oy, box, sharpen=True):
