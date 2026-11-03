@@ -1,54 +1,52 @@
 {
   "kicker": "20VC × SATYA NADELLA · 2026.10",
-  "tag": "COO-COO · AI LAB",
+  "brand": "Coo-Coo出海Ai实验室",
+  "speaker": "<b>Satya Nadella</b> · 微软 CEO｜20VC 播客 2026.10",
   "slides": [
     {
       "type": "cover",
-      "title": "大模型<br>要打<em>价格战</em>了",
-      "sub": "微软 CEO 纳德拉最新专访：4 个判断"
+      "label": "纳德拉最新专访",
+      "big": ["大模型", "要打<span class=\"p\">价格战</span>了"],
+      "cap": "微软 CEO 纳德拉上了 20VC 播客，给出 <span class=\"num p\">4</span> 个判断。"
     },
     {
-      "type": "point",
-      "no": "01",
-      "head": "算力会变成<br><em>大宗商品</em>",
-      "body": "纳德拉判断：大多数企业日常场景用的算力终将商品化，底层模型会打一场残酷的价格战；最前沿的模型，只属于少数细分市场。",
-      "take": "今天的 token 价格不是终点。别只盯着「接哪家」，要想清楚：模型越来越便宜之后，你的产品还剩下什么。"
+      "type": "point", "no": "01", "label": "价格战",
+      "big": ["算力会变成", "<span class=\"p\">大宗商品</span>"],
+      "panel": "tiers",
+      "cap1": "大多数企业日常场景的算力，终将商品化，底层模型会打一场<span class=\"p\">残酷的价格战</span>。",
+      "cap2": "对你：token 价格不是终点。模型越来越便宜之后，你的产品还剩<span class=\"p\">什么</span>？"
     },
     {
-      "type": "point",
-      "no": "02",
-      "head": "微软自己<br>每天都在<em>混用</em>模型",
-      "body": "据报道，微软 Copilot 内部每天都在大量混搭便宜的闭源和开源模型，而不是只押一家。",
-      "take": "产品架构要能随时换模型：同一个任务，谁又好又便宜就用谁。"
+      "type": "point", "no": "02", "label": "混用",
+      "big": ["微软自己", "每天都在<span class=\"p\">混用</span>模型"],
+      "panel": "router",
+      "cap1": "据报道，Copilot 内部每天都在大量混搭<span class=\"p\">便宜的</span>闭源和开源模型。",
+      "cap2": "对你：同一个任务，谁<span class=\"p\">又好又便宜</span>就用谁。"
     },
     {
-      "type": "point",
-      "no": "03",
-      "head": "私有评测集<br>才是<em>核心资产</em>",
-      "body": "他认为，未来每家公司都会有一套自己的私有评测基准（eval），这会是公司最核心的知识产权。",
-      "take": "把你业务里「什么叫做得好」写成一套考题。模型会换，这套考题不会。"
+      "type": "point", "no": "03", "label": "护城河",
+      "big": ["私有评测集", "才是<span class=\"p\">核心资产</span>"],
+      "panel": "exam",
+      "cap1": "他认为：每家公司都会有一套自己的私有评测基准，这是最核心的<span class=\"p\">知识产权</span>。",
+      "cap2": "对你：模型会换，<span class=\"p\">这套考题不会</span>。"
     },
     {
-      "type": "point",
-      "no": "04",
-      "head": "他承认<br><em>想错了</em>一件事",
-      "body": "他说以前一直以为，模型做大了，「对齐」自然会解决。现在他不这么想了：微软不再等，而是用零信任架构把每个模型包起来。",
-      "take": "Agent 的权限别只靠提示词约束：身份、日志、权限，都放在模型外面。"
+      "type": "point", "no": "04", "label": "改口",
+      "big": ["他承认", "<span class=\"p\">想错了</span>一件事"],
+      "panel": "shell",
+      "cap1": "以前以为模型做大了，对齐自然会解决。现在微软不等了，用<span class=\"p\">零信任架构</span>把每个模型包起来。",
+      "cap2": "对你：Agent 的权限，别只靠<span class=\"p\">提示词</span>约束。"
     },
     {
-      "type": "list",
-      "head": "给出海 / AI 创业者的<br><em>3 个动作</em>",
-      "items": [
-        "架构支持多模型切换，别绑死一家",
-        "建一套自己的私有评测集",
-        "Agent 的权限和日志，放在模型之外"
-      ],
+      "type": "list", "label": "我们的解读",
+      "big": ["给创业者的", "<span class=\"num p\">3</span> 个动作"],
+      "items": ["架构支持<span class=\"p\">多模型切换</span>，别绑死一家", "建一套自己的<span class=\"p\">私有评测集</span>", "Agent 的权限和日志，<span class=\"p\">放在模型之外</span>"],
       "note": "以上动作是我们的解读，不是纳德拉原话"
     },
     {
       "type": "end",
-      "q": "你现在的产品<br>接了<em>几家</em>模型？",
-      "cta": "评论区聊聊",
+      "big": ["你现在的产品", "接了<span class=\"p\">几家</span>模型？"],
+      "sub": "评论区聊聊",
       "src": "来源：20VC 播客专访 Satya Nadella（2026.10.26）。观点据节目内容及 The Next Web、36Kr 等报道整理。"
     }
   ]

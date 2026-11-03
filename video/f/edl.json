@@ -1,44 +1,155 @@
 {
   "source": "build/f/source.mp4",
-  "note": "clip 的 in/out 是原片里的秒数，拿到原片后按逐字稿填。subs 里 draft=true 的字幕只是意思草稿，正式出片前必须换成原话的翻译并去掉 draft，否则 build.py 会拒绝出片。",
+  "note": "clip 的 in/out 是原片里的秒数，拿到原片后按逐字稿填。subs 里 draft=true 的字幕只是意思草稿，正式出片前必须换成原话的翻译并去掉 draft，否则 build.py 会拒绝出片。 字幕每行不超过 16 个字，用 | 手动换行。",
   "items": [
-    { "type": "card", "img": "cards/slide0.png", "dur": 2.6 },
-
-    { "type": "card", "img": "cards/bump1.png", "dur": 1.4 },
-    { "type": "clip", "id": "c1", "frame": "cards/frame1.png", "in": null, "out": null, "dur_est": 14,
+    {
+      "type": "card",
+      "img": "cards/slide0.png",
+      "dur": 2.6
+    },
+    {
+      "type": "card",
+      "img": "cards/bump1.png",
+      "dur": 1.4
+    },
+    {
+      "type": "clip",
+      "id": "c1",
+      "frame": "cards/frame1.png",
+      "in": null,
+      "out": null,
+      "dur_est": 14,
       "find": "commodit / price / niche / frontier",
       "subs": [
-        { "t0": 0, "t1": 5, "zh": "大多数日常场景的算力，最终都会变成大宗商品", "en": "", "draft": true },
-        { "t0": 5, "t1": 10, "zh": "底层模型，会有一场非常激烈的价格战", "en": "", "draft": true },
-        { "t0": 10, "t1": 14, "zh": "最前沿的模型，只属于少数高端细分市场", "en": "", "draft": true }
-      ] },
-
-    { "type": "card", "img": "cards/bump2.png", "dur": 1.4 },
-    { "type": "clip", "id": "c2", "frame": "cards/frame2.png", "in": null, "out": null, "dur_est": 10,
+        {
+          "t0": 0,
+          "t1": 5,
+          "zh": "大多数日常场景的算力，|最终都会变成大宗商品",
+          "en": "",
+          "draft": true
+        },
+        {
+          "t0": 5,
+          "t1": 10,
+          "zh": "底层模型，|会有一场非常激烈的价格战",
+          "en": "",
+          "draft": true
+        },
+        {
+          "t0": 10,
+          "t1": 14,
+          "zh": "最前沿的模型，|只属于少数高端细分市场",
+          "en": "",
+          "draft": true
+        }
+      ]
+    },
+    {
+      "type": "card",
+      "img": "cards/bump2.png",
+      "dur": 1.4
+    },
+    {
+      "type": "clip",
+      "id": "c2",
+      "frame": "cards/frame2.png",
+      "in": null,
+      "out": null,
+      "dur_est": 10,
       "find": "Copilot / mix / open source / cheap",
       "subs": [
-        { "t0": 0, "t1": 5, "zh": "我们的 Copilot 每天都在混用很多模型", "en": "", "draft": true },
-        { "t0": 5, "t1": 10, "zh": "便宜的闭源模型、开源模型，都在用", "en": "", "draft": true }
-      ] },
-
-    { "type": "card", "img": "cards/bump3.png", "dur": 1.4 },
-    { "type": "clip", "id": "c3", "frame": "cards/frame3.png", "in": null, "out": null, "dur_est": 10,
+        {
+          "t0": 0,
+          "t1": 5,
+          "zh": "我们的 Copilot|每天都在混用很多模型",
+          "en": "",
+          "draft": true
+        },
+        {
+          "t0": 5,
+          "t1": 10,
+          "zh": "便宜的闭源、开源模型|都在用",
+          "en": "",
+          "draft": true
+        }
+      ]
+    },
+    {
+      "type": "card",
+      "img": "cards/bump3.png",
+      "dur": 1.4
+    },
+    {
+      "type": "clip",
+      "id": "c3",
+      "frame": "cards/frame3.png",
+      "in": null,
+      "out": null,
+      "dur_est": 10,
       "find": "eval / benchmark / IP",
       "subs": [
-        { "t0": 0, "t1": 5, "zh": "每家公司都会有一套自己的私有评测基准", "en": "", "draft": true },
-        { "t0": 5, "t1": 10, "zh": "这就是它们的核心知识产权", "en": "", "draft": true }
-      ] },
-
-    { "type": "card", "img": "cards/bump4.png", "dur": 1.4 },
-    { "type": "clip", "id": "c4", "frame": "cards/frame4.png", "in": null, "out": null, "dur_est": 14,
+        {
+          "t0": 0,
+          "t1": 5,
+          "zh": "每家公司都会有|一套自己的私有评测基准",
+          "en": "",
+          "draft": true
+        },
+        {
+          "t0": 5,
+          "t1": 10,
+          "zh": "这就是它们的核心知识产权",
+          "en": "",
+          "draft": true
+        }
+      ]
+    },
+    {
+      "type": "card",
+      "img": "cards/bump4.png",
+      "dur": 1.4
+    },
+    {
+      "type": "clip",
+      "id": "c4",
+      "frame": "cards/frame4.png",
+      "in": null,
+      "out": null,
+      "dur_est": 14,
       "find": "changed your mind / alignment / fall out / zero trust",
       "subs": [
-        { "t0": 0, "t1": 5, "zh": "我以前一直以为，对齐会随着规模自然解决", "en": "", "draft": true },
-        { "t0": 5, "t1": 10, "zh": "现在我们不等了", "en": "", "draft": true },
-        { "t0": 10, "t1": 14, "zh": "每个模型都放进零信任架构里运行", "en": "", "draft": true }
-      ] },
-
-    { "type": "card", "img": "cards/slide5.png", "dur": 5.0 },
-    { "type": "card", "img": "cards/slide6.png", "dur": 3.4 }
+        {
+          "t0": 0,
+          "t1": 5,
+          "zh": "我以前一直以为，|对齐会随着规模自然解决",
+          "en": "",
+          "draft": true
+        },
+        {
+          "t0": 5,
+          "t1": 10,
+          "zh": "现在我们不等了",
+          "en": "",
+          "draft": true
+        },
+        {
+          "t0": 10,
+          "t1": 14,
+          "zh": "每个模型都放进|零信任架构里运行",
+          "en": "",
+          "draft": true
+        }
+      ]
+    },
+    {
+      "type": "card",
+      "img": "cards/slide5.png",
+      "dur": 5.0
+    },
+    {
+      "type": "card",
+      "img": "cards/slide6.png",
+      "dur": 3.4
+    }
   ]
 }

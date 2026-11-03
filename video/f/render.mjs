@@ -23,7 +23,7 @@ async function shot(query, w, h, out, transparent = false) {
   await page.goto(`http://127.0.0.1:${port}/f/slides.html?${query}`);
   await page.waitForFunction('window.__ready === true', null, { timeout: 60000 });
   await page.evaluate(() => document.fonts.ready);
-  await page.waitForTimeout(150);
+  await page.waitForTimeout(250);
   fs.mkdirSync(path.dirname(out), { recursive: true });
   await page.screenshot({ path: out, type: 'png', omitBackground: transparent });
   await page.close();
@@ -42,6 +42,7 @@ if (want('cards')) {
     if (slides[i].type === 'point') {
       await shot(`i=${i}&h=1920&mode=bump`, 1080, 1920, path.join(ROOT, `build/f/cards/bump${i}.png`));
       await shot(`i=${i}&h=1920&mode=frame`, 1080, 1920, path.join(ROOT, `build/f/cards/frame${i}.png`));
+      await shot(`i=${i}&h=1920&mode=frametop`, 1080, 1920, path.join(ROOT, `build/f/cards/frametop${i}.png`), true);
     }
   }
   console.log('cards done');
@@ -52,8 +53,8 @@ if (want('subs')) {
   for (const item of edl.items) {
     if (item.type !== 'clip') continue;
     for (const [j, s] of item.subs.entries()) {
-      const q = new URLSearchParams({ mode: 'sub', h: '300', zh: s.zh, en: s.en || '', draft: s.draft ? '1' : '0' });
-      await shot(q.toString(), 1080, 300, path.join(ROOT, `build/f/subs/${item.id}_${j}.png`), true);
+      const q = new URLSearchParams({ mode: 'sub', h: '380', zh: s.zh, en: s.en || '', draft: s.draft ? '1' : '0' });
+      await shot(q.toString(), 1080, 380, path.join(ROOT, `build/f/subs/${item.id}_${j}.png`), true);
       k++;
     }
   }
