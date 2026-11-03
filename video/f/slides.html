@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/900.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/700.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/500.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/inter/800.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/anton/400.css">
+<style>
+  :root { --violet: #5B2EFF; --paper: #F6F3EE; --ink: #15121b; --mute: rgba(21,18,27,.66); }
+  html, body { margin: 0; background: transparent; }
+  .s { position: relative; width: 1080px; overflow: hidden; background: var(--paper); color: var(--ink);
+       font-family: 'Noto Sans SC', sans-serif; box-sizing: border-box; padding: 0 84px; }
+  em { font-style: normal; color: var(--violet); }
+  .kick { font: 800 24px/1 'Inter', sans-serif; letter-spacing: .24em; color: var(--violet); }
+  .tag { position: absolute; left: 84px; bottom: 64px; font: 800 24px/1 'Inter', sans-serif; letter-spacing: .24em;
+         color: #fff; background: var(--ink); padding: 14px 20px; }
+  .page { position: absolute; right: 84px; bottom: 74px; font: 800 24px/1 'Inter', sans-serif; letter-spacing: .12em; color: var(--mute); }
+  .bar { width: 96px; height: 12px; background: var(--violet); }
+
+  /* cover */
+  .cover h1 { margin: 34px 0 0; font-size: 146px; line-height: 1.06; font-weight: 900; letter-spacing: -0.02em; }
+  .cover .sub { margin-top: 34px; font-size: 46px; font-weight: 700; color: var(--mute); }
+  .tags { position: absolute; left: 84px; right: 84px; display: flex; align-items: flex-end; gap: 22px; }
+  .tags div { background: var(--ink); color: #fff; font: 800 30px/1 'Inter', sans-serif; letter-spacing: .14em;
+              display: flex; align-items: center; justify-content: center; position: relative; }
+  .tags div { padding-left: 24px; box-sizing: border-box; }
+  .tags div::before { content: ''; position: absolute; left: 18px; top: 50%; width: 14px; height: 14px; margin-top: -7px;
+                      border-radius: 50%; background: var(--paper); }
+  .tags div.v { background: var(--violet); }
+
+  /* point */
+  .no { font: 400 240px/0.9 'Anton', sans-serif; color: var(--violet); }
+  .head { margin-top: 26px; font-size: 104px; line-height: 1.12; font-weight: 900; letter-spacing: -0.01em; }
+  .body { margin-top: 44px; font-size: 44px; line-height: 1.62; font-weight: 500; color: rgba(21,18,27,.82); }
+  .take { margin-top: 50px; background: var(--ink); color: #fff; padding: 38px 42px 40px; font-size: 42px; line-height: 1.55; font-weight: 700; }
+  .take b { display: block; font: 800 22px/1 'Inter', sans-serif; letter-spacing: .22em; color: #B9A6FF; margin-bottom: 18px; }
+
+  /* list */
+  .list .head { font-size: 88px; }
+  .items { margin-top: 56px; }
+  .item { display: flex; align-items: center; gap: 30px; padding: 34px 0; border-top: 3px solid var(--ink); font-size: 46px; font-weight: 900; line-height: 1.3; }
+  .item:last-child { border-bottom: 3px solid var(--ink); }
+  .item span { font: 400 84px/1 'Anton', sans-serif; color: var(--violet); width: 70px; flex: none; }
+  .note { margin-top: 30px; font-size: 28px; font-weight: 500; color: var(--mute); }
+
+  /* end */
+  .end .q { font-size: 120px; line-height: 1.14; font-weight: 900; letter-spacing: -0.01em; }
+  .end .cta { margin-top: 44px; display: inline-block; background: var(--violet); color: #fff; font-size: 44px; font-weight: 900; padding: 18px 30px; }
+  .end .src { position: absolute; left: 84px; right: 84px; font-size: 26px; line-height: 1.6; font-weight: 500; color: var(--mute); }
+
+  /* video-only: a short chapter bumper */
+  .bump { display: flex; flex-direction: column; justify-content: center; }
+  .bump .head { font-size: 104px; }
+
+  /* video-only: frame around a source clip (the clip is composited into the hole) */
+  .frame .hole { position: absolute; left: 0; width: 1080px; height: 608px; background: #000; }
+  .frame .head { font-size: 80px; margin-top: 22px; }
+  .frame .who { position: absolute; left: 84px; font-size: 30px; font-weight: 700; color: var(--mute); }
+  .frame .who b { color: var(--ink); font-weight: 900; }
+
+  /* video-only: subtitle strip, transparent background */
+  .sub-strip { background: transparent; padding: 0 70px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; }
+  .sub-strip .zh { font-size: 54px; line-height: 1.38; font-weight: 900; color: var(--ink); }
+  .sub-strip .en { margin-top: 14px; font: 500 28px/1.4 'Inter', sans-serif; color: var(--mute); }
+  .sub-strip .draft { display: inline-block; margin-top: 16px; font-size: 24px; font-weight: 700; color: #fff; background: #d33; padding: 6px 12px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const P = new URLSearchParams(location.search);
+const H = Number(P.get('h') || 1440);          // 1440 = 3:4 image post, 1920 = 9:16 video
+const MODE = P.get('mode') || 'slide';          // slide | bump | frame | sub
+const tall = H >= 1920;
+
+async function main() {
+  const data = await (await fetch('/f/slides.json')).json();
+  const root = document.getElementById('root');
+  const el = document.createElement('div');
+  el.className = 's';
+  el.style.height = H + 'px';
+  root.appendChild(el);
+  const n = data.slides.length;
+
+  if (MODE === 'sub') {
+    el.className = 's sub-strip';
+    el.style.height = H + 'px';
+    const zh = P.get('zh') || '', en = P.get('en') || '', draft = P.get('draft') === '1';
+    el.innerHTML = `<div class="zh">${zh}</div>${en ? `<div class="en">${en}</div>` : ''}${draft ? '<div class="draft">字幕草稿 · 待按原话校对</div>' : ''}`;
+    document.body.style.background = 'transparent';
+    window.__ready = true; return;
+  }
+
+  if (MODE === 'frame') {
+    const sl = data.slides[Number(P.get('i'))];
+    const top = 130, hole = 560;
+    el.className = 's frame';
+    el.innerHTML = `
+      <div style="padding-top:${top}px"><div class="kick">${data.kicker}</div>
+      <div class="head">${sl.no ? `<em>${sl.no}</em> ` : ''}${sl.head}</div></div>
+      <div class="hole" style="top:${hole}px"></div>
+      <div class="who" style="top:${hole + 608 + 330}px"><b>Satya Nadella</b> · 微软 CEO　|　20VC 播客 2026.10</div>
+      <div class="tag">${data.tag}</div>`;
+    window.__ready = true; return;
+  }
+
+  const i = Number(P.get('i'));
+  const sl = data.slides[i];
+  const pad = tall ? 250 : 120;
+  const page = `<div class="page">${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</div>`;
+
+  if (MODE === 'bump') {
+    el.className = 's bump';
+    el.innerHTML = `<div class="kick">${data.kicker}</div><div class="no" style="margin-top:40px">${sl.no}</div><div class="head">${sl.head}</div><div class="tag">${data.tag}</div>`;
+    window.__ready = true; return;
+  }
+
+  if (sl.type === 'cover') {
+    el.className = 's cover';
+    const sizes = [[150, 116], [230, 140], [330, 164], [450, 188]];
+    el.innerHTML = `
+      <div style="padding-top:${pad}px"><div class="bar"></div><div class="kick" style="margin-top:30px">${data.kicker}</div>
+      <h1>${sl.title}</h1><div class="sub">${sl.sub}</div></div>
+      <div class="tags" style="bottom:${tall ? 300 : 150}px">${sizes.reverse().map(([w, h], k) =>
+        `<div class="${k === 0 ? 'v' : ''}" style="width:${w}px;height:${h}px;opacity:${1 - k * 0.18}">${w >= 300 ? 'TOKEN' : ''}</div>`).join('')}</div>
+      <div class="tag">${data.tag}</div>`;
+  } else if (sl.type === 'point') {
+    el.innerHTML = `
+      <div style="padding-top:${pad - 20}px"><div class="kick">${data.kicker}</div>
+      <div class="no" style="margin-top:34px">${sl.no}</div><div class="head">${sl.head}</div>
+      <div class="body">${sl.body}</div>
+      <div class="take"><b>对你意味着</b>${sl.take}</div></div>
+      <div class="tag">${data.tag}</div>${page}`;
+  } else if (sl.type === 'list') {
+    el.className = 's list';
+    el.innerHTML = `
+      <div style="padding-top:${pad}px"><div class="kick">${data.kicker}</div><div class="bar" style="margin-top:30px"></div>
+      <div class="head" style="margin-top:36px">${sl.head}</div>
+      <div class="items">${sl.items.map((t, k) => `<div class="item"><span>${k + 1}</span>${t}</div>`).join('')}</div>
+      <div class="note">${sl.note}</div></div>
+      <div class="tag">${data.tag}</div>${page}`;
+  } else if (sl.type === 'end') {
+    el.className = 's end';
+    el.innerHTML = `
+      <div style="padding-top:${tall ? 520 : 300}px"><div class="bar"></div>
+      <div class="q" style="margin-top:40px">${sl.q}</div><div class="cta">${sl.cta}</div></div>
+      <div class="src" style="bottom:${tall ? 220 : 150}px">${sl.src}</div>
+      <div class="tag">${data.tag}</div>${page}`;
+  }
+  if (tall && (sl.type === 'point' || sl.type === 'list')) {
+    const w = el.firstElementChild;
+    w.style.paddingTop = '0px';
+    const h = w.getBoundingClientRect().height;
+    w.style.paddingTop = Math.max(160, (H - h) / 2 - 60) + 'px';
+  }
+  window.__ready = true;
+}
+main();
+</script>
+</body>
+</html>

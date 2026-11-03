@@ -3,3 +3,7 @@ build/*
 !build/timeline.json
 !build/final.mp4
 !build/cover.jpg
+!build/f/
+build/f/*
+!build/f/carousel/
+!build/f/F_preview.mp4
