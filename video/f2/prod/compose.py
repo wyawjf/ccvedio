@@ -92,12 +92,23 @@ def run_all(jobs, a=0, b=NFRAMES, chunk=48):
 
 
 def mux():
+    """Master (CRF 16 picture + AAC, local only) and the upload copy F2_final.mp4 (2-pass ~10 Mbps, < 100 MB)."""
     pic = os.path.join(BUILD, 'F2_picture.mp4')
     wav = os.path.join(BUILD, 'score.wav')
-    out = os.path.join(BUILD, 'F2_final.mp4')
+    master = os.path.join(BUILD, 'F2_master.mp4')
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', pic, '-i', wav, '-map', '0:v:0', '-map', '1:a:0', '-c:v', 'copy',
-                    '-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-movflags', '+faststart', '-shortest', out], check=True)
-    print('final ->', out)
+                    '-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-movflags', '+faststart', '-shortest', master], check=True)
+    print('master ->', master)
+    out = os.path.join(BUILD, 'F2_final.mp4')
+    v = ['-c:v', 'libx264', '-preset', 'slow', '-tune', 'grain', '-b:v', '10M', '-maxrate', '14M', '-bufsize', '20M',
+         '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-color_primaries', 'bt709', '-color_trc', 'bt709',
+         '-colorspace', 'bt709', '-color_range', 'tv']
+    log = os.path.join(BUILD, 'x264_2pass')
+    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', pic, *v, '-pass', '1', '-passlogfile', log, '-an', '-f', 'null', '-'], check=True)
+    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', pic, '-i', wav, '-map', '0:v:0', '-map', '1:a:0', *v, '-pass', '2',
+                    '-passlogfile', log, '-c:a', 'aac', '-b:a', '256k', '-ar', '48000', '-movflags', '+faststart',
+                    '-shortest', out], check=True)
+    print('upload copy ->', out)
 
 
 def main():
