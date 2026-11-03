@@ -78,6 +78,77 @@
 
 ---
 
+# 第二批候选（F–J）
+
+| # | 暂定标题 | 字符 | 原视频 | 类型 |
+|---|---|---|---|---|
+| F | 微软CEO：大模型要打价格战了 | 15 | 20VC × Satya Nadella（10/26） | 创业 / 商业 |
+| G | 微软AI一把手：别造有意识的AI | 16 | The Builders × Mustafa Suleyman（10/12 录制，10/29 上线） | 争议观点，可和 D 做成对线 |
+| H | AI最大的瓶颈，是一台光刻机 | 14 | Dwarkesh Podcast：英特尔晶圆厂实地探访（10/22） | 硬科技 / 算力 |
+| I | 特斯拉机器人产线开工，按百万台设计 | 17 | 特斯拉 Q3 财报电话会（10/22） + Optimus 官方画面 | 机器人 |
+| J | 几万美元两周，AI拍的大片能看吗？ | 17 | Grok Imagine 版《奥德赛》第 1 集（10/23） | AI 视频 / 创作者 |
+
+## F. 微软CEO：大模型要打价格战了
+
+- **原视频**：20VC（主持人 Harry Stebbings），2026-10-26 上线，约 24 分钟。播客标题是《Satya Nadella on Open vs Closed Models: Who Wins | Whether to Trust Frontier Model Providers | Why Companies Need to Own Their Own Intelligence》。YouTube 链接待确认。
+- **炸点**：
+  1. 日常用的算力最终会变成大宗商品，底层模型市场会有一场残酷的价格战。顶尖模型只占少数细分市场。
+  2. 微软 Copilot 内部每天都在混用便宜的闭源和开源模型。
+  3. 每家公司都应该有自己的私有评测集，这会成为核心资产。
+  4. 他承认自己以前以为「模型规模大了，对齐就会自然解决」，这个想法是错的。现在微软的做法是不等对齐，先用零信任架构把模型包起来再用。
+- **对账号受众的价值**：做出海和 AI 应用的人，可以直接用这三条行动建议：别押单一模型、成本会持续下降、自建评测集当护城河。
+- **注意**：目前引语都来自二手报道（The Next Web、36Kr 等）。20VC 有逐字稿 PDF，剪之前要对一遍原话。「中性云租算力不是一门生意」那句是 10/28 财报电话会上说的，**不在这期播客里**。
+
+## G. 微软AI一把手：别造有意识的AI
+
+- **原视频**：沃尔特·艾萨克森（乔布斯、马斯克传记作者）的播客 The Builders。10/12 在纽约 92NY 现场录制，现场 500 多人，10/29 上线（iHeart / Kaleidoscope）。目前只确认有音频版，YouTube 视频版待确认。
+- **炸点**：
+  1. Suleyman 认为意识植根于能感受痛苦的生物身体。他说举证责任在「AI 有意识」那一方，而他目前没看到任何证据。
+  2. 他把 Anthropic 的立场概括成一句话：「if we love the model enough, the model will love us back」（只要我们足够爱模型，模型就会爱我们）。
+  3. 他会在什么情况下喊「立即暂停」（这条红线的原话需要去原片核实）。
+  4. 11 月初他又在 X 上发了一句：「Don't build conscious superintelligence.」
+- **玩法**：和 D（Hinton：AI 已有意识）连着发，做成「上集 Hinton 说有，下集微软 AI 掌门说别造」，或者合成一期对线：「AI有没有意识？两位大佬吵翻了」（15 字符）。
+- **注意**：如果只有音频，画面就要靠字幕卡、两人照片和演讲画面来撑。红线的具体内容没核实之前不要写进标题。
+
+## H. AI最大的瓶颈，是一台光刻机
+
+- **原视频**：Dwarkesh Podcast《What will computer chips look like in 2045?》，2026-10-22 上线，约 69 分钟。Dwarkesh 在英特尔俄勒冈最先进的晶圆厂里拍了两天，嘉宾有英特尔 CTO Pushkar Ranade、工艺研发负责人 Chris Auth 等人。—— https://www.dwarkesh.com/p/intel-tour
+- **炸点**：
+  1. ASML 一年造不到 100 台 EUV 光刻机。CTO 说 EUV 是最大的瓶颈，但其实大部分制造设备都缺货。
+  2. 英特尔 CTO 说：就算想，也造不出 10 倍的先进晶圆。按现在全球的设备存量，先进产能大约只能翻一倍，而 AI 算力需求每年涨约 3 倍。
+  3. 今天下单的设备要等约 18 个月，也就是要到 2028 年才到货。
+- **画面优势**：全程是真实的晶圆厂画面，B-roll 素材非常好剪。
+- **注意**：「只能翻一倍」是摘要网站的说法，原话要对照 dwarkesh.com 上的逐字稿核实。
+
+## I. 特斯拉机器人产线开工，按百万台设计
+
+- **出处**：2026-10-22 特斯拉 Q3 财报电话会。马斯克说，Fremont 那条原来造 Model S/X 的产线已经拆掉，改成了 Optimus 产线，「the vast majority of a million-unit-per-line production line」已经在 Fremont 落地，开始早期生产。他还说爬坡是一条 S 曲线，「initial part has a shallow slope and is somewhat bumpy」，对外交付大约在 2027 年底。
+- **视频素材**：财报电话会录音（特斯拉投资者关系网站有回放），配特斯拉官方的 Optimus 画面。
+- **注意**：「每周 2 万台」只出现在 Teslarati 的报道里，电话会逐字稿里没找到，不要用。标题不要写「量产」，用「开工」，因为马斯克自己说的是 early production。
+
+## J. 几万美元两周，AI拍的大片能看吗？
+
+- **事件**：今年 7 月诺兰版《奥德赛》上映前后，马斯克多次批评这部电影，并扬言要用 Grok Imagine 在年底前拍一部「历史准确」的版本。10/23 第 1 集在 X 上发布，约 7 分钟，由 Wonder Studios 和导演 Dev Walker 制作。联合创始人说**不到两周、花了几万美元**。结果口碑很差：观众说画面灰暗、没有生气，而且「历史准确」的希腊人全是盎格鲁-撒克逊长相、说英国口音。
+- **素材**：X 上的原片，加上外媒和网友的评价截图。
+- **角度**：别讲政治，只讲「AI 拍电影现在到底什么水平」。成本和周期是好莱坞的零头，但质量还差在哪。这个角度对做内容的人最有用。
+- **注意**：只引用片方自己说的成本，不要自己估算。
+
+## 第二批的备选
+
+- **2个人的公司，年卖4亿美元？**（15 字符）：Medvi 创始人 Matthew Gallagher，《纽约时报》4 月报道，2025 年销售额 4.01 亿美元，只有他和弟弟两名员工。贴合账号「一人公司」的主线，但是**时间偏旧**，而且有 FDA 警告信和集体诉讼，只适合做「一人公司神话的另一面」。
+- **OpenAI DevDay 2026（9/29）**：发布了常驻个人 Agent「Dots」和带电脑操作能力的 Agents API。离现在 5 周，偏旧，可以并进 A。
+
+### 第二批来源
+
+- Nadella × 20VC：https://thenextweb.com/news/satya-nadella-ai-alignment-20vc ，https://eu.36kr.com/en/p/4044987101762441 ，https://getscuttlebutt.substack.com/p/satya-nadella-treat-every-ai-model ，https://20vc.substack.com/p/20vc-newsletter-1st-november-2026
+- Suleyman × Isaacson：https://kaleidoscopemedia.substack.com/p/ais-insider-critic ，https://x.com/WalterIsaacson/status/2107210784095007112 ，https://www.techandnyc.com/insights/mustafa-suleyman-wants-ai-to-stay-a-tool/ ，https://x.com/mustafasuleyman/status/2116913722878820528 ，https://yourstory.com/ai-story/conscious-ai-warning-microsoft-ai-chief
+- Dwarkesh × Intel：https://www.dwarkesh.com/p/intel-tour ，https://thenextweb.com/news/intel-cto-ranade-dwarkesh-chip-tools-2x-not-10x
+- Tesla Q3：https://www.fool.com/earnings/call-transcripts/2026/10/22/tesla-tsla-q3-2026-earnings-call-transcript/ ，https://www.notateslaapp.com/news/4866/tesla-officially-begins-optimus-robot-production ，https://www.teslarati.com/tesla-tsla-q3-2026-earnings-results/
+- Grok《奥德赛》：https://petapixel.com/2026/10/26/elon-musk-has-followed-through-on-his-threat-to-remake-the-odyssey-with-grok-ai/ ，https://www.thenewdaily.com.au/life/entertainment/movies/2026/10/27/musks-ai-odyssey-ridiculed ，https://avclub.com/elon-musk-grok-ai-the-odyssey-first-episode
+- Medvi：https://finance.yahoo.com/sectors/healthcare/articles/1-8-billion-startup-just-190000841.html ，https://www.techdirt.com/2026/04/07/the-new-york-times-got-played-by-a-telehealth-scam-and-called-it-the-future-of-ai/
+
+---
+
 ## 备选（这周不够用时再上）
 
 - **Dwarkesh Podcast（9/11）**：OpenAI 联合创始人 John Schulman 等三位研究者辩论「AI 离递归自我改进还有多远」。偏硬核，二手摘要说 Schulman 预测两年内 AI 能让 AI 研究员效率提升 10 倍，用之前要对原文核实。—— https://www.dwarkesh.com/p/john-beren-charlie
