@@ -532,8 +532,8 @@ Last frame **f1795** must read as a complete, shareable card. No RH on paper.
 
 ### 3.4 Optional soundbite slot (the film is complete without it)
 
-- **One slot only**, at **f380 (A: price war, before S03)** or **f860 (B: changed mind, before S05)**. Length = whole beats, **≤ 8 beats (192 f = 6.4 s)**.
-- **To stay ≤ 60 s** when a slot is used (the delivered film ends at B73, f1796), remove 8 beats: drop the S03 token beat (S03-T1/T2; the router starts at f392 instead of f488; −4 beats; the token fact stays on C3), shorten the S05 rise to 36 f and move the annotations to half-beats (−1 beat), drop S06-F2 (−1 beat; it stays on C5), end S08 at B71 (−2 beats, f1796 → f1748). Result with an 8-beat slot: 1796 frames = 59.867 s. Everything after the slot shifts by whole beats, so the grid is preserved.
+- **One slot only**, at **f380 (A: price war, before S03)** or **f860 (B: after the changed mind, before S05)**. Length = whole beats, **≤ 6 beats (144 f = 4.8 s)**, so the end card's hold is never cut.
+- **To stay ≤ 60 s** when a slot is used, remove 6 beats: drop the S03 token beat (S03-T1/T2; the router starts at f392 instead of f488; −4 beats; the token fact stays on C3), shorten the S05 rise f860→f920 to 36 f (−1 beat), drop S06-F2 (−1 beat; it stays on C5). S08 is untouched. Result: 1796 frames = 59.867 s.
 - **Frame:** 16:9 picture 900×506 at (90, 700), colour grade sat 0.80 + film grain, develops in 33 f. RH left reads `原声`. Plex Mono 400 24 bone-5 at (90, 1226): `Satya Nadella · 20VC · 2026.10.26 · 原片 mm:ss`. Subtitles Hei 500 46/64 bone at (90, 1290), ≤ 2 lines of ≤ 18 字, no quotation marks. Hei 500 24 bone-5 at (90, 1424): `字幕为翻译`. Subtitles must be a verified translation of the actual audio.
 - **Audio:** dialogue −18 LUFS; music ducks −10 dB with 300 ms ramps; room tone continues.
 
@@ -1094,4 +1094,4 @@ where they disagree with §0–§10, this section wins. IDs refer to the review 
   tapered and textured like wax.
 - Round 3 (release QA): the chunk encoder converts RGB → YUV with the BT.709 matrix (ffmpeg's default BT.601 shifted
   every colour under the BT.709 tags); the post title stays 微软CEO：大模型要打价格战了 (the 判断 variant is the cautious alternate) and the caption's
-  我们的解读 line is the end card's (canonical copy: `script/f-nadella.md`); the soundbite-slot budget in §3.4 is 8 beats.
+  我们的解读 line is the end card's (canonical copy: `script/f-nadella.md`); the optional soundbite slot in §3.4 is capped at 6 beats so the end card is never cut.

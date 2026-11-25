@@ -4,8 +4,8 @@
 
 ## 环境
 
-- Node：在 `video/` 运行 `npm ci`（字体和 Playwright 都在 package-lock 里）。Chromium 默认用 `/opt/pw-browsers/chromium`，别的位置用环境变量 `PW_CHROMIUM` 指定。
-- Python：`pip install opencv-python scikit-image==0.26.0 scipy numpy pillow soundfile pyloudnorm`（本次出片用的版本：opencv 5.0.0、scikit-image 0.26.0、scipy 1.18.1、numpy 2.5.3、Pillow 12.3.0、soundfile 0.14.0）。
+- Node 22：在 `video/` 运行 `npm ci`（字体和 Playwright 都在 package-lock 里）。Chromium 默认用 `/opt/pw-browsers/chromium`，别的位置用环境变量 `PW_CHROMIUM` 指定。
+- Python：`pip install opencv-python-headless==5.0.0.93 scikit-image==0.26.0 scipy==1.18.1 numpy==2.5.3 pillow==12.3.0 soundfile==0.14.0 pyloudnorm==0.2.0`（本次出片用的版本）。
 - ffmpeg ≥ 6.1，带 libx264。
 - 上传版 `F2_final.mp4` 是 2-pass 编码，每次重编码的字节都不一样（画质等价）。发布的是哪一个，以 `script/f-nadella.md` 里记的 sha256 为准。
 
