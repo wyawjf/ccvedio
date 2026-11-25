@@ -35,7 +35,7 @@ if (parts > 1 && part === null) {
 
 const server = await startServer(ROOT);
 const browser = await chromium.launch({
-  executablePath: '/opt/pw-browsers/chromium',
+  executablePath: process.env.PW_CHROMIUM || '/opt/pw-browsers/chromium',
   args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none', '--disable-lcd-text', '--force-color-profile=srgb'],
 });
 const page = await browser.newPage({ viewport: { width: data.w, height: data.h }, deviceScaleFactor: 1 });

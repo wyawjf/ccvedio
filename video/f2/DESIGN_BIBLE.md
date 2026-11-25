@@ -1,7 +1,7 @@
 # 第十二张 · THE TWELFTH PLATE — Production Design Bible (LOCKED)
 
-**Topic:** 微软CEO：大模型要打价格战了 · **Account:** Coo-Coo出海Ai实验室 (Xiaohongshu)
-**Deliverables:** vertical film 1080×1920, 30 fps, **1772 frames = 59.067 s**, silent text + synthesized score · carousel 1080×1440 × **7 frames** (C1 is also the video cover)
+**Topic:** 微软CEO判断：大模型要打价格战了 · **Account:** Coo-Coo出海Ai实验室 (Xiaohongshu)
+**Deliverables:** vertical film 1080×1920, 30 fps, **1796 frames = 59.867 s** (after review; originally 1772), silent text + synthesized score · carousel 1080×1440 × **7 frames** (C1 is also the video cover)
 **Spine:** `concepts/doc.md` (won 3/3 judges). **Grafts:** per-call router light, coin pitches from measured radii, honest-scale captions, zero-trust margin, plate-mark emboss, two copy lines (all from `editorial.md`); retina rising with a terminator, headline static from frame 0 (`idea.md`); light-foley at the lamp-up, licence wording, the 示意 honesty rule (`product.md`).
 **Status:** locked. Production builds exactly this. If a number here conflicts with any concept doc or look-dev, this file wins.
 **Delivered state:** two design-review rounds revised timings, layout and copy; §11 records every change and supersedes §0–§10 where they differ (final film: **1796 frames = 59.867 s**; score cues in `prod/CUES_v2.md`).
@@ -46,7 +46,7 @@ Rejected grafts (and why): the 256-tile step-and-repeat (reads as a filter when 
 
 1. **The Settle (S01, 0–1.467 s).** Frame 0 is already a finished title over a defocused tray of Pompeii coins. Off screen, a coin spins down: whirr, then a rattle accelerating to 32 Hz. At **f44 (1.467 s)** the rattle ends in a clack, the rack focus lands, and one glint crosses the face of coin #16. Sound, focus and claim land on the same frame. Then a hard graphic match: the bright coin becomes the espresso crema at the same centre (678, 1000).
 2. **The Hard Stop (S04, f764 = 25.467 s).** An accelerating push through the Hubble Deep Field dies in one frame. Every audio track goes to digital zero for 12 frames. In 2 frames, his old belief is struck through and `现在 / 他不这么想了。` prints on. Grain and gate weave keep living; only the camera has died.
-3. **The Twelfth Plate (S05 → S08, 37.467–59.067 s).** The framed eye pulls back to become cell 05 of a contact sheet of eleven public test images. Eleven felt-piano notes sound as the cells develop; the twelfth cell is an empty hairline window and its note is withheld. The camera dives into the 12th plate, where his line about private evals sits inside its outline. A light table switches on: the darkness becomes paper and the plate becomes an intaglio plate mark, revealed by a raking light. As the light crosses it, the withheld note (D5) finally sounds.
+3. **The Twelfth Plate (S05 → S08, 37.467–59.867 s).** The framed eye pulls back to become cell 05 of a contact sheet of eleven public test images. Eleven felt-piano notes sound as the cells develop; the twelfth cell is an empty hairline window and its note is withheld. The camera dives into the 12th plate, where his line about private evals sits inside its outline. A light table switches on: the darkness becomes paper and the plate becomes an intaglio plate mark, revealed by a raking light. As the light crosses it, the withheld note (D5) finally sounds.
 
 Supporting moves (not signatures): the **develop** (every print comes up highlights-first, like paper in a tray), the **slit** (a narrow window opens in the everyday), the **router light**, the **contain** move (the eye is put inside a frame; the rules sit outside it).
 
@@ -207,6 +207,8 @@ Each `code span` is one line box, in reading order. Footer on C2–C6 = `■ Coo
 
 ### 2.5 Post caption (XHS text body, not on screen)
 
+(Superseded: the canonical post copy is `script/f-nadella.md` §一, revised in round 3.)
+
 ```
 微软CEO：大模型要打价格战了
 20VC 播客最新一期（2026.10.26），纳德拉谈了四个判断。以下据公开报道整理，均为转述：
@@ -264,8 +266,8 @@ Each `code span` is one line box, in reading order. Footer on C2–C6 = `■ Coo
 | **S04** | Scale · the hard stop | f644 → f859 | 21.467 → 28.667 | 216 f · 7.200 s | B25 → B34 | Hard cut | Hard cut on SUB swell |
 | **S05** | Zero trust · the eye in the frame | f860 → f1123 | 28.667 → 37.467 | 264 f · 8.800 s | B34 → B45 | Hard cut | Continuous pull-back |
 | **S06** | The contact sheet | f1124 → f1387 | 37.467 → 46.267 | 264 f · 8.800 s | B45 → B56 | Pull-back | Continuous plunge |
-| **S07** | Inside the twelfth plate | f1388 → f1603 | 46.267 → 53.467 | 216 f · 7.200 s | B56 → B65 | Plunge | Continuous lamp-up |
-| **S08** | Lamp-up · plate mark · colophon | f1604 → f1771 | 53.467 → 59.067 | 168 f · 5.600 s | B65 → B72 | Lamp-up | End; f1771 is a complete shareable still |
+| **S07** | Inside the twelfth plate | f1388 → f1579 | 46.267 → 52.667 | 192 f · 6.400 s | B56 → B64 | Plunge | Light-table switch |
+| **S08** | Lamp-up · plate mark · colophon | f1580 → f1795 | 52.667 → 59.867 | 216 f · 7.200 s | B64 → B73 | Switch | End; f1795 is a complete shareable still |
 
 ### 3.3 Shot specifications
 
@@ -481,7 +483,7 @@ Picture alone f1376–f1387 (sheet + empty window only). **Plunge from f1388.**
 
 ---
 
-#### S07 · Inside the twelfth plate (f1388 → f1603, 46.267 → 53.467 s)
+#### S07 · Inside the twelfth plate (f1388 → f1579, 46.267 → 52.667 s; revised in §11)
 
 **Plunge** f1388 → f1428 (40 f), E-DIVE `cubic-bezier(.6,0,.1,1)`: cell 12's window grows from (720,1216, 255×170) to **(42, 600, 996×664)**. With u = E-DIVE(t): `s = s1^u`, s1 = 996/255 = **3.9059**; `P = P0 + (P1 − P0)·w`, `w = (s − 1)/(s1 − 1)`, P0 = (720,1216), P1 = (42,600); `T = P − s·(720,1216)`; end T1 = (−2770.2, −4149.6). The other cells fly out of frame with motion blur; the window's hairline stays 1 px and **becomes rule-18 with a 6 px corner radius** by f1428 (the plate outline). Interior and surround are ink.
 
@@ -501,11 +503,11 @@ Picture alone (ink + plate outline) f1592–f1603. **Lamp-up at f1604.**
 
 ---
 
-#### S08 · Lamp-up · plate mark · colophon (f1604 → f1771, 53.467 → 59.067 s)
+#### S08 · Lamp-up · plate mark · colophon (f1580 → f1795, 52.667 → 59.867 s; revised in §11)
 
 | Event | Frames | Spec | Curve |
 |---|---|---|---|
-| **Lamp-up** | f1604 → f1628 | ground ink #0B0A09 → paper #F2EEE7 (linear light); paper texture fades in with it; film bloom 0 → 0.18 → 0 (peak f1616) | E-LAMP `cubic-bezier(.4,0,.2,1)` |
+| **Lamp-up** (revised in §11: a switch at f1580/f1581, pull-out and rake f1580 → f1628, D5 peak f1604) | f1604 → f1628 | ground ink #0B0A09 → paper #F2EEE7 (linear light); paper texture fades in with it; film bloom 0 → 0.18 → 0 (peak f1616) | E-LAMP `cubic-bezier(.4,0,.2,1)` |
 | Outline out | f1604 → f1616 | the rule-18 plate outline fades | E-LEAVE |
 | **Pull-out** | f1604 → f1652 | plate rect (42,600, 996×664) → **(90, 540, 642×428)**; `s = (642/996)^u`, `P = P0 + (P1 − P0)·(1 − s)/(1 − 0.6446)` | E-SETTLE-L `cubic-bezier(.22,1,.36,1)` |
 | **Raking light** | f1604 → f1652 | directional light az 215° → 135°, el 8° → 24°; crosses the plate's midpoint at **f1628** | E-RAKE `cubic-bezier(.45,0,.55,1)` |
@@ -525,13 +527,13 @@ The plate mark is the intaglio emboss of §7.3, computed per frame at the curren
 | S08-ACC | T-ACC · Noto Sans SC 700 56/56 ink-p | 90, 1104 | f1700 | end |
 | S08-SRC1 … SRC7 | T-SRC · Noto Sans SC 500 20/31 +0.02em ink-p-62 (plate numbers Plex Mono 500 20) | 90, 1226 + 31k (k = 0…6) | f1712 + 2k | end |
 
-Last frame **f1771** must read as a complete, shareable card. No RH on paper.
-**Sound:** f1604 RELAY + light-table HUM + PAD D major add9 · **f1628 FELT D5 (the 12th note)** · f1700 COIN ting D7 · fade to room by f1771.
+Last frame **f1795** must read as a complete, shareable card. No RH on paper.
+**Sound (revised, see `prod/CUES_v2.md`):** f1580 RELAY · f1581 light-table HUM + PAD D major add9 · **f1604 FELT D5 (the 12th note)** · f1700 COIN ting D7 · hold f1712 → f1795.
 
 ### 3.4 Optional soundbite slot (the film is complete without it)
 
 - **One slot only**, at **f380 (A: price war, before S03)** or **f860 (B: changed mind, before S05)**. Length = whole beats, **≤ 8 beats (192 f = 6.4 s)**.
-- **To stay ≤ 60 s** when a slot is used, remove 7 beats: drop the S03 token beat (S03-T1/T2; the router starts at f392 instead of f488; −4 beats; the token fact stays on C3), shorten the S05 rise to 36 f and move the annotations to half-beats (−1 beat), drop S06-F2 (−1 beat; it stays on C5), end S08 at B71 (−1 beat). Result ≤ 59.87 s. Everything after the slot shifts by whole beats, so the grid is preserved.
+- **To stay ≤ 60 s** when a slot is used (the delivered film ends at B73, f1796), remove 8 beats: drop the S03 token beat (S03-T1/T2; the router starts at f392 instead of f488; −4 beats; the token fact stays on C3), shorten the S05 rise to 36 f and move the annotations to half-beats (−1 beat), drop S06-F2 (−1 beat; it stays on C5), end S08 at B71 (−2 beats, f1796 → f1748). Result with an 8-beat slot: 1796 frames = 59.867 s. Everything after the slot shifts by whole beats, so the grid is preserved.
 - **Frame:** 16:9 picture 900×506 at (90, 700), colour grade sat 0.80 + film grain, develops in 33 f. RH left reads `原声`. Plex Mono 400 24 bone-5 at (90, 1226): `Satya Nadella · 20VC · 2026.10.26 · 原片 mm:ss`. Subtitles Hei 500 46/64 bone at (90, 1290), ≤ 2 lines of ≤ 18 字, no quotation marks. Hei 500 24 bone-5 at (90, 1424): `字幕为翻译`. Subtitles must be a verified translation of the actual audio.
 - **Audio:** dialogue −18 LUFS; music ducks −10 dB with 300 ms ramps; room tone continues.
 
@@ -864,6 +866,8 @@ All px parameters (14, 8.4, 12.6, 4.0, 9) scale with plate width / 642 during th
 | REVERB | `reverb_ir(2.2 s music / 1.0 s coin)`, pre-delay 12 ms, damping 4.5 kHz; wet −14 dB (piano), −18 dB (coin) |
 
 ### 8.2 Cue sheet (sample-locked: sample = round(f × 1600))
+
+> Delivered frames differ after review: `prod/CUES_v2.md` supersedes every row it lists (router pings, S05, sheet chords, all of S08, end at f1796).
 | Frame (s) | Picture | Cue |
 |---|---|---|
 | f0 (0.000) | title over defocused coins | ROOM fades in over 0.25 s |
@@ -948,13 +952,13 @@ Integrated **−16 LUFS ±0.5**, true peak ≤ **−1.0 dBTP** (4× oversampled 
 - [ ] Positions match §3–§4 within ±1 px (compare against `bible_proofs/` layouts).
 
 **Timing**
-- [ ] 1772 frames at 30 fps CFR (59.067 s). All cuts at f116, f380, f644, f860; continuous moves at f260, f932, f1124, f1388, f1604.
+- [ ] 1796 frames at 30 fps CFR (59.867 s). All cuts at f116, f380, f644, f860; continuous moves at f260, f300, f920, f1124, f1388, f1580.
 - [ ] Event log from `renderAt` equals the frames in §3 (text in/out, hops, develops, draws).
 - [ ] Hard stop: camera transform identical on f764–f859; grain and weave still change frame to frame.
-- [ ] Audio events sample-locked (sample = f × 1600); exact digital zeros f764–f775; no note at f1187; D5 at f1628.
+- [ ] Audio events sample-locked (sample = f × 1600); exact digital zeros f764–f775 in score.wav (in the AAC, f765–f774 exact and f764/f775 ≤ −60 dBFS from MDCT spread); no note at f1187; D5 at f1604.
 
 **Images**
-- [ ] Logged effective scale per plate per frame ≤ §7.2 maxima (S01 ≤ 2.46, slit ≤ 2.06, Hubble ≤ 1.18, retina ≤ 0.53, thumbnails ≤ 1.0).
+- [ ] Logged effective scale per plate per frame ≤ §7.2 maxima (S01 ≤ 2.46, slit ≤ 2.06, Hubble ≤ 1.20, retina ≤ 0.53, thumbnails ≤ 1.0).
 - [ ] 1:1 inspection: no halos, no ringing, rocket sky free of JPEG blocks, no mirrored or extended regions, people uncropped.
 - [ ] Develop order visible (crema first, stars first, lamps first); terminator ends on the untreated retina by f920.
 - [ ] Re-run App. C verification (10 × max diff 0; Grace Hopper sha256).
@@ -996,16 +1000,12 @@ Row-major order (row bands of 60 px, then x). Pitch: target MIDI = 74 + 18·(r_m
 
 Hero = **#16** (the facing head). Hook: screen (678, 1000) at ×2.40, r 56.4. Router: screen (646.8, 1086.2) at ×2.00, r 47.0. Cover ring centre (647, 934).
 
-## Appendix B · Build pipeline (recommended)
+## Appendix B · Build pipeline
 
-| Step | Tool | Output |
-|---|---|---|
-| 1. Prep | `python3 -I f2/prod/prep.py` (reads only `assets/lib/`) | Graded full-res plates, coin matte + `coins.json`, Hubble FG/BG, rack-focus frames f0–f44 (numpy disc blur), emboss frames f1604–f1652 + rest plate, paper textures |
-| 2. Film raw | `f2/prod/film.html` implementing `window.__ready`, `window.__duration = 1772/30`, `window.renderAt(t)`; WebGL2 photo layer (develop, light maps, terminator, motion blur) + DOM type; `node f2/render.mjs --page f2/prod/film.html --out build/f2/raw.mp4` with **PNG frames** (switch `frameAt` to `'png'` and the ffmpeg input codec to `png` to avoid JPEG banding in the darks) | `build/f2/raw.mp4` |
-| 3. Finish | `python3 f2/film.py build/f2/raw.mp4 build/f2/graded.mp4 --look f2/prod/look.json` (after adding `print_bloom`) | graded video |
-| 4. Score | `python3 -I f2/prod/score.py` (uses `f2/synth.py`, cue sheet §8.2) | `build/f2/score.wav` |
-| 5. Master | ffmpeg mux + final encode per §10 | `build/f2/F2_final.mp4` |
-| 6. Carousel | `f2/prod/carousel.html` → `node f2/render.mjs --page f2/prod/carousel.html --w 1080 --h 1440 --frames 0,1,2,3,4,5,6 --out build/f2/carousel` → `film.py --still` per frame (§5.4) | `build/f2/carousel/01…07.png` |
+Superseded by the production code. The build is `prod/README.md`: `prep.py` → `timeline.py` → `type_render.mjs` →
+`compose.py --jobs 4` → `score.py` (cue frames from `prod/CUES_v2.md`) → `compose.py --mux` → `carousel.py` →
+`review_kit.py`. The chunk encoder converts RGB to YUV with the BT.709 matrix (`scale=out_color_matrix=bt709`), matching
+the BT.709 tags.
 
 ## Appendix C · Verified facts (re-run before release)
 
@@ -1092,3 +1092,6 @@ where they disagree with §0–§10, this section wins. IDs refer to the review 
   block on B69 (no wipe), and the complete card holds about 3 s. The hook breathes first (focus 16 → 11 px over
   f0–f15, then lands on f44); cell 12's number arrives with its window, its name on f1268. The cover's marker loop is
   tapered and textured like wax.
+- Round 3 (release QA): the chunk encoder converts RGB → YUV with the BT.709 matrix (ffmpeg's default BT.601 shifted
+  every colour under the BT.709 tags); the post title is 微软CEO判断：大模型要打价格战了 and the caption's 我们的解读 line is
+  the end card's (canonical copy: `script/f-nadella.md`); the soundbite-slot budget in §3.4 is 8 beats.

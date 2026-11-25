@@ -1,8 +1,8 @@
 """Composite picture + type, run the finishing pass (film.py + look.json) and encode (Appendix B steps 2-5).
 
     python3 f2/prod/compose.py --jobs 4                 # whole film -> build/f2/F2_picture.mp4 (no audio)
-    python3 f2/prod/compose.py --frames 0,500 --still   # finished stills -> build/f2/stills/
-    python3 f2/prod/compose.py --mux                    # + build/f2/score.wav -> build/f2/F2_final.mp4
+    python3 f2/prod/compose.py --frames 0,500           # finished stills -> build/f2/stills/
+    python3 f2/prod/compose.py --mux                    # + build/f2/score.wav -> build/f2/F2_master.mp4 + F2_final.mp4
 """
 import json
 import os
@@ -20,7 +20,10 @@ from common import BUILD, FPS, H, NFRAMES, W, save_png  # noqa: E402
 
 LOOK = os.path.join(HERE, 'look.json')
 SEG = os.path.join(BUILD, 'seg')
-X264 = ['-c:v', 'libx264', '-preset', 'slow', '-tune', 'grain', '-crf', '16', '-pix_fmt', 'yuv420p',
+# rgb24 -> yuv420p with the BT.709 matrix: without the scale filter ffmpeg converts with BT.601 and only the
+# tags say 709, so players shift every colour (release QA R3-FIN-01)
+X264 = ['-vf', 'scale=out_color_matrix=bt709:out_range=tv', '-c:v', 'libx264', '-preset', 'slow', '-tune', 'grain',
+        '-crf', '16', '-pix_fmt', 'yuv420p',
         '-profile:v', 'high', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709',
         '-color_range', 'tv']
 

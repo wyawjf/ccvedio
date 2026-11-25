@@ -1,4 +1,4 @@
-> 新选题的视频和图文统一按 [`DESIGN.md`](DESIGN.md) 的视觉规范来做。F 选题的实现在 `f/`，可以当模板复用。
+> 新选题的视频和图文统一按 [`DESIGN.md`](DESIGN.md) 的视觉规范来做。F 选题的现行版本是 F2（`f2/`，出片流程见 [`f2/prod/README.md`](f2/prod/README.md)，设计规范见 [`f2/DESIGN_BIBLE.md`](f2/DESIGN_BIBLE.md)）。`f/` 是客户否掉的旧版，仅作对照。
 
 # 《当智慧像电一样便宜》视频
 
