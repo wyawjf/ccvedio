@@ -1,6 +1,6 @@
 # F2 出片流程：第十二张 · THE TWELFTH PLATE
 
-视觉、文案、时间轴、声音都以 `../DESIGN_BIBLE.md` 为准。两份文件有冲突时，按 bible 改代码。
+视觉、文案、时间轴、声音都以 `../DESIGN_BIBLE.md` 为准，其中 §11 记录了两轮设计评审后的改动（优先于前面各节），配乐的帧号以 `CUES_v2.md` 为准。成片 1796 帧，59.867 秒。
 
 ## 一次性出全片
 
@@ -23,21 +23,27 @@ python3 f2/prod/compose.py --jobs 4          # 画面 + 字幕 + 胶片后期，
 ```
 
 ```bash
-python3 -I f2/prod/score.py                  # 合成配乐（按 bible §8.2 逐帧对点）→ build/f2/score.wav
+python3 -I f2/prod/score.py                  # 合成配乐（按 CUES_v2.md 逐帧对点，自检全部通过才退出 0）→ build/f2/score.wav
 ```
 
 ```bash
-python3 f2/prod/compose.py --mux             # 混入配乐 → build/f2/F2_final.mp4
+python3 f2/prod/compose.py --mux             # 混入配乐 → build/f2/F2_master.mp4（CRF 16 母版，留在本地）和 build/f2/F2_final.mp4（2-pass 约 10 Mbps 的上传版）
 ```
 
 ```bash
 python3 f2/prod/carousel.py                  # 图文 7 张 → build/f2/carousel/01.png … 07.png（01 是封面）
 ```
 
+设计评审用的抽帧包（从编码后的成片里解码）：
+
+```bash
+python3 f2/prod/review_kit.py build/f2/F2_final.mp4   # → build/f2/review/
+```
+
 查看单帧：
 
 ```bash
-python3 f2/prod/compose.py --frames 0,770,1771   # 成品静帧 → build/f2/stills/
+python3 f2/prod/compose.py --frames 0,770,1795   # 成品静帧 → build/f2/stills/
 ```
 
 ## 文件分工

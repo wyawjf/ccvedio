@@ -4,6 +4,7 @@
 **Deliverables:** vertical film 1080×1920, 30 fps, **1772 frames = 59.067 s**, silent text + synthesized score · carousel 1080×1440 × **7 frames** (C1 is also the video cover)
 **Spine:** `concepts/doc.md` (won 3/3 judges). **Grafts:** per-call router light, coin pitches from measured radii, honest-scale captions, zero-trust margin, plate-mark emboss, two copy lines (all from `editorial.md`); retina rising with a terminator, headline static from frame 0 (`idea.md`); light-foley at the lamp-up, licence wording, the 示意 honesty rule (`product.md`).
 **Status:** locked. Production builds exactly this. If a number here conflicts with any concept doc or look-dev, this file wins.
+**Delivered state:** two design-review rounds revised timings, layout and copy; §11 records every change and supersedes §0–§10 where they differ (final film: **1796 frames = 59.867 s**; score cues in `prod/CUES_v2.md`).
 **Layout proofs** (real fonts, real copy, approximate grade, no post): `f2/bible_proofs/` (`_final_film_a.jpg`, `_final_film_b.jpg`, `_final_car.jpg`, 1:1 frames, `_cover_thumb.jpg`, `_c7_emb2_crop.jpg`). They check geometry only. Final look = §5–§7.
 
 ---
