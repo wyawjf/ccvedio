@@ -1,6 +1,6 @@
 # 第十二张 · THE TWELFTH PLATE — Production Design Bible (LOCKED)
 
-**Topic:** 微软CEO判断：大模型要打价格战了 · **Account:** Coo-Coo出海Ai实验室 (Xiaohongshu)
+**Topic:** 微软CEO：大模型要打价格战了 · **Account:** Coo-Coo出海Ai实验室 (Xiaohongshu)
 **Deliverables:** vertical film 1080×1920, 30 fps, **1796 frames = 59.867 s** (after review; originally 1772), silent text + synthesized score · carousel 1080×1440 × **7 frames** (C1 is also the video cover)
 **Spine:** `concepts/doc.md` (won 3/3 judges). **Grafts:** per-call router light, coin pitches from measured radii, honest-scale captions, zero-trust margin, plate-mark emboss, two copy lines (all from `editorial.md`); retina rising with a terminator, headline static from frame 0 (`idea.md`); light-foley at the lamp-up, licence wording, the 示意 honesty rule (`product.md`).
 **Status:** locked. Production builds exactly this. If a number here conflicts with any concept doc or look-dev, this file wins.
@@ -1093,5 +1093,5 @@ where they disagree with §0–§10, this section wins. IDs refer to the review 
   f0–f15, then lands on f44); cell 12's number arrives with its window, its name on f1268. The cover's marker loop is
   tapered and textured like wax.
 - Round 3 (release QA): the chunk encoder converts RGB → YUV with the BT.709 matrix (ffmpeg's default BT.601 shifted
-  every colour under the BT.709 tags); the post title is 微软CEO判断：大模型要打价格战了 and the caption's 我们的解读 line is
-  the end card's (canonical copy: `script/f-nadella.md`); the soundbite-slot budget in §3.4 is 8 beats.
+  every colour under the BT.709 tags); the post title stays 微软CEO：大模型要打价格战了 (the 判断 variant is the cautious alternate) and the caption's
+  我们的解读 line is the end card's (canonical copy: `script/f-nadella.md`); the soundbite-slot budget in §3.4 is 8 beats.

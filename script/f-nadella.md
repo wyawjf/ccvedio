@@ -1,4 +1,4 @@
-# F｜微软CEO判断：大模型要打价格战了
+# F｜微软CEO：大模型要打价格战了
 
 > 原素材：20VC 播客专访 Satya Nadella，主持人 Harry Stebbings，2026-10-26（周一）上线，约 24 分钟。
 > 节目标题：《Satya Nadella on Open vs Closed Models: Who Wins | Whether to Trust Frontier Model Providers | Why Companies Need to Own Their Own Intelligence》
@@ -20,11 +20,12 @@
 
 ## 一、小红书文案（视频和图文通用）
 
-**标题（主推）**：微软CEO判断：大模型要打价格战了（17 字符）
+**标题（主推）**：微软CEO：大模型要打价格战了（15 字符）
 
-（原定的「微软CEO：大模型要打价格战了」是「人名：话」的标题格式，中文读者会当成原话；这句其实是我们对 brutal price war 的转述，所以加上「判断」，和封面、片头的引导语一致。）
+备选里的「微软CEO判断：…」更保守：它和封面、片头的引导语「纳德拉判断」一致，读者不会把这句当成他的原话。主推标题「人名：话」是新闻标题里「他说」的写法，没有引号，也是对 brutal price war 的如实转述，按规则可以用。
 
 备选：
+- 微软CEO判断：大模型要打价格战了（17）
 - 11 张公开图，第 12 张是你的（17）
 - 纳德拉判断：模型层会有一场残酷的价格战（19）
 
