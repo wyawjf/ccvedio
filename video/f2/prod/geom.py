@@ -251,7 +251,7 @@ def rake(t):
 
 
 def lamp(t):
-    """A light table is a switch, not a fade (review CD-08): dark on f1604, on from f1605."""
+    """A light table is a switch, not a fade (review CD-08): dark on f1580, on from f1581."""
     return 0.0 if t < 1580.5 else 1.0
 
 

@@ -1,4 +1,4 @@
-"""Composite picture + type, run the finishing pass (film.py + look.json) and encode (Appendix B steps 2-5).
+"""Composite picture + type, run the finishing pass (film.py + look.json) and encode.
 
     python3 f2/prod/compose.py --jobs 4                 # whole film -> build/f2/F2_picture.mp4 (no audio)
     python3 f2/prod/compose.py --frames 0,500           # finished stills -> build/f2/stills/

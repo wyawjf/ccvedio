@@ -20,8 +20,9 @@ give them: RMS where the bible says RMS (ROOM, WHIRR, DRONE, SLIT, PAD, and the 
 noise sweep the SLIT, review fix 6), sample peak otherwise. The cue sheet as written integrates to about -28 LUFS, so
 §8.2 and §8.3 (-16 LUFS) cannot both hold at one scale: the master is ONE uniform gain (about +12 dB, reported as
 master_gain_db) and nothing else. No limiter acts: render() moves the hook group (flick, whirr, rattle, CLACK and
-their room, in the cue sheet's own balance) as one so the CLACK lands at CLACK_DBTP (-1.40 dBTP) and levels the plunge
-SUB to SUB_DBTP just under it; every other peak of the film sits below both. score_report.json shows
+their room, in the balance set below: the flick and the whirr 3 dB under the cue sheet, so the CLACK leads) as one so
+the CLACK lands at CLACK_DBTP (-1.40 dBTP) and levels the plunge SUB to SUB_DBTP just under it; every other peak of the
+film sits below both, and so does every other cue's own K-weighted 100 ms loudness. score_report.json shows
 limiter_clusters == [] and file_equals_gain_times_mix_bus. DESIGN_BIBLE §8.3 should carry this convention; this
 script may not edit the bible. Where a review fix had to differ from its prescription to pass the review's own
 acceptance test, score_report.json 'review_fixes' says what was measured and what was changed.
@@ -66,6 +67,7 @@ RET_MUSIC, RET_COIN = -14.0 + 10.46, -18.0 + 10.46   # returns for a 0.3 send: w
 
 # ---------------------------------------------------------------- the picture's timing (f2/prod/CUES_v2.md)
 assert len(LANDS) == 12
+F_DRONE_IN, F_D3 = 53, 54                      # the S01 sub-line prints over 10 f from f49 and is legible from about f54 (R3-REL-07): DRONE f53, FELT D3 f54, as in §8.2
 F_SLIT2 = 300                                  # a second, lighter SLIT swell (the slit outgrows the print f300-f318)
 F_DRAW = (950, 966)                            # the retina frame draws (E-DRAW)
 F_STAMPS = (968, 992, 1016)                    # 身份 / 记录 / 权限
@@ -77,6 +79,7 @@ SHEET = (                                      # arrival order, as chords: (fram
     (1171, ((11, 392.00, 'G4'),)),
     (1179, ((10, 261.63, 'C4'),)))
 F_NO_NOTE = 1187                               # the withheld 12th (unchanged)
+F_DYAD = 1453                                  # the S07 statement now completes on E3 (私有评测集。) at f1453 (was f1444): FELT dyad
 F_DRONE_OUT = (1568, 1580)                     # DRONE fades out over 12 f
 F_RELAY, F_LIGHT = 1580, 1581                  # the click one frame before the light; HUM + PAD from the light
 F_D5 = 1604                                    # the raking light's relief peaks: the withheld 12th note
@@ -87,12 +90,14 @@ F_HOLD = (1712, 1795)                          # complete card: everything but t
 CLACK_DBTP = -1.40          # 1/11: the hook group moves as one so the CLACK is the file's peak at -1.40 dBTP (no limiter)
 FLICK_DAMP = 0.15           # 1: the table's contact damping of the flick's ring from f2, exp(-(t - t2)/0.15)
 SUB_DBTP = CLACK_DBTP - 0.1   # 1/11: the plunge SUB lands with the CLACK (render() levels it); nothing else reaches them
-CLACK_RING_DB = -4.0        # 1: the CLACK's D7 tau x1.5 ring re its bursts (was -16; the review's -8 left the CLACK quieter than the flick)
-CLACK_THUMP = (2.0, 0.030)  # 1: the 120 Hz table sine for its full 40 ms, dB re the bursts and decay (s): the table takes the weight
+CLACK_RING_DB = 0.0         # 1 / D1: the CLACK's D7 tau x1.5 ring re its bursts (was -16, the review's -8, then -4): a phone plays the ring
+CLACK_THUMP = (-4.0, 0.030) # 1 / D1: the 120 Hz table sine for its full 40 ms, dB re the bursts, and its decay (s) (was +2 dB: the sine
+#                             carried the CLACK's level, and a phone plays none of 120 Hz)
+FLICK_DB = -17.0            # D1: the flick's strike, dBFS peak: 3 dB under the cue sheet's -14, so the CLACK is the hook's loudest event
 FLICK_LP = 5000.0           # 7: flick low-passed at 5 kHz, 4th order
 HOOK_LP = 7500.0            # 7: rattle and CLACK end in a 4th-order low-pass at 7.5 kHz (no 9 kHz shelf)
 WHIRR_LP = (7000.0, 8)      # 7: the whirr (most of the hook's energy) ends in an 8th-order low-pass at 7 kHz
-WHIRR_DB = -30.0            # §8.1: WHIRR -30 dBFS RMS
+WHIRR_DB = -33.0            # D1: WHIRR dBFS RMS, 3 dB under §8.1's -30 with the flick (the rolling leads up to the CLACK, never over it)
 WHIRR_TAIL = 0.25           # s: the whirr's body ends at f15 and releases over 0.25 s into the rattle (its AM is at the
 #                             rattle's own 9 Hz there), so the rolling hands over to the wobble without an 11 dB step
 RATTLE_BED_DB = (-54.0, -44.0)   # 5: rattle bed RMS, its pulses driven by the ticks' own times; every tick >= 6 dB over it (3-7 kHz)
@@ -102,7 +107,8 @@ SLIT_CREST_DB = 8.0         # SLIT noise: spikes above 8 dB over its local RMS a
 SLIT2_DB = -6.0             # CUES_v2: the f300 swell sits about 6 dB under the f260 one
 DRONE_DIP = (1187, 1188, 1205, 1211)            # f1187: down in 1 f, at -6 dB for 18 f (to f1205), back by f1211
 DRONE_NOTCHES = ((183.55, -15.0), (367.10, -15.0), (734.20, -15.0), (256.97, -10.0), (513.94, -10.0))  # 10: (Hz, dB), Q 12
-SUB_LAYER = dict(swell=-12.0, plunge=-3.0)      # 8: saturated harmonic layer re the sub's peak (dB)
+SUB_LAYER = dict(swell=-12.0, plunge=0.0)       # 8 / D5: saturated harmonic layer re the sub's peak (dB); the plunge's at 0 (was -3):
+#                                                 at -3 the landing read only 1.5 LU over the riser's end through a 300 Hz high-pass
 SUB_SERIES = (0.7, 0.5, 1.5)    # 8: layer = 2nd-10th harmonics of the glide: 2nd/3rd weight, k^-slope, tanh drive
 BLOOM_TRIM = {116: 0.0, 380: 0.0, 644: 0.0, 1124: 0.0}   # 6: dB over the cue sheet's -34 / -36 dBFS RMS (loudest 100 ms)
 SHEET_DB = (-30.0, -28.7, -27.3, -26.0, -27.0, -28.0)   # 3: one note, dBFS peak, per arrival (was -24 -> -20): -30 -> -26
@@ -220,6 +226,8 @@ class Score:
         self.refs = []              # (frame, cue, first 200 ms of the placed event (mono), tag): placement check
         self.kept = {}              # tag -> (first sample, placed stereo signal): per-cue measurements
         self.onsets = []            # (frame, cue, first sample, offset of its first non-zero sample)
+        self.events = []            # every placed cue: {frame, cue, stem, tag, k100_bus}: its own K-weighted 100 ms maximum
+        #                             (LUFS at the mix bus; render() adds the hook / plunge offsets, the tests the master gain)
 
     def stem(self, name):
         if name not in self.stems:
@@ -252,6 +260,7 @@ class Score:
             self.kept[tag] = (s0, x)
         if log:
             self.log(frame, cue, gain_dbfs, pan)
+            self.events.append(dict(frame=int(frame), cue=cue, stem=stem, tag=tag, k100_bus=k_max_lufs(x, 0.1)))
             if not free:
                 self.refs.append((int(frame), cue, 0.5 * (x[0, :secs(0.2)] + x[1, :secs(0.2)]), tag))
                 nz = np.flatnonzero(np.any(x != 0, axis=0))
@@ -315,7 +324,7 @@ def spin_rate(t):
 
 
 def coin_flick():
-    """f1: the coin is flicked into a spin (D7, 4 ms finger-nail excitation, -14 dBFS strike). From f2 it spins
+    """f1: the coin is flicked into a spin (D7, 4 ms finger-nail excitation; compose() strikes it at FLICK_DB, -17 dBFS). From f2 it spins
     on its rim on the table, and the table contact damps the ring, exp(-(t - t2)/0.15) (25 dB down by f15), so the
     flick never out-rings the hook: the CLACK's own D7 ring is the one left hanging at f44 (review fix 1). While it
     rings it is swept by the rotating radiation pattern (gentle AM at the spin rate). 4th-order low-pass at
@@ -336,8 +345,8 @@ def coin_flick():
 def whirr():
     """f2-f15: rolling rim on the table. BP noise 4-8 kHz (4th order) coloured by the coin's own modes, AM at the
     spin rate 14 -> 9 Hz, a faint table rumble at the same rate, 8th-order low-pass at 7 kHz (fix 7: the band's upper
-    skirt was most of the hook's energy above 8 kHz; a 4th-order 7.5 kHz low-pass still left it at -21 dB); -30 dBFS RMS.
-    Its body ends at f15; it releases over WHIRR_TAIL s into the rattle."""
+    skirt was most of the hook's energy above 8 kHz; a 4th-order 7.5 kHz low-pass still left it at -21 dB); placed at
+    WHIRR_DB (-33 dBFS RMS). Its body ends at f15; it releases over WHIRR_TAIL s into the rattle."""
     n = smp(15) - smp(2) + secs(WHIRR_TAIL)
     r = np.random.default_rng(202)
     t = 2 / FPS + np.arange(n) / SR
@@ -440,9 +449,12 @@ def rattle():
 
 def clack():
     """f44: the coin lands flat (review fix 1). 3 ticks within 12 ms (bounces, BP 2-8 kHz 4th order) + 120 Hz table
-    sine for its full 40 ms, 2 dB over the bursts with a 30 ms decay (the table takes the weight) + COIN D7 tau x1.5 at
-    -4 dB (its ring is the tail heard f44-f53, the glint's sound), 4th-order low-pass at 7.5 kHz. Unit peak. (The review's
-    0 dB / 25 ms / -8 dB left the CLACK's 50 ms RMS 1.2 dB over the flick's ring and its loudness under it.)"""
+    sine for its full 40 ms, 4 dB under the bursts with a 30 ms decay (the table's weight) + COIN D7 tau x1.5 at 0 dB
+    re the bursts (its ring is the tail heard f44-f53, the glint's sound), 4th-order low-pass at 7.5 kHz. Unit peak.
+    (The review's 0 dB / 25 ms / -8 dB left the CLACK's 50 ms RMS 1.2 dB over the flick's ring and its loudness under it;
+    round 3 (D1) measured the +2 dB sine / -4 dB ring under the flick's f1 strike by K-weighted loudness, 1.0 dB in 50 ms
+    and 2.5 dB in 100 ms windows, and 6-7 LU under it through a 300 Hz high-pass: the sine carried the level, and a phone
+    plays none of it. The ring, which a phone does play, carries it now.)"""
     r = np.random.default_rng(440)
     n = secs(5.0)
     y = np.zeros(n)
@@ -734,11 +746,11 @@ def compose():
     sc.place('room', room, 0, 'ROOM in (fade 0.25 s), pink BP 60 Hz-6 kHz, L/R corr 0.7', -46.0, 0.0, free=True)
     sc.refs.append((776, 'ROOM back (2 ms fade)', 0.5 * (room[0, S776:S776 + secs(0.2)] + room[1, S776:S776 + secs(0.2)]), None))
 
-    # S01 hook: the coin settles (pan = coin #16 at x 678 -> +0.15). The hook keeps the cue sheet's internal balance
-    # (flick -14 peak, whirr -30 RMS, ticks -24 -> -18, CLACK -10 dBFS peak); render() then moves the whole group
-    # (dry + its room) so the CLACK is the delivered file's loudest peak.
+    # S01 hook: the coin settles (pan = coin #16 at x 678 -> +0.15). The hook is the cue sheet's, rebalanced so the CLACK is
+    # its loudest event (D1): flick -17 dBFS peak and whirr -33 dBFS RMS (3 dB under §8.2), ticks -24 -> -18, CLACK -10 dBFS
+    # peak; render() then moves the whole group (dry + its room) so the CLACK is the delivered file's loudest peak.
     hp = x_pan(678.0)
-    sc.place('hook', at_peak(pan_mono(coin_flick(), hp), -14.0), 1, 'COIN flick D7 2349.3 Hz (4 ms excitation, table-damped from f2)', -14.0, hp,
+    sc.place('hook', at_peak(pan_mono(coin_flick(), hp), FLICK_DB), 1, 'COIN flick D7 2349.3 Hz (4 ms excitation, table-damped from f2)', FLICK_DB, hp,
              {'hook': 0.3}, tag='flick')
     sc.place('hook', at_strms(pan_mono(whirr(), hp), WHIRR_DB, 0.35), 2, 'WHIRR f2-f15, BP 4-8 kHz, AM 14 -> 9 Hz', WHIRR_DB, hp, {'hook': 0.15},
              tag='whirr')
@@ -750,8 +762,8 @@ def compose():
     sc.place('hook', at_peak(pan_mono(clack(), hp), -10.0), 44, f'CLACK (3 ticks / 12 ms + 120 Hz 40 ms at {CLACK_THUMP[0]:+g} dB + COIN D7 tau x1.5 at {CLACK_RING_DB:g} dB)', -10.0, hp,
              {'hook': 0.3}, tag='clack')
 
-    # DRONE segment A: f53 -> cut at f764 (LP 900 -> 500 at f244, back at f380; push from f644)
-    a0 = smp(53)
+    # DRONE segment A: in under the S01 sub-line (f53; the line prints from f49, CUES_v2) -> cut at f764 (LP 900 -> 500 at f244, back at f380; push from f644)
+    a0 = smp(F_DRONE_IN)
     durA = (S764 - a0) / SR
 
     def lp_curve_a(t):
@@ -778,8 +790,8 @@ def compose():
     uP = np.arange(nP) / nP
     target = push_curve(nP, -30.0, -24.0) + (e0 + 30.0) * np.clip(1 - uP / 0.4, 0, 1) ** 2
     gA[p0:] *= undb(target) / env[p0:]
-    sc.place('drone', dA * gA, 53, 'DRONE in (1.5 s fade): D1 36.71 + D2 73.42 (+0.15 Hz copy) + A2 110, LP 900 Hz, LFO 0.07 Hz', -30.0, 0.0, {'music': 0.05},
-             tag='droneA')
+    sc.place('drone', dA * gA, F_DRONE_IN, 'DRONE in (1.5 s fade): D1 36.71 + D2 73.42 (+0.15 Hz copy) + A2 110, LP 900 Hz, LFO 0.07 Hz', -30.0, 0.0,
+             {'music': 0.05}, tag='droneA')
     sc.log(244, 'DRONE low-pass 900 -> 500 Hz over 0.4 s', -30.0)
     sc.log(380, 'DRONE low-pass back to 900 Hz', -30.0)
     sc.log(644, f'DRONE push {e0:.1f} -> -30 -> -24 dBFS RMS (300 ms), exponential to f764', -24.0)
@@ -789,7 +801,7 @@ def compose():
         y = balance(felt_upright(freq, dur, vel, 0.4, decay, seed=seed if seed is not None else frame * 7 + 1), p)
         sc.place('felt', at_peak(y, level), frame, name or f'FELT {freq:.2f} Hz vel {vel:.2f}', level, p, {'music': 0.3}, tag=tag)
 
-    felt(54, 146.83, -22.0, 0.50, name='FELT D3 146.83, vel 0.50')
+    felt(F_D3, 146.83, -22.0, 0.50, name='FELT D3 146.83, vel 0.50', seed=54 * 7 + 1)     # the original take, on f54
 
     # S02
     lv = -34.0 + BLOOM_TRIM[116]
@@ -810,11 +822,17 @@ def compose():
     lv = -36.0 + BLOOM_TRIM[380]
     sc.place('fx', bloom(0.9, lv, 380), 380, 'BLOOM whoosh 0.9 s (RMS, loudest 100 ms)', lv, 0.0, {'music': 0.15}, tag='bloom380')
     for k, ((coin, f, nm, x), fr) in enumerate(zip(PINGS, LANDS)):
-        lvl = (-20.0 if k == 11 else -22.0) + (PING_DENSE_DB if k and fr - LANDS[k - 1] <= 6 else 0.0)
+        # all twelve at the table's -22 dBFS: the home call (hop 12) too, which the table gives -20 (D1: at -20 the home call,
+        # landing on the drone and the rings before it, measured 0.6 LU over the CLACK in the mix, K-weighted 100 ms)
+        lvl = -22.0 + (PING_DENSE_DB if k and fr - LANDS[k - 1] <= 6 else 0.0)
         # review fix 9: coin_strike(f, tau=0.6, excite='soft', focus=2.0, beat=0.2), its doublets struck in phase
         # (coin_strike_coherent: a struck disc excites both members of a split mode together; with independent
-        # phases a ping's fundamental could be born half-cancelled and leave the 1.594 mode to set the pitch)
-        y = coin_strike_coherent(f, tau=0.6, excite='soft', seed=fr, coin=coin, focus=PING_FOCUS, beat=PING_BEAT, click_db=None)
+        # phases a ping's fundamental could be born half-cancelled and leave the 1.594 mode to set the pitch).
+        # D3: hop 7 (F6, coin #24, f566) is struck while hop 5's F6 (coin #14, f554) still rings; with seed=fr its F6 met
+        # that ring out of phase and the F6 line FELL 4.3 dB at the strike (the call hardly read); this take (seed 2400)
+        # adds to it: +3.2 dB
+        y = coin_strike_coherent(f, tau=0.6, excite='soft', seed=(2400 if k == 6 else fr), coin=coin, focus=PING_FOCUS, beat=PING_BEAT,
+                                 click_db=None)
         sc.place('coins', at_peak(pan_mono(y, x_pan(x)), lvl), fr,
                  f'PING hop {k + 1}: {nm} {f:.2f} Hz, coin #{coin:02d} (tau x0.6, soft mallet, focus {PING_FOCUS:g})', lvl, x_pan(x), {'coin': 0.35},
                  tag=f'ping{k + 1}')
@@ -889,7 +907,8 @@ def compose():
     sc.log(1428, 'ROOM -52 dBFS; DRONE reduced to D1 at -34 dBFS RMS', -34.0)
     pa, pe = pitch_pan(220.0), pitch_pan(329.63)
     dy = balance(felt_upright(220.0, 5.0, 0.45, 0.4, seed=1444), pa) + balance(felt_upright(329.63, 5.0, 0.45, 0.4, seed=1445), pe)
-    sc.place('felt', at_peak(dy, -24.0), 1444, 'FELT dyad A3 220.00 + E4 329.63', -24.0, 0.5 * (pa + pe), {'music': 0.3})
+    sc.place('felt', at_peak(dy, -24.0), F_DYAD, 'FELT dyad A3 220.00 + E4 329.63 (the statement completes, E3)', -24.0, 0.5 * (pa + pe),
+             {'music': 0.3})                         # the same take (seeds 1444 / 1445), moved from f1444
     sc.log(F_DRONE_OUT[0], f'DRONE fades out over 12 f (f{F_DRONE_OUT[0]}-f{F_DRONE_OUT[1]})', None)
 
     # S08: the light table is a switch (dark f1580, lit f1581)
@@ -1048,6 +1067,32 @@ def kweight(x):
     return lfilter(b2, a2, lfilter(b1, a1, np.asarray(x, np.float64), axis=-1), axis=-1)
 
 
+def k_cum(x, hp_hz=None):
+    """Cumulative K-weighted power (channels summed) of stereo x, optionally after a 4th-order Butterworth high-pass
+    at hp_hz (a phone's speaker: nothing below about 200-300 Hz). c[b] - c[a] is the energy of samples [a, b)."""
+    x = np.atleast_2d(np.asarray(x, np.float64))
+    if hp_hz is not None:
+        x = sosfilt(butter(4, hp_hz, 'high', fs=SR, output='sos'), x, axis=-1)
+    k = kweight(x)
+    return np.concatenate([[0.0], np.cumsum((k * k).sum(axis=0))])
+
+
+def k_starts(c, starts, win):
+    """BS.1770 loudness (LUFS, ungated) of the `win` s windows starting at `starts` (indices into k_cum's signal)."""
+    w = secs(win)
+    s = np.asarray(starts)
+    return -0.691 + 10 * np.log10((c[s + w] - c[s]) / w + 1e-20)
+
+
+def k_max_lufs(x, win=0.1):
+    """A cue's own loudness: the max BS.1770 loudness (LUFS, ungated) over every `win` s window of stereo x alone, with
+    one window of silence after it (the filters' tail; a cue shorter than a window is heard in one window)."""
+    x = np.atleast_2d(np.asarray(x, np.float64))
+    w = secs(win)
+    c = k_cum(np.concatenate([x, np.zeros((x.shape[0], w))], axis=1))
+    return float(k_starts(c, np.arange(c.size - w), win).max())
+
+
 def loud_windows(x, ends, win=0.4, a=0):
     """BS.1770 loudness (LUFS, ungated) of the `win` s windows of stereo x (starting at absolute sample a) that END
     at absolute samples `ends`: 0.4 s = momentary, 3 s = short-term."""
@@ -1094,12 +1139,17 @@ def third_octave_snr(cue, rest, nfft=2400, hop=1200):
 
 
 REVIEW_FIXES = {
-    '1_hook': 'APPLIED: flick keeps its -14 dBFS strike, table damping exp(-(t-t2)/0.15) from f2 (-35 dB by f15); CLACK 120 Hz sine for '
-              'its full 40 ms. CHANGED: the review\'s 0 dB / 25 ms / ring -8 dB measured CLACK 50 ms RMS only +1.2 dB over the flick\'s '
-              'ring at f2 and CLACK loudness -17.3 vs flick -15.7 LUFS (its own test fails), so the sine sits 2 dB over the bursts with '
-              'a 30 ms decay and the D7 ring at -4 dB. Instead of a fixed -12.3 dBFS bus peak the whole hook group moves as one so the '
-              'CLACK lands at -1.40 dBTP (the master gain moved from 10.96 to about 12 dB): same intent, no limiting. The whirr '
-              'releases over 0.25 s into the rattle (no 11 dB step at f15).',
+    '1_hook': 'APPLIED: the flick\'s table damping exp(-(t-t2)/0.15) from f2 (-35 dB by f15); CLACK 120 Hz sine for its full 40 ms. '
+              'CHANGED: the review\'s 0 dB / 25 ms / ring -8 dB measured CLACK 50 ms RMS only +1.2 dB over the flick\'s ring at f2 and '
+              'CLACK loudness -17.3 vs flick -15.7 LUFS (its own test fails), so the sine went 2 dB over the bursts with a 30 ms decay and '
+              'the D7 ring to -4 dB. Instead of a fixed -12.3 dBFS bus peak the whole hook group moves as one so the CLACK lands at '
+              '-1.40 dBTP (the master gain moved from 10.96 to about 12 dB): same intent, no limiting. The whirr releases over 0.25 s '
+              'into the rattle (no 11 dB step at f15). ROUND 3 (D1): that test began at f2 and never saw the flick\'s strike. Measured '
+              'from f1 by K-weighted loudness, the +2 dB sine / -4 dB ring CLACK sat 1.0 dB (50 ms) and 2.5 dB (100 ms) under the strike, '
+              'and 6.8 / 6.2 LU under it through a 300 Hz high-pass: the 120 Hz sine carried its level and a phone plays none of it. '
+              'Now the sine sits 4 dB under the bursts, the D7 ring (which a phone plays) at 0 dB, the flick strikes at -17 dBFS and '
+              'the whirr rolls at -33 dBFS RMS (both 3 dB under the cue sheet), and the home router call plays at the table\'s -22 like '
+              'the others (at -20 its moment measured 0.6 LU over the CLACK\'s in the mix). review_acceptance 1_hook now tests this.',
     '2_d5_over_pad': 'APPLIED at the CUES_v2 frames: one pad ride -4 dB, down f1598-f1606, held, back to 0 dB f1614-f1652; the E5 voice '
                      'pulled down. CHANGED: with E5 -8 dB and the pad at -24 RMS the D5 measured 3.8 LU under the pad and its line 8.8 dB '
                      'under 659 Hz, so the pad sits at -27 dBFS RMS (which also stops the ending being the loudest passage), E5 at -10 dB, '
@@ -1119,13 +1169,27 @@ REVIEW_FIXES = {
     '8_sub_phone': 'APPLIED: a saturated harmonic layer on the sub\'s own glide, high-passed at 90 Hz, on both SUB moments. CHANGED: a '
                    '2nd/3rd-only layer at -10 dB measured 6.8 LU UNDER the riser through a 200 Hz high-pass (2nd/3rd of 32-52 Hz lie at '
                    '64-156 Hz, below a phone\'s range), and still -1.7 LU at 0 dB; the layer keeps the 2nd/3rd and continues the series '
-                   'to the 10th (k^-0.5, 2nd/3rd at 0.7, tanh 1.5, low-pass 1.2 kHz), at -3 dB re the plunge and -12 dB re the swell.',
+                   'to the 10th (k^-0.5, 2nd/3rd at 0.7, tanh 1.5, low-pass 1.2 kHz), at -12 dB re the swell. ROUND 3 (D5): at -3 dB re '
+                   'the plunge it read 3.9 LU over the riser\'s end through the 200 Hz high-pass but only 1.5 LU through a 300 Hz one, '
+                   'so the plunge\'s layer is at 0 dB and the test runs through both high-passes.',
     '9_pings': 'APPLIED: tau x0.6, soft mallet, beat 0.2. CHANGED: coin_strike(focus=2.0) measured as low as -7.6 dB (fundamental under '
                'the 1.594 mode: independent doublet phases cancel it at birth), coherent doublets at focus 2.0 still 7.2 dB; '
-               'coin_strike_coherent at focus 3.0 gives >= 10.9 dB on all 12. Calls landing 6 f apart play 2 dB lighter.',
+               'coin_strike_coherent at focus 3.0 gives >= 10.9 dB on all 12. Calls landing 6 f apart play 2 dB lighter. ROUND 3 '
+               '(D3): hop 7 (F6, coin #24, f566) lands while hop 5\'s F6 (f554) still rings, and with seed 566 the two met out of '
+               'phase: the F6 line fell 4.3 dB at the new strike. Hop 7 is now struck with seed 2400 (+3.2 dB); the sheet chords keep '
+               'their seeds.',
     '10_drone_notches': 'APPLIED exactly: -15 dB at 183.55 / 367.10 / 734.20 Hz and -10 dB at 256.97 / 513.94 Hz, Q 12, both segments.',
     '11_levels': 'APPLIED: the convention (cue levels are mix-bus, master one uniform gain) is written in this script\'s docstring and in '
                  'levels_note; DESIGN_BIBLE §8.3 still needs that sentence (this script may not edit the bible). limiter_clusters is empty.',
+    'r3_self_tests': 'ROUND 3 (D4), the self-tests no longer overstate: 1_hook is K-weighted (50 and 100 ms, full band and through a 300 Hz '
+                     'high-pass) over every window from 5 ms before the f1 strike, not unweighted RMS from f2; loudest_events also '
+                     'compares every cue\'s own K-weighted 100 ms maximum with the CLACK\'s and the plunge SUB\'s, and its CLACK true-peak '
+                     'window ends where the FELT D3 starts (f54); the f1187 note says how many sheet arrivals reach z >= 3 instead of '
+                     'claiming all six; 8_sub_on_a_phone also runs through a 300 Hz high-pass.',
+    'r3_retimed_text': 'the picture re-timed two lines (CUES_v2): the S01 sub-line prints over 10 f from f49 and is legible from about '
+                       'f54, so the DRONE stays at f53 and the FELT D3 at f54 (release review R3-REL-07; a D3 on f50 would land on a line '
+                       'at about 10 % opacity); the S07 statement completes on E3 at f1453, so the FELT dyad A3 + E4 moved there from '
+                       'f1444 (the same take and seed, only moved).',
 }
 
 
@@ -1148,11 +1212,24 @@ def review_acceptance(y, sc, stems, info, rattle_times, rstats):
     A = {}
     r50 = run_rms_db(y, 0.05)
 
-    # 1 -- the CLACK leads its hook
-    s44, h50 = smp(44), secs(0.05)
-    clack50 = float(r50[s44 - secs(0.005):s44 + secs(0.01)].max())
-    pre = r50[smp(2):s44 - h50 + 1]
-    pre50, pre_at = float(pre.max()), (smp(2) + int(np.argmax(pre))) / SPF
+    # 1 -- the CLACK leads its hook (round 3, D1 / D4): BS.1770 K-weighted loudness of the delivered file in 50 ms and 100 ms
+    # windows, full band and through a 4th-order 300 Hz high-pass (a phone): the CLACK's windows (starting f44 - 5 ms ..
+    # f44 + 10 ms) against EVERY window of the hook before it, from 5 ms before the flick's strike on f1 to the one that ends
+    # on f44. (The test this replaces compared unweighted 50 ms RMS from f2 on, so it never saw the strike itself.)
+    s44 = smp(44)
+    b0 = smp(1) - secs(0.005)
+    clack50 = float(r50[s44 - secs(0.005):s44 + secs(0.01)].max())      # unweighted, for the f1156 chord below
+    hook = {}
+    for band, hp_hz, need in (('full_band', None, 2.0), ('hp300', 300.0, 1.0)):
+        c = k_cum(y[:, :s44 + secs(0.2)], hp_hz)
+        for win in (0.05, 0.1):
+            st = np.arange(b0, s44 - secs(win) + 1)
+            Lb = k_starts(c, st, win)
+            Lk = float(k_starts(c, np.arange(s44 - secs(0.005), s44 + secs(0.01) + 1), win).max())
+            hook[f'{band}_{round(win * 1000)}ms'] = dict(
+                clack_lufs=round(Lk, 2), max_before_lufs=round(float(Lb.max()), 2),
+                max_before_at_frame=round(float(st[int(np.argmax(Lb))]) / SPF, 2), margin=round(Lk - float(Lb.max()), 2),
+                required=need, passed=bool(Lk - float(Lb.max()) >= need))
 
     def max_mom(tag):
         s0, x = sc.kept[tag]
@@ -1164,11 +1241,13 @@ def review_acceptance(y, sc, stems, info, rattle_times, rstats):
     f15 = smp(15) - smp(1)
     ring_db = float(10 * np.log10(np.mean(fl[f15 - secs(0.01):f15 + secs(0.01)] ** 2) / max(
         np.mean(fl[i:i + secs(0.02)] ** 2) for i in range(0, secs(0.03), secs(0.002)))))
-    A['1_hook'] = dict(clack_rms50_dbfs=round(clack50, 2), max_rms50_f2_f43_dbfs=round(pre50, 2), at_frame=round(pre_at, 1),
-                       margin_db=round(clack50 - pre50, 2), clack_max_momentary_lufs=round(Lc, 2), flick_max_momentary_lufs=round(Lf, 2),
-                       flick_ring_at_f15_re_strike_db=round(ring_db, 1),
-                       accept='CLACK 50 ms RMS >= every 50 ms window in f2-f43 + 2 dB, and its loudness >= the flick\'s',
-                       passed=bool(clack50 - pre50 >= 2.0 and Lc >= Lf and ring_db <= -20.0))
+    A['1_hook'] = dict(k_weighted=hook, clack_max_momentary_lufs=round(Lc, 2), flick_max_momentary_lufs=round(Lf, 2),
+                       flick_ring_at_f15_re_strike_db=round(ring_db, 1), clack_rms50_dbfs=round(clack50, 2),
+                       accept='K-weighted 50 ms and 100 ms loudness of the delivered file: the CLACK (windows starting f44 - 5 ms .. + 10 ms) '
+                              '>= the loudest window of the hook before it (every window from 5 ms before the f1 strike to the one ending '
+                              'on f44) + 2 dB full band and + 1 LU through a 4th-order 300 Hz high-pass; the CLACK alone >= the flick alone '
+                              '(max momentary); the flick\'s ring <= -20 dB re its strike by f15',
+                       passed=bool(all(v['passed'] for v in hook.values()) and Lc >= Lf and ring_db <= -20.0))
 
     # 2 -- the withheld D5 over the PAD (f1604-f1621) and its line over the E5 through f1656
     a, b = smp(F_D5) - secs(0.5), smp(1621) + secs(0.5)
@@ -1244,20 +1323,26 @@ def review_acceptance(y, sc, stems, info, rattle_times, rstats):
     hf = float(10 * np.log10(P[f_ >= 8000].sum() / P.sum()))
     A['7_hook_hf'] = dict(above_8k_re_hook_total_db=round(hf, 1), accept='at most -25 dB', passed=bool(hf <= -25.0))
 
-    # 8 -- the SUB moments on a phone (4th-order high-pass at 200 Hz)
+    # 8 -- the SUB moments on a phone (4th-order high-pass at 200 Hz, and at 300 Hz: round 3, D5)
     yh = sosfilt(butter(4, 200.0, 'high', fs=SR, output='sos'), y, axis=-1)
     Lr = loud_windows(yh, [smp(1428)], win=0.3)[0]
     Ls = loud_windows(yh, [smp(1440)], win=(smp(1440) - smp(1428)) / SR)[0]
+    yh3 = sosfilt(butter(4, 300.0, 'high', fs=SR, output='sos'), y, axis=-1)
+    Lr3 = loud_windows(yh3, [smp(1428)], win=0.3)[0]
+    Ls3 = loud_windows(yh3, [smp(1440)], win=(smp(1440) - smp(1428)) / SR)[0]
     s0, sw = sc.kept['swell']
     swb = sosfilt(butter(4, [150.0, 400.0], 'band', fs=SR, output='sos'), sw * g, axis=-1)
     swh = sosfilt(butter(4, 200.0, 'high', fs=SR, output='sos'), sw * g, axis=-1)
     best, fc, frac = third_octave_snr(swh[:, :secs(2.5)], yh[:, s0:s0 + secs(2.5)] - swh[:, :secs(2.5)])
     A['8_sub_on_a_phone'] = dict(hp200_riser_last_300ms_lufs=round(float(Lr), 2), hp200_f1428_f1440_lufs=round(float(Ls), 2),
                                  plunge_minus_riser_lu=round(float(Ls - Lr), 2),
+                                 hp300_riser_last_300ms_lufs=round(float(Lr3), 2), hp300_f1428_f1440_lufs=round(float(Ls3), 2),
+                                 hp300_plunge_minus_riser_lu=round(float(Ls3 - Lr3), 2),
                                  swell_150_400hz_max_rms100_dbfs=round(float(run_rms_db(swb, 0.1).max()), 1),
                                  swell_hp200_best_band_snr_db=round(best, 1), swell_hp200_frames_above_rest=round(frac, 3),
-                                 accept='through a 200 Hz high-pass, f1428-f1440 at least 3 LU louder than the riser\'s last 300 ms',
-                                 passed=bool(Ls - Lr >= 3.0))
+                                 accept='through a 4th-order 200 Hz high-pass, and again through a 300 Hz one, f1428-f1440 at least 3 LU '
+                                        'louder than the riser\'s last 300 ms',
+                                 passed=bool(Ls - Lr >= 3.0 and Ls3 - Lr3 >= 3.0))
 
     # 9 -- every router ping reads at its fundamental: >= 10 dB over the 1.594 mode across 0-0.8 s
     pings = []
@@ -1286,10 +1371,16 @@ def review_acceptance(y, sc, stems, info, rattle_times, rstats):
                              convention='cue levels are mix-bus levels (score_cues.json); the master is one uniform gain',
                              accept='limiter_clusters empty: the master is a pure gain', passed=bool(not info['limiter_clusters']))
 
-    # ---- the task's level hierarchy: the CLACK and the plunge SUB are the loudest events of the film
+    # ---- the task's level hierarchy: the CLACK and the plunge SUB are the loudest events of the film, by true peak (the
+    # CLACK's window ends where the FELT D3 starts, f54, so the D3 counts as elsewhere) and by loudness (round 3, D4): every
+    # cue's own K-weighted 100 ms maximum (each cue alone, dry, at its delivered gain), full band
     up = resample_poly(y, 4, 1, axis=1)
     env = np.abs(up).max(axis=0)[:4 * N].reshape(-1, 4).max(axis=1)
-    wc, ws = slice(s44 - secs(0.01), s44 + secs(0.3)), slice(smp(1428) - secs(0.01), smp(1428) + secs(0.6))
+    wc, ws = slice(s44 - secs(0.01), smp(F_D3)), slice(smp(1428) - secs(0.01), smp(1428) + secs(0.6))
+    kev = sorted(((e['k100_bus'] + info['master_gain_exact_db'], e) for e in sc.events), key=lambda t: -t[0])
+    k_clack = next(v for v, e in kev if e['tag'] == 'clack')
+    k_plunge = next(v for v, e in kev if e['tag'] == 'plunge')
+    k_rest = [(v, e) for v, e in kev if e['tag'] not in ('clack', 'plunge')]
     tpc, tps = float(to_db(env[wc].max())), float(to_db(env[ws].max()))
     rest = env.copy()
     rest[wc] = 0.0
@@ -1311,9 +1402,14 @@ def review_acceptance(y, sc, stems, info, rattle_times, rstats):
         chord_f1156_tp_dbtp=round(chord_tp, 2), chord_f1156_max_rms50_dbfs=round(chord50, 2), cascade_f1136_f1200_tp_dbtp=round(casc_tp, 2),
         max_short_term_lufs=round(Lmax, 2), loudest_passage_ends_at_frame=round(int(st_ends[np.argmax(Lst)]) / SPF),
         cascade_max_short_term_lufs=round(float(Lst[is_casc].max()), 2), s08_max_short_term_lufs=round(float(Lst[is_s08].max()), 2),
-        accept='CLACK and plunge SUB above every other true peak; the f1156 chord under the CLACK (peak and 50 ms RMS); '
-               'the cascade not the loudest passage (3 s short-term loudness)',
-        passed=bool(tpr < min(tpc, tps) and chord_tp < tpc and chord50 < clack50 and Lst[is_casc].max() < Lmax))
+        clack_k100_lufs=round(k_clack, 2), plunge_sub_k100_lufs=round(k_plunge, 2), max_other_cue_k100_lufs=round(k_rest[0][0], 2),
+        k100_margin_lu=round(min(k_clack, k_plunge) - k_rest[0][0], 2), cues_compared=len(kev),
+        loudest_other_cues_k100=[dict(frame=e['frame'], cue=e['cue'][:48], k100_lufs=round(v, 2)) for v, e in k_rest[:6]],
+        accept='CLACK and plunge SUB above every other true peak; the CLACK\'s and the plunge SUB\'s own K-weighted 100 ms maxima '
+               '(each cue alone, dry, at its delivered gain, full band) >= every other cue\'s; the f1156 chord under the CLACK (peak '
+               'and 50 ms RMS); the cascade not the loudest passage (3 s short-term loudness)',
+        passed=bool(tpr < min(tpc, tps) and min(k_clack, k_plunge) >= k_rest[0][0] and chord_tp < tpc and chord50 < clack50
+                    and Lst[is_casc].max() < Lmax))
     return A
 
 
@@ -1370,6 +1466,8 @@ def measure(path, sc, stems, rattle_times, rstats, info):
     d5b = tone_amp_db(mono, s87 - secs(0.3), s87, 587.33)
     d5a = tone_amp_db(mono, s87, s87 + secs(0.3), 587.33)
     L87, L96 = loud_windows(y, [s87, smp(1196)])
+    n_det = int(sum(z(v) >= 3.0 for v in cells))
+    weak = ', '.join(f'f{f}: {z(v):.2f}' for (f, _), v in zip(SHEET, cells) if z(v) < 3.0)
     rep['f1187_no_onset'] = dict(
         superflux_f1187=round(v87, 2), superflux_sheet_arrivals=[round(v, 2) for v in cells], sheet_arrival_frames=[f for f, _ in SHEET],
         superflux_arrivals_median=round(float(np.median(cells)), 2), superflux_background_f1189_f1215_max=round(max(bg), 2),
@@ -1382,8 +1480,9 @@ def measure(path, sc, stems, rattle_times, rstats, info):
         no_onset=bool(z(v87) < 3.0 and v87 < float(np.median(cells)) and e_after <= e_before + 0.5 and d5a <= d5b + 1.0
                       and not any(1180 <= c['frame'] <= 1200 and not c['cue'].startswith('NO NOTE') for c in sc.cues)),
         note='SuperFlux (40 ms window from each frame): f1187 must not be an outlier against the post-cascade background '
-             '(robust z < 3, where every sheet arrival scores z >= 3), no event is logged f1180-f1200, the HP150 level and the '
-             '587.33 Hz (D5) component must not rise, and the momentary loudness must fall >= 2 LU by f1196')
+             f'(robust z < 3; {n_det} of {len(cells)} sheet arrivals score z >= 3' + (f' ({weak})' if weak else '') + '), no event '
+             'is logged f1180-f1200, the HP150 level and the 587.33 Hz (D5) component must not rise, and the momentary loudness '
+             'must fall >= 2 LU by f1196')
 
     # correlation / mono compatibility
     def corr(st, a=0, b=None):
@@ -1447,8 +1546,9 @@ def measure(path, sc, stems, rattle_times, rstats, info):
     rep['clack_s'] = round(T_CLACK, 4)
     rep.update(info)
     frames = sorted({c['frame'] for c in sc.cues})
-    want = dict(pings=list(LANDS), slit2=[F_SLIT2], draw=[F_DRAW[0]], stamps=list(F_STAMPS), sheet=[f for f, _ in SHEET],
-                drone_out=[F_DRONE_OUT[0]], relay=[F_RELAY], hum_pad=[F_LIGHT], d5=[F_D5], ting=[F_TING], hold=[F_HOLD[0]])
+    want = dict(drone_in=[F_DRONE_IN], felt_d3=[F_D3], pings=list(LANDS), slit2=[F_SLIT2], draw=[F_DRAW[0]], stamps=list(F_STAMPS),
+                sheet=[f for f, _ in SHEET], felt_dyad=[F_DYAD], drone_out=[F_DRONE_OUT[0]], relay=[F_RELAY], hum_pad=[F_LIGHT], d5=[F_D5],
+                ting=[F_TING], hold=[F_HOLD[0]])
     rep['cues_v2'] = dict(want, all_present=bool(all(f in frames for v in want.values() for f in v)),
                           pad_ride=dict(down=[PAD_RIDE[0], PAD_RIDE[1]], up=[PAD_RIDE[2], PAD_RIDE[3]], db=PAD_RIDE[4]))
     rep['levels_note'] = ('cue gain_dbfs values are mix-bus levels: RMS where the bible says RMS (ROOM, WHIRR, DRONE, SLIT, PAD) and for '
@@ -1457,8 +1557,11 @@ def measure(path, sc, stems, rattle_times, rstats, info):
                           '(CLACK_DBTP), and the plunge SUB carries plunge_sub_offset_db so it lands with it (SUB_DBTP); both are '
                           'already included in the logged gain_dbfs')
     rep['interpretations'] = [
-        'cue timing: f2/prod/CUES_v2.md wherever it differs from §8.2 (pings at geom.LANDS, SLIT f300, DRAW f950, STAMPs f968/f992/f1016, '
-        'sheet notes in arrival order as chords f1136-f1179, DRONE out f1568, RELAY f1580, HUM + PAD f1581, D5 f1604, ting f1700, hold f1712)',
+        'cue timing: f2/prod/CUES_v2.md wherever it differs from §8.2 (DRONE in f53 and FELT D3 f54 under the S01 sub-line, which prints from f49, pings at '
+        'geom.LANDS, SLIT f300, DRAW f950, STAMPs f968/f992/f1016, sheet notes in arrival order as chords f1136-f1179, FELT dyad f1453 '
+        'on the S07 statement\'s last line, DRONE out f1568, RELAY f1580, HUM + PAD f1581, D5 f1604, ting f1700, hold f1712)',
+        'the hook is rebalanced so the CLACK is its loudest event by K-weighted loudness, also through a 300 Hz high-pass: flick -17 '
+        'dBFS peak and whirr -33 dBFS RMS, 3 dB under §8.2 / §8.1 (-14 / -30)',
         'DRONE returns with the f1124 pull-back (1.5 s fade): the bible cuts it at f764 and dips it at f1187 but never says when it comes back',
         'unlabelled dBFS levels (RISER, DRAW, SHIMMER, STAMP, RELAY, COIN, PING, FELT) are sample peak, so CLACK and the plunge SUB stay the loudest (§8.3)',
         'SUB swell (f860) at -20 dBFS peak: no level given; kept under the -14 dBFS plunge SUB',
@@ -1466,8 +1569,9 @@ def measure(path, sc, stems, rattle_times, rstats, info):
         'piano wet -14 dB and coin wet -18 dB are wet/dry energy ratios: 0.3 send into unit-energy room IRs',
         'FELT pan: player-side spread by pitch (+-0.3); the sheet notes are panned where their cells are on screen when they develop',
         'the f300 SLIT swell: 600 -> 2400 Hz over the slit\'s second move (0.6 s), 6 dB under the f260 one',
-        'router pings keep the §3.3 table\'s pans (CUES_v2: same coins, notes and pans) and its -22 dBFS (last -20); a call landing 6 f '
-        'after the previous one plays 2 dB lighter, so the accelerando\'s piled-up rings stay under the CLACK and the SUB',
+        'router pings keep the §3.3 table\'s pans (CUES_v2: same coins, notes and pans) and its -22 dBFS, the home call (hop 12, -20 in '
+        'the table) included; a call landing 6 f after the previous one plays 2 dB lighter, so the accelerando\'s piled-up rings stay '
+        'under the CLACK and the SUB',
         'ROOM: -52 inside the plate, back to -46 once the table is lit (f1581, over the pull-out to f1628)',
         'PAD D major add9 attack 0.8 s from the switch (§8.1: 0.8-1.0 s); the HUM has no fade-in (a 3 ms de-click and a +3 dB inrush)',
         'the final f1712 -> f1795 fade to ROOM also carries the D5 tail, the coin ting and the reverb returns']
@@ -1575,8 +1679,8 @@ def render():
     meter = pyln.Meter(SR)
     # The CLACK is the hook and the loudest peak of the film (§1, §8.3). At the cue sheet's -10 dBFS it would sit
     # above the ceiling after the uniform master gain that -16 LUFS needs, so the hook group (flick, whirr, rattle,
-    # CLACK and their room, in the cue sheet's own balance) moves as one until the CLACK lands at CLACK_DBTP. The
-    # master then stays a pure gain (no limiting anywhere).
+    # CLACK and their room, in compose()'s balance) moves as one until the CLACK lands at CLACK_DBTP. The master then
+    # stays a pure gain (no limiting anywhere).
     # The plunge SUB (§8.3: the other loudest event) is levelled the same way, to SUB_DBTP just under the CLACK
     # (with the drone's D1 under it, its -14 dBFS bus peak would sit on the ceiling).
     k_db, u_db = 0.0, 0.0
@@ -1600,6 +1704,8 @@ def render():
         sc.kept[tag] = (s0, xk * undb(k_db))
     s0, xk = sc.kept['plunge']
     sc.kept['plunge'] = (s0, xk * undb(u_db))
+    for e in sc.events:
+        e['k100_bus'] += k_db if e['stem'] == 'hook' else u_db if e['stem'] == 'sub' else 0.0
     for c in sc.cues:
         if c['cue'].startswith(('COIN flick', 'WHIRR', 'RATTLE', 'CLACK')):
             c['gain_dbfs'] = round(c['gain_dbfs'] + k_db, 2)
@@ -1634,7 +1740,8 @@ def main():
              (smp(F_RELAY) / SR, f'f{F_RELAY}'), (smp(F_D5) / SR, f'f{F_D5} D5')]
     spectrogram_png(mono, os.path.join(OUT, 'score_spec.png'), 0.0, N / SR,
                     f'score.wav  {rep["integrated_lufs"]} LUFS  TP {rep["true_peak_dbtp"]} dBTP  (mono sum, log f)', marks, W=2400, tick=5.0)
-    hook_marks = [(1 / 30, 'f1 flick'), (2 / 30, 'f2'), (0.5, 'f15 rattle'), (T_CLACK, 'f44 CLACK'), (53 / 30, 'f53 drone'), (54 / 30, 'f54 D3')]
+    hook_marks = [(1 / 30, 'f1 flick'), (2 / 30, 'f2'), (0.5, 'f15 rattle'), (T_CLACK, 'f44 CLACK'), (F_DRONE_IN / 30, f'f{F_DRONE_IN} drone'),
+                  (F_D3 / 30, f'f{F_D3} D3')]
     spectrogram_png(mono, os.path.join(OUT, 'score_hook_spec.png'), 0.0, 4.0, 'hook 0-4 s (mono sum)', hook_marks,
                     W=2000, nfft=2048, tick=0.25)
     print(json.dumps({k: rep[k] for k in ('integrated_lufs', 'true_peak_dbtp', 'sample_peak_dbfs', 'master_gain_db',

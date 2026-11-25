@@ -12,3 +12,4 @@ __pycache__/
 !build/f2/
 build/f2/*
 !build/f2/carousel/
+!build/f2/F2_final.mp4
