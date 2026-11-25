@@ -8,7 +8,7 @@ f2/prod/CUES_v2.md (the picture was re-timed after the design review, §11; wher
 and the router landings are imported from geom.LANDS) so that each cue starts on sample round(f * 1600), mixes
 and masters per §8.3, then measures the written file and reports:
 
-    build/f2/score.wav            48 kHz / 24-bit PCM stereo, exactly 1772 * 1600 = 2,835,200 samples
+    build/f2/score.wav            48 kHz / 24-bit PCM stereo, exactly 1796 * 1600 = 2,873,600 samples
     build/f2/score_cues.json      every placed event: {frame, sample, cue, gain_dbfs, pan}
     build/f2/score_report.json    LUFS, true peak, zero window, D5 at f1604, f1187 absence, correlation, sample lock,
                                   and 'review_acceptance': every acceptance test of the independent review
@@ -56,8 +56,8 @@ from synth import (SR, secs, undb, to_db, ramp_in, ramp_out, filt, eq, tv_lowpas
 from geom import LANDS, CELLS, RETINA_FRAME, sheet_tf  # noqa: E402  (the picture's own timing, §11)
 
 OUT = os.path.join(ROOT, 'build', 'f2')
-FPS, SPF, NF = 30, 1600, 1772
-N = NF * SPF                                  # 2,835,200 samples = 59.0667 s
+FPS, SPF, NF = 30, 1600, 1796                # one beat added after review (DESIGN_BIBLE §11)
+N = NF * SPF                                  # 2,873,600 samples = 59.8667 s
 S764, S776 = 764 * SPF, 776 * SPF             # exact zeros on [1,222,400, 1,241,600)
 DECLICK = secs(0.002)                         # 96 samples
 T_CLACK = 44 / FPS                            # 1.4667 s, the hook
@@ -80,8 +80,8 @@ F_NO_NOTE = 1187                               # the withheld 12th (unchanged)
 F_DRONE_OUT = (1568, 1580)                     # DRONE fades out over 12 f
 F_RELAY, F_LIGHT = 1580, 1581                  # the click one frame before the light; HUM + PAD from the light
 F_D5 = 1604                                    # the raking light's relief peaks: the withheld 12th note
-F_TING = 1676                                  # account mark
-F_HOLD = (1688, 1771)                          # source lines: everything but the room fades to the room
+F_TING = 1700                                  # account mark (B69)
+F_HOLD = (1712, 1795)                          # complete card: everything but the room fades to the room
 
 # ---------------------------------------------------------------- mix decisions (independent review, fixes 1-11)
 CLACK_DBTP = -1.40          # 1/11: the hook group moves as one so the CLACK is the file's peak at -1.40 dBTP (no limiter)
@@ -285,7 +285,7 @@ def room_bed():
     """ROOM: pink noise BP 60 Hz-6 kHz, two noises at 0.7 correlation, -46 dBFS RMS, +-1.5 dB wander at
     0.05 Hz. Level automation per §8.2: f0 fade-in 0.25 s; cut at f764; back at f776 at -50 (2 ms fade);
     -52 inside the plate (f1428); back to -46 once the light table is on (f1581, over the pull-out to f1628);
-    ends at f1772."""
+    ends at f1796."""
     a, b = pink_noise(N, seed=11, channels=2)
     st = filt(np.stack([a, 0.7 * a + np.sqrt(1 - 0.49) * b]), 'band', (60.0, 6000.0))
     st /= np.sqrt((st * st).mean(axis=1, keepdims=True))
@@ -918,7 +918,7 @@ def compose():
     sc.place('coins', at_peak(pan_mono(y, hp), -30.0), F_TING, 'COIN ting D7 2349.3, tau x0.8 (frame-0 callback)', -30.0, hp, {'coin': 0.3},
              tag='ting')
     sc.log(F_HOLD[0], f'PAD + HUM (+ all music and reverb) fade to ROOM, f{F_HOLD[0]}-f{F_HOLD[1]}', None)
-    sc.log(1772, 'ROOM ends (end of file)', None)
+    sc.log(NF, 'ROOM ends (end of file)', None)
     sc.cues.sort(key=lambda c: (c['frame'], c['cue']))
     return sc, rattle_times, rstats
 
@@ -1458,7 +1458,7 @@ def measure(path, sc, stems, rattle_times, rstats, info):
                           'already included in the logged gain_dbfs')
     rep['interpretations'] = [
         'cue timing: f2/prod/CUES_v2.md wherever it differs from §8.2 (pings at geom.LANDS, SLIT f300, DRAW f950, STAMPs f968/f992/f1016, '
-        'sheet notes in arrival order as chords f1136-f1179, DRONE out f1568, RELAY f1580, HUM + PAD f1581, D5 f1604, ting f1676, hold f1688)',
+        'sheet notes in arrival order as chords f1136-f1179, DRONE out f1568, RELAY f1580, HUM + PAD f1581, D5 f1604, ting f1700, hold f1712)',
         'DRONE returns with the f1124 pull-back (1.5 s fade): the bible cuts it at f764 and dips it at f1187 but never says when it comes back',
         'unlabelled dBFS levels (RISER, DRAW, SHIMMER, STAMP, RELAY, COIN, PING, FELT) are sample peak, so CLACK and the plunge SUB stay the loudest (§8.3)',
         'SUB swell (f860) at -20 dBFS peak: no level given; kept under the -14 dBFS plunge SUB',
@@ -1470,7 +1470,7 @@ def measure(path, sc, stems, rattle_times, rstats, info):
         'after the previous one plays 2 dB lighter, so the accelerando\'s piled-up rings stay under the CLACK and the SUB',
         'ROOM: -52 inside the plate, back to -46 once the table is lit (f1581, over the pull-out to f1628)',
         'PAD D major add9 attack 0.8 s from the switch (§8.1: 0.8-1.0 s); the HUM has no fade-in (a 3 ms de-click and a +3 dB inrush)',
-        'the final f1688 -> f1771 fade to ROOM also carries the D5 tail, the coin ting and the reverb returns']
+        'the final f1712 -> f1795 fade to ROOM also carries the D5 tail, the coin ting and the reverb returns']
     lr = rep['correlation']
     rep['review_fixes'] = REVIEW_FIXES
     rep['review_acceptance'] = review_acceptance(y, sc, stems, info, rattle_times, rstats)
@@ -1564,7 +1564,7 @@ def render():
     ret = sc.reverb_returns()
     stems = dict(sc.stems)
     stems['rev_music'], stems['rev_coin'], stems['rev_hook'] = ret['music'], ret['coin'], ret['hook']
-    # f1688 -> f1771 (CUES_v2 hold): everything but the room fades to the room
+    # f1712 -> f1795 (CUES_v2 hold, one beat later after review): everything but the room fades to the room
     fade = np.ones(N)
     a, b = smp(F_HOLD[0]), smp(F_HOLD[1])
     fade[a:b] = ramp_out(b - a)

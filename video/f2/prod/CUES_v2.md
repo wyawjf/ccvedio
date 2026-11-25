@@ -14,8 +14,8 @@ these frames exactly. Sample of frame f = round(f × 1600). Everything not liste
 | DRONE out f1592 | **f1568** | S08 moved one beat (24 f) earlier |
 | RELAY + HUM + PAD at f1604 (lamp fades up over 24 f) | **RELAY f1580; HUM and PAD D major add9 from f1581** | The light table is now a switch: dark on f1580, fully lit on f1581 |
 | FELT D5 (the withheld 12th note) f1628 | **f1604** | The raking light's relief peaks on f1604 |
-| COIN ting D7 f1700 | **f1676** | Account mark |
-| Hold f1712–f1771 | **f1688–f1771** | Source lines |
+| COIN ting D7 f1700 | **f1700** (unchanged frame; after round 2 the account mark lands on B69) | Account mark |
+| Hold f1712–f1771 | **f1712–f1795**; the film is one beat longer (1796 frames, 2,873,600 samples) | Complete end card |
 
 Checks to re-run: exact digital zeros f764–f775; no new onset at f1187; D5 present right after f1604; −16 LUFS ±0.5;
 true peak ≤ −1.0 dBTP; every cue above sample-locked.

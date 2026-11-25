@@ -25,11 +25,12 @@ KEY = {  # frame: what it shows (timings after the post-review revisions, DESIGN
     1140: 'S06 pull-back with ripple', 1160: 'S06 ripple', 1200: 'S06 sheet + facts', 1300: 'S06 complete sheet',
     1400: 'S07 plunge', 1460: 'S07 inside plate', 1540: 'S07 complete', 1570: 'S07 outline returns',
     1581: 'S08 light-table switch', 1595: 'S08 raking light', 1604: 'S08 relief peak (withheld D5)',
-    1650: 'S08 reading', 1700: 'S08 end card building', 1771: 'S08 last frame'}
+    1650: 'S08 reading (payoff line alone)', 1690: 'S08 your_eval() + closing question', 1720: 'S08 complete card',
+    1795: 'S08 last frame'}
 SEQS = {'hook_settle': range(36, 60, 2), 'slit_beat1': range(258, 290, 3), 'slit_beat2': range(298, 322, 2),
         'router_accelerando': range(548, 584, 3), 'hard_stop': range(752, 772, 2), 'contain': range(916, 956, 4),
         'pullback_ripple': range(1122, 1182, 5), 'plunge': range(1386, 1432, 5), 'lampup': range(1576, 1636, 6),
-        'end_card': range(1626, 1772, 16)}
+        'end_card': range(1626, 1796, 16)}
 
 
 def decode(video, frames):
@@ -89,7 +90,7 @@ def main():
             strip([fr[f] for f in part], [f'f{f}' for f in part], 360, 640).save(os.path.join(OUT, f'overview_{i // 8 + 1}.jpg'), quality=90)
         fh.write('\n## overview_N.jpg: key frames side by side\n')
         os.makedirs(os.path.join(OUT, 'xhs'), exist_ok=True)
-        for f in (0, 200, 330, 600, 820, 1060, 1300, 1540, 1771):
+        for f in (0, 200, 330, 600, 820, 1060, 1300, 1540, 1795):
             xhs_overlay(fr[f]).save(os.path.join(OUT, 'xhs', f'f{f:04d}.jpg'), quality=90)
         fh.write('\n## xhs/: key frames under a rough Xiaohongshu feed overlay (top bar, bottom caption, right actions)\n')
     print('review kit ->', OUT)
